@@ -57,12 +57,4 @@ include = ["sigmalang*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short --cov=sigmalang --cov-report=html --cov-report=term-missing --strict-markers"
-markers = [
-    "unit: Unit tests for individual components",
-    "integration: Integration tests for component interactions",
-    "e2e: End-to-end tests for full pipeline",
-    "performance: Performance and benchmarking tests",
-    "round_trip: Encoder/decoder round-trip validation tests",
-    "slow: Slow tests that should run separately",
-]
+addopts = "-v --tb=short"
