@@ -1,0 +1,12 @@
+# ΣLANG Kubernetes Namespace
+# Isolates ΣLANG resources in its own namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: namespace
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    description: "ΣLANG - A sophisticated meaning encoding system"

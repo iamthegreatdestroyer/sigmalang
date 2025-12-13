@@ -1,0 +1,44 @@
+# ΣLANG Kustomize Configuration
+# Use kustomize to manage environment-specific configurations
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: sigmalang
+
+namespace: sigmalang
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/part-of: sigmalang-system
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - redis.yaml
+  - networkpolicy.yaml
+
+# Images to potentially override
+images:
+  - name: ghcr.io/iamthegreatdestroyer/sigmalang
+    newTag: latest
+
+# ConfigMap generator (alternative to static configmap.yaml)
+# configMapGenerator:
+#   - name: sigmalang-config
+#     literals:
+#       - SIGMALANG_HOST=0.0.0.0
+#       - SIGMALANG_PORT=8000
+
+# Secret generator (for development only)
+# secretGenerator:
+#   - name: sigmalang-secret
+#     literals:
+#       - SIGMALANG_REDIS_URL=redis://redis:6379/0

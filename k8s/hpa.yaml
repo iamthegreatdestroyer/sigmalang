@@ -1,0 +1,79 @@
+# ΣLANG Horizontal Pod Autoscaler
+# Automatically scales pods based on CPU/Memory utilization
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sigmalang-api-hpa
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    description: "HPA for ΣLANG API based on CPU and memory"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sigmalang-api
+  
+  minReplicas: 2
+  maxReplicas: 10
+  
+  metrics:
+    # CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    
+    # Memory-based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # 5 min cooldown
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+      selectPolicy: Min  # Conservative scale-down
+    
+    scaleUp:
+      stabilizationWindowSeconds: 0  # Immediate scale-up
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max  # Aggressive scale-up
+---
+# Pod Disruption Budget
+# Ensures minimum availability during voluntary disruptions
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sigmalang-api-pdb
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: sigmalang-system
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sigmalang
+      app.kubernetes.io/component: api

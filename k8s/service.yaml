@@ -1,0 +1,80 @@
+# ΣLANG Kubernetes Services
+# Service definitions for internal and external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: sigmalang-api
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    description: "Internal ClusterIP service for ΣLANG API"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  sessionAffinity: None
+---
+# LoadBalancer Service for external access
+# Use this for cloud providers (AWS, GCP, Azure)
+apiVersion: v1
+kind: Service
+metadata:
+  name: sigmalang-api-lb
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    description: "External LoadBalancer service for ΣLANG API"
+    # AWS annotations (uncomment as needed)
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # GCP annotations (uncomment as needed)
+    # cloud.google.com/load-balancer-type: "External"
+    # networking.gke.io/load-balancer-type: "External"
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  # externalTrafficPolicy: Local  # Preserves client IP
+---
+# Headless Service for StatefulSet or direct pod access
+apiVersion: v1
+kind: Service
+metadata:
+  name: sigmalang-api-headless
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    description: "Headless service for direct pod access"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP

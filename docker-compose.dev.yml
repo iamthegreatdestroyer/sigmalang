@@ -1,0 +1,106 @@
+# =============================================================================
+# ΣLANG Development Environment - Docker Compose
+# Hot reload, debugging tools, and local development setup
+# =============================================================================
+# Usage:
+#   docker compose -f docker-compose.dev.yml up    # Start dev environment
+#   docker compose -f docker-compose.dev.yml down  # Stop dev environment
+# =============================================================================
+
+name: sigmalang-dev
+
+services:
+  # ===========================================================================
+  # ΣLANG API Server (Development Mode)
+  # ===========================================================================
+  sigmalang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: sigmalang-api-dev
+    ports:
+      - "8000:8000"
+    environment:
+      # API Configuration (Development)
+      SIGMALANG_API_HOST: "0.0.0.0"
+      SIGMALANG_API_PORT: "8000"
+      SIGMALANG_DEBUG: "true"
+      
+      # Logging (Verbose for development)
+      SIGMALANG_LOG_LEVEL: "DEBUG"
+      SIGMALANG_LOG_FORMAT: "console"
+      
+      # Cache (Redis)
+      SIGMALANG_CACHE_ENABLED: "true"
+      SIGMALANG_REDIS_URL: "redis://redis:6379/0"
+      
+      # Monitoring
+      SIGMALANG_METRICS_ENABLED: "true"
+      
+      # Rate Limiting (Disabled for development)
+      SIGMALANG_RATE_LIMIT_ENABLED: "false"
+    
+    volumes:
+      # Mount source code for hot reload
+      - .:/app:cached
+      # Exclude cache directories
+      - /app/__pycache__
+      - /app/.pytest_cache
+      - /app/htmlcov
+      - /app/.hypothesis
+    
+    depends_on:
+      - redis
+    
+    networks:
+      - sigmalang-dev-network
+    
+    # Development command with hot reload
+    command: >
+      uvicorn sigmalang.core.api_server:create_fastapi_app 
+      --factory
+      --host 0.0.0.0 
+      --port 8000 
+      --reload 
+      --reload-dir /app/core
+      --log-level debug
+
+  # ===========================================================================
+  # Redis Cache (Development)
+  # ===========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sigmalang-redis-dev
+    ports:
+      - "6379:6379"
+    command: redis-server --loglevel debug
+    networks:
+      - sigmalang-dev-network
+
+  # ===========================================================================
+  # Test Runner (Optional - for containerized testing)
+  # ===========================================================================
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: sigmalang-test
+    profiles:
+      - test
+    environment:
+      SIGMALANG_LOG_LEVEL: "WARNING"
+    volumes:
+      - .:/app:cached
+    command: pytest tests/ -v --tb=short
+    networks:
+      - sigmalang-dev-network
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  sigmalang-dev-network:
+    driver: bridge
+    name: sigmalang-dev-network

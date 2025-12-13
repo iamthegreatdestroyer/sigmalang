@@ -1,0 +1,77 @@
+# ΣLANG Ingress Configuration
+# Exposes the API through an Ingress controller with TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sigmalang-api-ingress
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/part-of: sigmalang-system
+  annotations:
+    # NGINX Ingress Controller annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    
+    # Rate limiting at ingress level
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    
+    # CORS configuration
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    
+    # cert-manager for automatic TLS certificates
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # AWS ALB Ingress Controller annotations (alternative)
+    # kubernetes.io/ingress.class: alb
+    # alb.ingress.kubernetes.io/scheme: internet-facing
+    # alb.ingress.kubernetes.io/target-type: ip
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:...
+spec:
+  ingressClassName: nginx
+  
+  tls:
+    - hosts:
+        - api.sigmalang.example.com
+      secretName: sigmalang-tls-secret
+  
+  rules:
+    - host: api.sigmalang.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sigmalang-api
+                port:
+                  name: http
+---
+# Certificate for TLS (if using cert-manager)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sigmalang-tls
+  namespace: sigmalang
+  labels:
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/component: certificate
+    app.kubernetes.io/part-of: sigmalang-system
+spec:
+  secretName: sigmalang-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - api.sigmalang.example.com
+  # Additional SANs as needed
+  # - sigmalang.example.com
+  # - "*.sigmalang.example.com"
