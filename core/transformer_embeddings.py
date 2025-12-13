@@ -17,7 +17,7 @@ Example:
     >>> encoder = TransformerEncoder()
     >>> embedding = encoder.encode_text("Hello world")
     >>> similarity = encoder.similarity("Hello", "Hi there")
-    >>> print(f"Similarity: {similarity:.3f}")
+    >>> print(f"Similarity: {similarity:.3f}")  # doctest: +SKIP
 """
 
 from __future__ import annotations
@@ -428,7 +428,9 @@ class EmbeddingCache:
     Thread-safe cache with configurable size and TTL.
     
     Example:
+        >>> import numpy as np
         >>> cache = EmbeddingCache(max_size=1000)
+        >>> embedding = np.array([0.1, 0.2, 0.3])
         >>> cache.put("key1", embedding)
         >>> result = cache.get("key1")
     """

@@ -30,36 +30,36 @@ services:
       SIGMALANG_API_PORT: "8000"
       SIGMALANG_API_WORKERS: "4"
       SIGMALANG_DEBUG: "false"
-      
+
       # Logging
       SIGMALANG_LOG_LEVEL: "INFO"
       SIGMALANG_LOG_FORMAT: "json"
-      
+
       # Cache (Redis)
       SIGMALANG_CACHE_ENABLED: "true"
       SIGMALANG_CACHE_BACKEND: "redis"
       SIGMALANG_REDIS_URL: "redis://redis:6379/0"
-      
+
       # Monitoring
       SIGMALANG_METRICS_ENABLED: "true"
       SIGMALANG_METRICS_PORT: "9090"
-      
+
       # Rate Limiting
       SIGMALANG_RATE_LIMIT_ENABLED: "true"
       SIGMALANG_RATE_LIMIT_REQUESTS: "100"
       SIGMALANG_RATE_LIMIT_WINDOW: "60"
-    
+
     depends_on:
       redis:
         condition: service_healthy
-    
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
-    
+
     deploy:
       resources:
         limits:
@@ -68,7 +68,7 @@ services:
         reservations:
           cpus: "0.5"
           memory: 512M
-    
+
     networks:
       - sigmalang-network
 

@@ -26,21 +26,21 @@ services:
       SIGMALANG_API_HOST: "0.0.0.0"
       SIGMALANG_API_PORT: "8000"
       SIGMALANG_DEBUG: "true"
-      
+
       # Logging (Verbose for development)
       SIGMALANG_LOG_LEVEL: "DEBUG"
       SIGMALANG_LOG_FORMAT: "console"
-      
+
       # Cache (Redis)
       SIGMALANG_CACHE_ENABLED: "true"
       SIGMALANG_REDIS_URL: "redis://redis:6379/0"
-      
+
       # Monitoring
       SIGMALANG_METRICS_ENABLED: "true"
-      
+
       # Rate Limiting (Disabled for development)
       SIGMALANG_RATE_LIMIT_ENABLED: "false"
-    
+
     volumes:
       # Mount source code for hot reload
       - .:/app:cached
@@ -49,13 +49,13 @@ services:
       - /app/.pytest_cache
       - /app/htmlcov
       - /app/.hypothesis
-    
+
     depends_on:
       - redis
-    
+
     networks:
       - sigmalang-dev-network
-    
+
     # Development command with hot reload
     command: >
       uvicorn sigmalang.core.api_server:create_fastapi_app 

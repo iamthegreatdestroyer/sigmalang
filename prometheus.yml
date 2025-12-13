@@ -5,20 +5,20 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    monitor: 'sigmalang-monitor'
+    monitor: "sigmalang-monitor"
 
 scrape_configs:
   # ΣLANG API metrics
-  - job_name: 'sigmalang'
+  - job_name: "sigmalang"
     static_configs:
-      - targets: ['sigmalang:8000']
+      - targets: ["sigmalang:8000"]
     metrics_path: /metrics
     scrape_interval: 5s
 
   # Prometheus self-monitoring
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
   # Redis metrics (if redis_exporter is added)
   # - job_name: 'redis'

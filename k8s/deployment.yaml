@@ -41,7 +41,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-      
+
       # Anti-affinity to spread pods across nodes
       affinity:
         podAntiAffinity:
@@ -53,7 +53,7 @@ spec:
                     app.kubernetes.io/name: sigmalang
                     app.kubernetes.io/component: api
                 topologyKey: kubernetes.io/hostname
-      
+
       # Topology spread for zone distribution
       topologySpreadConstraints:
         - maxSkew: 1
@@ -63,23 +63,23 @@ spec:
             matchLabels:
               app.kubernetes.io/name: sigmalang
               app.kubernetes.io/component: api
-      
+
       containers:
         - name: sigmalang
           image: ghcr.io/iamthegreatdestroyer/sigmalang:latest
           imagePullPolicy: Always
-          
+
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
-          
+
           envFrom:
             - configMapRef:
                 name: sigmalang-config
             - secretRef:
                 name: sigmalang-secret
-          
+
           resources:
             requests:
               cpu: "250m"
@@ -87,7 +87,7 @@ spec:
             limits:
               cpu: "2000m"
               memory: "2Gi"
-          
+
           # Startup probe - allows slow startup
           startupProbe:
             httpGet:
@@ -96,8 +96,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3
-            failureThreshold: 30  # 5 + (30 * 5) = 155s max startup
-          
+            failureThreshold: 30 # 5 + (30 * 5) = 155s max startup
+
           # Liveness probe - restart if unhealthy
           livenessProbe:
             httpGet:
@@ -107,7 +107,7 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 3
-          
+
           # Readiness probe - remove from service if not ready
           readinessProbe:
             httpGet:
@@ -117,30 +117,30 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 3
-          
+
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
-          
+
           volumeMounts:
             - name: tmp
               mountPath: /tmp
             - name: cache
               mountPath: /home/sigmalang/.cache
-      
+
       volumes:
         - name: tmp
           emptyDir: {}
         - name: cache
           emptyDir:
             sizeLimit: 500Mi
-      
+
       # Graceful shutdown
       terminationGracePeriodSeconds: 30
-      
+
       # Image pull secrets for private registry
       # imagePullSecrets:
       #   - name: ghcr-secret

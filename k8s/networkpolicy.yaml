@@ -17,7 +17,7 @@ spec:
   policyTypes:
     - Ingress
     - Egress
-  
+
   ingress:
     # Allow traffic from ingress controller
     - from:
@@ -30,14 +30,14 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
-    
+
     # Allow traffic from within the namespace
     - from:
         - podSelector: {}
       ports:
         - protocol: TCP
           port: 8000
-    
+
     # Allow Prometheus scraping
     - from:
         - namespaceSelector:
@@ -46,7 +46,7 @@ spec:
       ports:
         - protocol: TCP
           port: 8000
-  
+
   egress:
     # Allow DNS resolution
     - to:
@@ -56,7 +56,7 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    
+
     # Allow Redis access
     - to:
         - podSelector:
@@ -65,7 +65,7 @@ spec:
       ports:
         - protocol: TCP
           port: 6379
-    
+
     # Allow external HTTPS (for external API calls if needed)
     - to:
         - ipBlock:
@@ -96,7 +96,7 @@ spec:
   policyTypes:
     - Ingress
     - Egress
-  
+
   ingress:
     # Only allow traffic from ΣLANG API pods
     - from:
@@ -107,7 +107,7 @@ spec:
       ports:
         - protocol: TCP
           port: 6379
-  
+
   egress:
     # Redis only needs DNS for initial setup
     - to:

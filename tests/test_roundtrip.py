@@ -49,7 +49,7 @@ class TestBasicRoundTrip:
     def test_simple_tree_round_trip(self, simple_semantic_tree):
         """Test encoding and decoding of simple semantic tree."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         # Encode
         encoded = encoder.encode(simple_semantic_tree)
@@ -68,7 +68,7 @@ class TestBasicRoundTrip:
     def test_complex_tree_round_trip(self, complex_semantic_tree):
         """Test encoding and decoding of complex semantic tree."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         encoded = encoder.encode(complex_semantic_tree)
         decoded = decoder.decode(encoded)
@@ -81,7 +81,7 @@ class TestBasicRoundTrip:
     def test_single_node_round_trip(self):
         """Test round-trip of single-node tree."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         root = SemanticNode(
             primitive=ExistentialPrimitive.ENTITY,
@@ -99,7 +99,7 @@ class TestBasicRoundTrip:
     def test_deep_tree_round_trip(self):
         """Test round-trip of deeply nested tree."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         # Create deep tree (depth 10)
         node = SemanticNode(
@@ -127,7 +127,7 @@ class TestBasicRoundTrip:
     def test_wide_tree_round_trip(self):
         """Test round-trip of wide tree (many siblings)."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         # Create wide tree (20 children)
         children = [
@@ -162,7 +162,7 @@ class TestEdgeCases:
     def test_empty_value_round_trip(self):
         """Test node with empty value string."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         root = SemanticNode(
             primitive=ExistentialPrimitive.ENTITY,
@@ -179,7 +179,7 @@ class TestEdgeCases:
     def test_special_characters_in_values(self):
         """Test values containing special characters."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         special_values = [
             "value_with_üñíçödé",
@@ -206,7 +206,7 @@ class TestEdgeCases:
     def test_large_value_round_trip(self):
         """Test node with very large value string."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         large_value = "x" * 10000  # 10KB value
         
@@ -225,7 +225,7 @@ class TestEdgeCases:
     def test_all_primitive_types_round_trip(self):
         """Test round-trip using all primitive types."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         primitives_to_test = [
             ExistentialPrimitive.ENTITY,
@@ -328,7 +328,7 @@ class TestPropertyBased:
     def test_round_trip_any_depth(self, depth):
         """Property: Encoding then decoding should always reconstruct."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         tree = SemanticTreeBuilder.random_tree(
             depth=depth,
@@ -348,7 +348,7 @@ class TestPropertyBased:
     def test_arbitrary_text_values(self, text_value):
         """Property: Any text value should encode/decode correctly."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         root = SemanticNode(
             primitive=ExistentialPrimitive.ENTITY,
@@ -369,7 +369,7 @@ class TestPropertyBased:
     def test_arbitrary_tree_width(self, width):
         """Property: Trees of any width should encode/decode correctly."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         children = [
             SemanticNode(
@@ -404,7 +404,7 @@ class TestIntegration:
     def test_parse_encode_decode_roundtrip(self, semantic_parser):
         """Full pipeline: text → parse → encode → decode → compare."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         input_text = "Create a Python function that sorts a list"
         
@@ -425,7 +425,7 @@ class TestIntegration:
     def test_all_code_snippets_roundtrip(self, semantic_parser, input_text):
         """Test round-trip for all code snippets."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         tree = semantic_parser.parse(input_text)
         encoded = encoder.encode(tree)
@@ -439,7 +439,7 @@ class TestIntegration:
     def test_all_queries_roundtrip(self, semantic_parser, input_text):
         """Test round-trip for all queries."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         
         tree = semantic_parser.parse(input_text)
         encoded = encoder.encode(tree)
@@ -472,7 +472,7 @@ class TestPerformance:
     def test_decode_performance(self, benchmark):
         """Benchmark decoding performance."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         tree = SemanticTreeBuilder.complex_tree()
         encoded = encoder.encode(tree)
         
@@ -486,7 +486,7 @@ class TestPerformance:
     def test_roundtrip_performance(self, benchmark):
         """Benchmark full round-trip performance."""
         encoder = SigmaEncoder()
-        decoder = SigmaDecoder()
+        decoder = SigmaDecoder(encoder)
         tree = SemanticTreeBuilder.complex_tree()
         
         def roundtrip():

@@ -16,10 +16,10 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: sigmalang-api
-  
+
   minReplicas: 2
   maxReplicas: 10
-  
+
   metrics:
     # CPU-based scaling
     - type: Resource
@@ -28,7 +28,7 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
-    
+
     # Memory-based scaling
     - type: Resource
       resource:
@@ -36,10 +36,10 @@ spec:
         target:
           type: Utilization
           averageUtilization: 80
-  
+
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 300  # 5 min cooldown
+      stabilizationWindowSeconds: 300 # 5 min cooldown
       policies:
         - type: Percent
           value: 10
@@ -47,10 +47,10 @@ spec:
         - type: Pods
           value: 1
           periodSeconds: 60
-      selectPolicy: Min  # Conservative scale-down
-    
+      selectPolicy: Min # Conservative scale-down
+
     scaleUp:
-      stabilizationWindowSeconds: 0  # Immediate scale-up
+      stabilizationWindowSeconds: 0 # Immediate scale-up
       policies:
         - type: Percent
           value: 100
@@ -58,7 +58,7 @@ spec:
         - type: Pods
           value: 4
           periodSeconds: 15
-      selectPolicy: Max  # Aggressive scale-up
+      selectPolicy: Max # Aggressive scale-up
 ---
 # Pod Disruption Budget
 # Ensures minimum availability during voluntary disruptions

@@ -29,7 +29,6 @@ resources:
 images:
   - name: ghcr.io/iamthegreatdestroyer/sigmalang
     newTag: latest
-
 # ConfigMap generator (alternative to static configmap.yaml)
 # configMapGenerator:
 #   - name: sigmalang-config

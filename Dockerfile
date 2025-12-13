@@ -45,11 +45,11 @@ FROM python:3.12-slim AS production
 
 # Labels for container metadata
 LABEL org.opencontainers.image.title="ΣLANG" \
-      org.opencontainers.image.description="Neural-inspired semantic compression framework" \
-      org.opencontainers.image.version="1.0.0" \
-      org.opencontainers.image.vendor="ΣLANG Project" \
-      org.opencontainers.image.source="https://github.com/iamthegreatdestroyer/sigmalang" \
-      org.opencontainers.image.licenses="MIT"
+    org.opencontainers.image.description="Neural-inspired semantic compression framework" \
+    org.opencontainers.image.version="1.0.0" \
+    org.opencontainers.image.vendor="ΣLANG Project" \
+    org.opencontainers.image.source="https://github.com/iamthegreatdestroyer/sigmalang" \
+    org.opencontainers.image.licenses="MIT"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
