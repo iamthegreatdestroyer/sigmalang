@@ -396,27 +396,32 @@ class Glyph:
     """
     A single ΣLANG glyph - the atomic unit of encoding.
     
-    Binary format:
+    Binary format (v2 with payload flag):
     [2 bits] TYPE - GlyphType enum
-    [6 bits] PRIMITIVE_ID - Σ-primitive (0-63 inline, extended for higher)
-    [variable] PAYLOAD - Type-dependent content
+    [1 bit]  HAS_PAYLOAD - 1 if payload follows, 0 otherwise
+    [5 bits] PRIMITIVE_ID - Σ-primitive (0-30 inline, 31 = escape for extended)
+    [optional 8 bits] EXTENDED_ID - present if PRIMITIVE_ID == 31
+    [optional variable] PAYLOAD - length-prefixed content if HAS_PAYLOAD == 1
     """
     glyph_type: GlyphType
     primitive_id: int
     payload: Optional[bytes] = None
     
     def to_bytes(self) -> bytes:
-        """Encode glyph to binary format."""
-        # First byte: type (2 bits) + primitive_id low 6 bits
-        first_byte = (self.glyph_type << 6) | (self.primitive_id & 0x3F)
-        result = bytes([first_byte])
+        """Encode glyph to binary format with explicit payload flag."""
+        has_payload = 1 if self.payload is not None else 0
         
-        # Extended primitive ID if > 63
-        if self.primitive_id > 63:
-            result += bytes([self.primitive_id >> 6])
+        if self.primitive_id > 30:
+            # Extended format: use 0x1F (31) as escape code, then full primitive_id
+            first_byte = (self.glyph_type << 6) | (has_payload << 5) | 0x1F
+            result = bytes([first_byte, self.primitive_id])
+        else:
+            # Inline format: type (2 bits) + has_payload (1 bit) + primitive_id (5 bits)
+            first_byte = (self.glyph_type << 6) | (has_payload << 5) | self.primitive_id
+            result = bytes([first_byte])
         
-        # Add payload if present
-        if self.payload:
+        # Add payload if present (including empty payload b'')
+        if self.payload is not None:
             # Length prefix (1-2 bytes depending on size)
             if len(self.payload) < 128:
                 result += bytes([len(self.payload)])
@@ -430,22 +435,32 @@ class Glyph:
     @classmethod
     def from_bytes(cls, data: bytes) -> Tuple['Glyph', int]:
         """
-        Decode glyph from binary format.
+        Decode glyph from binary format v2.
+        
+        Format v2 uses explicit has_payload flag:
+        - Bits 7-6: glyph_type (0-3)
+        - Bit 5: has_payload flag (1 = payload present, 0 = no payload)
+        - Bits 4-0: primitive_id (0-30 inline, 31 = extended format)
+        
+        Extended format (when primitive_id bits = 0x1F):
+        - Next byte contains actual primitive_id (for IDs 31-255)
+        
         Returns (glyph, bytes_consumed).
         """
         first_byte = data[0]
         glyph_type = GlyphType((first_byte >> 6) & 0x03)
-        primitive_id = first_byte & 0x3F
+        has_payload = (first_byte >> 5) & 0x01
+        primitive_id = first_byte & 0x1F  # Only 5 bits now
         offset = 1
         
-        # Check for extended primitive ID
-        if primitive_id == 0x3F and len(data) > 1:
-            primitive_id = 0x3F + data[1]
-            offset = 2
+        # Check for extended primitive ID (0x1F is escape code)
+        if primitive_id == 0x1F and len(data) > offset:
+            primitive_id = data[offset]
+            offset += 1
         
-        # Check for payload
+        # Only read payload if has_payload flag is set
         payload = None
-        if offset < len(data):
+        if has_payload and offset < len(data):
             length_byte = data[offset]
             offset += 1
             if length_byte & 0x80:
@@ -455,8 +470,8 @@ class Glyph:
             else:
                 length = length_byte
             
-            if length > 0 and offset + length <= len(data):
-                payload = data[offset:offset + length]
+            if offset + length <= len(data):
+                payload = data[offset:offset + length]  # Works for length=0 too (empty payload)
                 offset += length
         
         return cls(glyph_type, primitive_id, payload), offset

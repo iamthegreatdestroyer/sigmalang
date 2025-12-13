@@ -173,7 +173,7 @@ class BidirectionalSemanticCodec:
             verify_round_trip: If True, verify all encodes round-trip correctly
         """
         self.encoder = SigmaEncoder()
-        self.decoder = SigmaDecoder()
+        self.decoder = SigmaDecoder(self.encoder)
         self.verify_round_trip = verify_round_trip
         
         # Statistics tracking
