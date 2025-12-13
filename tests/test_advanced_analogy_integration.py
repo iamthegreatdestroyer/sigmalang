@@ -13,7 +13,7 @@ import json
 import time
 from pathlib import Path
 from unittest.mock import Mock, patch
-from core.advanced_analogy_patterns import (
+from sigmalang.core.advanced_analogy_patterns import (
     AnalyticsCollector,
     QueryMethod,
     QueryAnalytic,

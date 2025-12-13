@@ -10,7 +10,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from core.monitoring import (
+from sigmalang.core.monitoring import (
     # Metric types
     MetricType,
     MetricValue,

@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch, MagicMock
 
 import pytest
 
-from core.unified_pipeline import (
+from sigmalang.core.unified_pipeline import (
     # Enums
     QueryComplexity,
     ProcessingStrategy,

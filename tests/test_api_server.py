@@ -11,7 +11,7 @@ from dataclasses import asdict
 import pytest
 import numpy as np
 
-from core.api_models import (
+from sigmalang.core.api_models import (
     # Request models
     EncodeRequest, DecodeRequest,
     AnalogyRequest, AnalogyExplainRequest,
@@ -28,7 +28,7 @@ from core.api_models import (
     # Enums
     AnalogyType, SearchMode, EntityType, OutputFormat,
 )
-from core.api_server import (
+from sigmalang.core.api_server import (
     # Services
     EncoderService,
     DecoderService,
@@ -42,7 +42,7 @@ from core.api_server import (
     create_api,
     __version__,
 )
-from core.config import SigmalangConfig, FeatureFlags, reset_config
+from sigmalang.core.config import SigmalangConfig, FeatureFlags, reset_config
 
 
 # =============================================================================

@@ -14,7 +14,7 @@ from datetime import datetime
 from unittest.mock import Mock, patch, MagicMock
 from concurrent.futures import ThreadPoolExecutor
 
-from core.production_hardening import (
+from sigmalang.core.production_hardening import (
     # Enums
     CircuitState,
     RateLimitStrategy,

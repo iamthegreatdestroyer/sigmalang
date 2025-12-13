@@ -20,7 +20,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 
-from core.analytics_engine import (
+from sigmalang.core.analytics_engine import (
     # Enums
     MetricType,
     AggregationType,

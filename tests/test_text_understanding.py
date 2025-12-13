@@ -9,7 +9,7 @@ import numpy as np
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from core.text_understanding import (
+from sigmalang.core.text_understanding import (
     # Enums and configs
     ChunkingStrategy,
     ChunkConfig,

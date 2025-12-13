@@ -1,0 +1,137 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.2, pluggy-1.5.0 -- C:\Users\sgbil\miniconda3\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: C:\Users\sgbil\sigmalang
+configfile: pyproject.toml
+plugins: anyio-4.12.0, hypothesis-6.148.7, asyncio-1.3.0, benchmark-5.2.3, cov-7.0.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 70 items
+
+tests/test_roundtrip.py::TestBasicRoundTrip::test_simple_tree_round_trip PASSED [  1%]
+tests/test_roundtrip.py::TestBasicRoundTrip::test_complex_tree_round_trip PASSED [  2%]
+tests/test_roundtrip.py::TestBasicRoundTrip::test_single_node_round_trip PASSED [  4%]
+tests/test_roundtrip.py::TestBasicRoundTrip::test_deep_tree_round_trip PASSED [  5%]
+tests/test_roundtrip.py::TestBasicRoundTrip::test_wide_tree_round_trip PASSED [  7%]
+tests/test_roundtrip.py::TestEdgeCases::test_empty_value_round_trip PASSED [  8%]
+tests/test_roundtrip.py::TestEdgeCases::test_special_characters_in_values PASSED [ 10%]
+tests/test_roundtrip.py::TestEdgeCases::test_large_value_round_trip PASSED [ 11%]
+tests/test_roundtrip.py::TestEdgeCases::test_all_primitive_types_round_trip PASSED [ 12%]
+tests/test_roundtrip.py::TestCompressionRatios::test_compression_ratio_positive PASSED [ 14%]
+tests/test_roundtrip.py::TestCompressionRatios::test_code_snippet_compression[Create a Python function that sorts a list in descending order] PASSED [ 15%]
+tests/test_roundtrip.py::TestCompressionRatios::test_code_snippet_compression[Write a JavaScript async function to fetch data from an API] PASSED [ 17%]
+tests/test_roundtrip.py::TestCompressionRatios::test_code_snippet_compression[Implement a binary search algorithm in C++] PASSED [ 18%]
+tests/test_roundtrip.py::TestCompressionRatios::test_code_snippet_compression[Build a REST API endpoint for user authentication] PASSED [ 20%]
+tests/test_roundtrip.py::TestCompressionRatios::test_code_snippet_compression[Create a class that handles database connections with pooling] PASSED [ 21%]
+tests/test_roundtrip.py::TestCompressionRatios::test_compression_ratio_distribution PASSED [ 22%]
+tests/test_roundtrip.py::TestPropertyBased::test_round_trip_any_depth PASSED [ 24%]
+tests/test_roundtrip.py::TestPropertyBased::test_arbitrary_text_values PASSED [ 25%]
+tests/test_roundtrip.py::TestPropertyBased::test_arbitrary_tree_width PASSED [ 27%]
+tests/test_roundtrip.py::TestIntegration::test_parse_encode_decode_roundtrip PASSED [ 28%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Create a Python function that sorts a list in descending order] PASSED [ 30%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Write a JavaScript async function to fetch data from an API] PASSED [ 31%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Implement a binary search algorithm in C++] PASSED [ 32%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Build a REST API endpoint for user authentication] PASSED [ 34%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Create a class that handles database connections with pooling] PASSED [ 35%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Write a function to validate email addresses using regex] PASSED [ 37%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Implement a cache with LRU eviction policy] PASSED [ 38%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Create a decorator that logs function execution time] PASSED [ 40%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Write a function to merge two sorted arrays efficiently] PASSED [ 41%]
+tests/test_roundtrip.py::TestIntegration::test_all_code_snippets_roundtrip[Implement a trie data structure for prefix matching] PASSED [ 42%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[What is the time complexity of quicksort?] PASSED [ 44%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[How do I handle exceptions in Python?] PASSED [ 45%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[What are the best practices for API design?] PASSED [ 47%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[Explain how async/await works in JavaScript] PASSED [ 48%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[What is the difference between SQL and NoSQL?] PASSED [ 50%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[How does garbage collection work in Java?] PASSED [ 51%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[What is dependency injection and why is it useful?] PASSED [ 52%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[Explain the singleton pattern and its trade-offs] PASSED [ 54%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[What is the difference between a list and a tuple?] PASSED [ 55%]
+tests/test_roundtrip.py::TestIntegration::test_all_queries_roundtrip[How do I optimize database queries?] PASSED [ 57%]
+tests/test_roundtrip.py::TestPerformance::test_encode_performance PASSED [ 58%]
+tests/test_roundtrip.py::TestPerformance::test_decode_performance PASSED [ 60%]
+tests/test_roundtrip.py::TestPerformance::test_roundtrip_performance PASSED [ 61%]
+tests/test_sigmalang.py::TestPrimitives::test_primitive_id_lookup PASSED [ 62%]
+tests/test_sigmalang.py::TestPrimitives::test_primitive_registry_lookup PASSED [ 64%]
+tests/test_sigmalang.py::TestPrimitives::test_semantic_node_creation PASSED [ 65%]
+tests/test_sigmalang.py::TestPrimitives::test_semantic_tree_creation PASSED [ 67%]
+tests/test_sigmalang.py::TestGlyphs::test_glyph_decoding PASSED          [ 68%]
+tests/test_sigmalang.py::TestGlyphs::test_glyph_encoding PASSED          [ 70%]
+tests/test_sigmalang.py::TestGlyphs::test_glyph_stream PASSED            [ 71%]
+tests/test_sigmalang.py::TestParser::test_code_request_parsing PASSED    [ 72%]
+tests/test_sigmalang.py::TestParser::test_modification_parsing PASSED    [ 74%]
+tests/test_sigmalang.py::TestParser::test_query_parsing PASSED           [ 75%]
+tests/test_sigmalang.py::TestEncoder::test_basic_encoding PASSED         [ 77%]
+tests/test_sigmalang.py::TestEncoder::test_encoding_decoding_roundtrip SKIPPED [ 78%]
+tests/test_sigmalang.py::TestEncoder::test_encoding_produces_output PASSED [ 80%]
+tests/test_sigmalang.py::TestSigmaHashBank::test_hash_computation PASSED [ 81%]
+tests/test_sigmalang.py::TestSigmaHashBank::test_similar_inputs_similar_hashes PASSED [ 82%]
+tests/test_sigmalang.py::TestSigmaHashBank::test_store_and_retrieve PASSED [ 84%]
+tests/test_sigmalang.py::TestLearnedCodebook::test_codebook_save_load PASSED [ 85%]
+tests/test_sigmalang.py::TestLearnedCodebook::test_pattern_observation PASSED [ 87%]
+tests/test_sigmalang.py::TestLearnedCodebook::test_pattern_promotion PASSED [ 88%]
+tests/test_sigmalang.py::TestCodebookTrainer::test_online_training PASSED [ 90%]
+tests/test_sigmalang.py::TestCodebookTrainer::test_training_report PASSED [ 91%]
+tests/test_sigmalang.py::TestPipeline::test_compression_ratio PASSED     [ 92%]
+tests/test_sigmalang.py::TestPipeline::test_encode_input PASSED          [ 94%]
+tests/test_sigmalang.py::TestPipeline::test_pattern_learning PASSED      [ 95%]
+tests/test_sigmalang.py::TestPipeline::test_stats_tracking PASSED        [ 97%]
+tests/test_sigmalang.py::TestInputProcessor::test_context_history PASSED [ 98%]
+tests/test_sigmalang.py::TestInputProcessor::test_process_input PASSED   [100%]
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                           Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------
+sigmalang\__init__.py                              7      0   100%
+sigmalang\core\__init__.py                         7      0   100%
+sigmalang\core\advanced_analogy_patterns.py      383    383     0%   29-1296
+sigmalang\core\analogy_composition.py            129    129     0%   24-512
+sigmalang\core\analytics_engine.py               408    408     0%   40-1283
+sigmalang\core\api_models.py                     275     10    96%   65-68, 72-73, 78, 454, 466-468
+sigmalang\core\api_server.py                     399    338    15%   56-58, 62-69, 73-98, 102, 106-113, 120-122, 126-135, 139-149, 153, 160-162, 166-189, 200-241, 245-263, 270-272, 276-287, 298-339, 346-348, 352-363, 372-404, 414-416, 420-432, 436-449, 453-459, 463-472, 488-500, 504-526, 530-531, 539-564, 574-597, 611-639, 649-665, 679-709, 723-743, 757-782, 792-806, 820-836, 846, 867-868, 881-884, 889-891
+sigmalang\core\bidirectional_codec.py            143    143     0%   19-450
+sigmalang\core\cli.py                            393    393     0%   7-835
+sigmalang\core\config.py                         299    156    48%   35-39, 63, 90-91, 115-118, 130-132, 147, 169, 195, 224-225, 239-251, 271-273, 277-281, 285, 289, 293, 297-302, 307, 312, 336-353, 357-372, 376, 380, 389-408, 412, 461-463, 469, 475, 481-483, 489, 498-513, 518-524, 533-536, 541-547, 552-558, 563-566, 583-593, 611-633, 638-642
+sigmalang\core\cross_modal_analogies.py          384    384     0%   26-1262
+sigmalang\core\encoder.py                        339     35    90%   65, 67, 101, 131, 135, 139, 286-287, 346-347, 357-360, 387, 399-400, 450-452, 492, 496-501, 581, 613, 625-627, 642, 658, 671, 681-682, 712, 715, 721
+sigmalang\core\entity_relation_extraction.py     445    445     0%   18-1059
+sigmalang\core\hyperdimensional_encoder.py       181    181     0%   25-561
+sigmalang\core\ml_models.py                      584    584     0%   20-1310
+sigmalang\core\monitoring.py                     369    186    50%   62-66, 70-72, 76, 80-81, 108-110, 114-116, 120-122, 126-128, 132, 136-137, 150-154, 186-198, 202, 206-232, 237-242, 286-290, 294-301, 305, 314, 428-429, 433-445, 454-456, 460, 464, 473, 479, 501-510, 514, 518, 523-530, 534, 538, 542, 546, 550, 554-556, 565-584, 606, 610, 614, 622-624, 628-630, 645-646, 651-652, 656-671, 675-682, 687-697, 701-702, 706-707, 716, 725-732, 737-744, 749-756
+sigmalang\core\multilingual_support.py           322    322     0%   23-1061
+sigmalang\core\parallel_processor.py             347    347     0%   20-949
+sigmalang\core\parser.py                         205     56    73%   329, 333, 337, 434, 438, 524-565, 569-599, 608-610, 615-624
+sigmalang\core\pattern_evolution.py              243    243     0%   12-662
+sigmalang\core\pattern_intelligence.py           173    173     0%   52-699
+sigmalang\core\pattern_persistence.py            225    225     0%   13-640
+sigmalang\core\primitives.py                     326     12    96%   270, 360-362, 370-374, 378, 383, 532
+sigmalang\core\production_hardening.py           601    601     0%   15-1244
+sigmalang\core\semantic_analogy_engine.py        163    163     0%   31-502
+sigmalang\core\semantic_search.py                442    442     0%   30-1216
+sigmalang\core\streaming_processor.py            566    566     0%   16-1137
+sigmalang\core\text_understanding.py             372    372     0%   26-1183
+sigmalang\core\transformer_embeddings.py         453    453     0%   23-1261
+sigmalang\core\unified_pipeline.py               510    510     0%   22-1349
+sigmalang\ryot_integration.py                    200     78    61%   63, 69, 75, 88, 90, 132, 215, 217, 236, 264, 268, 280-281, 285-287, 291, 337, 373, 385-386, 391-395, 399-411, 430-432, 446-448, 463-465, 474-523, 527
+sigmalang\training\__init__.py                     1      0   100%
+sigmalang\training\codebook.py                   359    119    67%   34, 69, 72-74, 86-95, 259, 312-317, 320-321, 331-343, 349, 383, 387-400, 420, 426, 551, 554, 565-596, 603, 607-623, 627-629, 638-654, 685-687, 690, 710-712, 716-718, 722-723, 727-729, 733-741, 745, 752-765
+sigmalang\training\train.py                      202    202     0%   21-483
+----------------------------------------------------------------------------
+TOTAL                                          10455   8659    17%
+Coverage HTML written to dir htmlcov
+
+-------------------------------------------------------------------------------------------- benchmark: 3 tests --------------------------------------------------------------------------------------------
+Name (time in us)                   Min                   Max                Mean              StdDev              Median                IQR            Outliers  OPS (Kops/s)            Rounds  Iterations
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_encode_performance         97.8000 (1.0)        366.3000 (1.01)     108.9945 (1.0)       13.5038 (1.01)     106.5000 (1.0)       5.5000 (1.0)         42;52        9.1748 (1.0)         544           1
+test_roundtrip_performance     169.8000 (1.74)       362.2000 (1.0)      191.4192 (1.76)      13.3802 (1.0)      188.4000 (1.77)      9.6000 (1.75)        62;44        5.2241 (0.57)        422           1
+test_decode_performance        260.5000 (2.66)     5,043.6000 (13.92)    384.7205 (3.53)     179.2846 (13.40)    370.4500 (3.48)     21.1500 (3.85)       18;144        2.5993 (0.28)       2244           1
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+======================= 69 passed, 1 skipped in 12.55s ========================

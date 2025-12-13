@@ -15,7 +15,7 @@ import pytest
 import numpy as np
 from click.testing import CliRunner
 
-from core.cli import cli, CLIContext, main
+from sigmalang.core.cli import cli, CLIContext, main
 
 
 # =============================================================================

@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import numpy as np
 
-from core.transformer_embeddings import (
+from sigmalang.core.transformer_embeddings import (
     # Enums
     PoolingStrategy,
     EmbeddingModelType,

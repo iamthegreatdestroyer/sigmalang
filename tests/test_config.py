@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import pytest
 
-from core.config import (
+from sigmalang.core.config import (
     # Enums
     Environment,
     # Config classes

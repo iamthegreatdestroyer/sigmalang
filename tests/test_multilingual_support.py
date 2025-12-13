@@ -10,7 +10,7 @@ import numpy as np
 import threading
 from unittest.mock import Mock, patch
 
-from core.multilingual_support import (
+from sigmalang.core.multilingual_support import (
     # Enums and constants
     Language,
     LANGUAGE_CODE_MAP,

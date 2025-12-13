@@ -9,7 +9,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from core.cross_modal_analogies import (
+from sigmalang.core.cross_modal_analogies import (
     # Enums
     Modality,
     # Dataclasses

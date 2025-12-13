@@ -16,7 +16,7 @@ Test Coverage:
 import pytest
 import numpy as np
 from typing import List, Dict, Tuple
-from core.pattern_intelligence import (
+from sigmalang.core.pattern_intelligence import (
     MethodPredictor,
     ThresholdLearner,
     WeightLearner,

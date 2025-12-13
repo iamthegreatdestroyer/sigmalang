@@ -11,7 +11,7 @@ import pytest
 import numpy as np
 from typing import List, Dict, Any
 
-from core.pattern_evolution import (
+from sigmalang.core.pattern_evolution import (
     PatternClusterer,
     PatternAbstractor,
     EmergentPatternDiscoverer,

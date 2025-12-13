@@ -10,7 +10,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from core.semantic_search import (
+from sigmalang.core.semantic_search import (
     # Enums and configs
     SearchMode,
     IndexConfig,

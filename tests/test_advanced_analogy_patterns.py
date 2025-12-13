@@ -25,11 +25,11 @@ from pathlib import Path
 from typing import List
 from unittest.mock import Mock, patch, MagicMock
 
-from core.semantic_analogy_engine import (
+from sigmalang.core.semantic_analogy_engine import (
     SemanticAnalogyEngine,
     AnalogyResult,
 )
-from core.advanced_analogy_patterns import (
+from sigmalang.core.advanced_analogy_patterns import (
     AnalogyCachingLayer,
     FuzzyAnalogyMatcher,
     InverseAnalogyResolver,
@@ -40,7 +40,7 @@ from core.advanced_analogy_patterns import (
     InverseAnalogyResult,
     FuzzyAnalogyResult,
 )
-from core.analogy_composition import (
+from sigmalang.core.analogy_composition import (
     AnalogyCompositionEngine,
     AnalogyCatalog,
     AnalogySolver,

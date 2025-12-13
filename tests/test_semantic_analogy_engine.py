@@ -30,7 +30,7 @@ from pathlib import Path
 import json
 from unittest.mock import Mock, patch, MagicMock
 
-from core.semantic_analogy_engine import (
+from sigmalang.core.semantic_analogy_engine import (
     SemanticAnalogyEngine,
     AnalogyResult,
     AnalogyBenchmark,

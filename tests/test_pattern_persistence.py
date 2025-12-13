@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Tuple
 
-from core.pattern_persistence import (
+from sigmalang.core.pattern_persistence import (
     PatternMetadata,
     PatternIndex,
     CatalogPersistence,

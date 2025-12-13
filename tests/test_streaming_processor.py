@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from typing import List, Any
 from unittest.mock import Mock, patch, MagicMock
 
-from core.streaming_processor import (
+from sigmalang.core.streaming_processor import (
     # Enums
     WindowType,
     BackpressureStrategy,

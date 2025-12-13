@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.parallel_processor import (
+from sigmalang.core.parallel_processor import (
     ParallelExecutor,
     AsyncPatternProcessor,
     WorkStealingScheduler,

@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 from unittest.mock import Mock, MagicMock, patch
 
-from core.ml_models import (
+from sigmalang.core.ml_models import (
     # Enums
     ModelType,
     ModelState,

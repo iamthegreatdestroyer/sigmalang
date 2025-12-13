@@ -17,7 +17,7 @@ import json
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from core.entity_relation_extraction import (
+from sigmalang.core.entity_relation_extraction import (
     EntityType,
     RelationType,
     Entity,

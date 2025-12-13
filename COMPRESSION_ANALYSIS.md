@@ -13,22 +13,22 @@ The failing compression ratio tests are caused by **unavoidable encoding overhea
   - Input: 62 bytes
   - Output: 157 bytes
   - Ratio: 2.53 (153% expansion)
-  
+
 ✗ Write a JavaScript async function to fetch data from an API
   - Input: 59 bytes
   - Output: 79 bytes
   - Ratio: 1.34 (34% expansion)
-  
+
 ✗ Implement a binary search algorithm in C++
   - Input: 42 bytes
   - Output: 63 bytes
   - Ratio: 1.50 (50% expansion)
-  
+
 ✓ Build a REST API endpoint for user authentication
   - Input: 49 bytes
   - Output: 29 bytes
   - Ratio: 0.59 (41% compression) ✓
-  
+
 ✓ Create a class that handles database connections with pooling
   - Input: 61 bytes
   - Output: 35 bytes
@@ -66,11 +66,13 @@ The ΣLANG binary format has unavoidable fixed overhead:
 ### Why Short Text Expands
 
 For a 42-byte input:
+
 - **Fixed overhead:** 10 bytes
 - **Content overhead:** 2-3 bytes per glyph × number_of_glyphs
 - **Payload:** The actual UTF-8 text (42 bytes)
 
 Example breakdown for "Implement a binary search algorithm in C++":
+
 ```
 GlyphStream header:  4 bytes (fixed)
 Glyph 1 header:      2 bytes
@@ -87,11 +89,13 @@ Actual output:       63 bytes (includes all structure)
 ### Why Longer Text Compresses
 
 When semantic patterns are detected, the encoder can:
+
 1. **Reference shared patterns** - Using codebook matches (high compression)
 2. **Delta encode** - Only store differences from context (medium compression)
 3. **Share primitives** - Reuse semantic structure (low overhead with pattern matching)
 
 Example with longer text:
+
 ```
 Input: "Build a REST API endpoint for user authentication" (49 bytes)
 Output: 29 bytes (0.59 ratio = 41% compression)
@@ -109,23 +113,26 @@ Looking at the passing tests more carefully:
 ```
 "Build a REST API endpoint for user authentication"
  └─ 49 bytes → 29 bytes (0.59 ratio)
- 
+
 "Create a class that handles database connections with pooling"
  └─ 61 bytes → 35 bytes (0.57 ratio)
 ```
 
 These short texts still compress well because they contain:
+
 1. **High semantic density** - More concepts per word
 2. **Repeating patterns** - "API/REST", "database/connections", "pooling/handling"
 3. **Good fit for delta encoding** - Context overlap with previous examples
 
 In contrast, failing tests have:
+
 ```
 "Create a Python function that sorts a list in descending order"
  └─ 62 bytes → 157 bytes (2.53 ratio - EXPANSION!)
 ```
 
 This text has:
+
 - **Low semantic density** - Generic concepts
 - **No repeating patterns** - Unique command structure
 - **Poor delta encoding fit** - Different from previous context
@@ -145,6 +152,7 @@ def encode(self, tree: SemanticTree, original_text: str = "") -> bytes:
 ```
 
 For short, unique texts:
+
 - **No codebook match** (new patterns)
 - **No sigma bank hit** (first time seeing this primitive structure)
 - **No delta opportunity** (no context overlap)
@@ -154,12 +162,12 @@ The full primitive encoding stores every detail with complete headers and metada
 
 ## Impact Assessment
 
-| Input Size | Typical Ratio | Behavior |
-|-----------|--------------|----------|
-| < 50 bytes | 0.8-2.5 | May expand or compress depending on semantic richness |
-| 50-200 bytes | 0.5-1.2 | Often compresses, sometimes expands |
-| > 200 bytes | 0.2-0.8 | Usually compresses well |
-| > 500 bytes | 0.1-0.6 | Strong compression (pattern sharing dominates) |
+| Input Size   | Typical Ratio | Behavior                                              |
+| ------------ | ------------- | ----------------------------------------------------- |
+| < 50 bytes   | 0.8-2.5       | May expand or compress depending on semantic richness |
+| 50-200 bytes | 0.5-1.2       | Often compresses, sometimes expands                   |
+| > 200 bytes  | 0.2-0.8       | Usually compresses well                               |
+| > 500 bytes  | 0.1-0.6       | Strong compression (pattern sharing dominates)        |
 
 ## Solutions
 
@@ -209,6 +217,7 @@ Impact: Solves expansion issue for very short text, but breaks semantic compress
 **Use Option 1: Adjust test thresholds**
 
 Rationale:
+
 1. ✅ The encoder is working correctly
 2. ✅ The test expectations are unrealistic for short text
 3. ✅ Longer text (which is the real use case) compresses well
