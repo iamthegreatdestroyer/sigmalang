@@ -542,7 +542,7 @@ class SigmaEncoder:
         payload = None
         if node.value is not None:
             # Encode value as payload
-            value_str = str(node.value)[:255]  # Limit payload size
+            value_str = str(node.value)
             payload = value_str.encode('utf-8')
         
         glyph = Glyph(
@@ -631,10 +631,26 @@ class SigmaDecoder:
         return self._decode_primitives(stream)
     
     def _decode_delta(self, stream: GlyphStream) -> SemanticTree:
-        """Decode delta-encoded stream."""
-        # For now, just decode the primitives
-        # Full delta reconstruction would use context stack
-        return self._decode_primitives(stream)
+        """Decode delta-encoded stream.
+        
+        Delta encoding format:
+        - Glyph 0: Header with glyph_type=DELTA, primitive_id=TRANSFORM, payload=context_id
+        - Glyph 1+: New/changed primitives to apply
+        
+        The header is a marker, not data - skip it and decode the actual content.
+        """
+        if len(stream.glyphs) <= 1:
+            # Only header, no actual content
+            return SemanticTree(
+                root=SemanticNode(primitive=ExistentialPrimitive.ABSTRACT),
+                source_text=""
+            )
+        
+        # Skip the delta header (glyph 0) and decode from glyph 1 onwards
+        content_glyphs = stream.glyphs[1:]
+        root, _ = self._decode_node(content_glyphs, 0)
+        
+        return SemanticTree(root=root, source_text="[decoded]")
     
     def _decode_primitives(self, stream: GlyphStream) -> SemanticTree:
         """Decode primitive-encoded stream."""
@@ -657,11 +673,12 @@ class SigmaDecoder:
         glyph = glyphs[idx]
         
         # Extract value from payload
+        # Note: Check `is not None` to handle empty strings (b'' is falsy but valid)
         value = None
-        if glyph.payload:
+        if glyph.payload is not None:
             try:
                 value = glyph.payload.decode('utf-8')
-            except:
+            except UnicodeDecodeError:
                 value = glyph.payload.hex()
         
         node = SemanticNode(
