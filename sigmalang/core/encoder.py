@@ -25,6 +25,11 @@ from .primitives import (
     ExistentialPrimitive, PRIMITIVE_REGISTRY,
     LEARNED_PRIMITIVE_START, LEARNED_PRIMITIVE_END
 )
+from .optimizations import (
+    FastPrimitiveCache, GlyphBufferPool, FastGlyphEncoder,
+    IterativeTreeWalker, IncrementalDeltaCompressor,
+    MemoryProfiler, PerformanceMetrics
+)
 
 
 # ============================================================================
@@ -420,10 +425,23 @@ class SigmaEncoder:
     Transforms semantic trees into highly compressed binary format.
     """
     
-    def __init__(self, codebook: Optional['LearnedCodebook'] = None):
+    def __init__(self, codebook: Optional['LearnedCodebook'] = None, enable_optimizations: bool = True):
         self.sigma_bank = SigmaHashBank()
         self.context_stack = ContextStack()
         self.codebook = codebook
+        
+        # Phase 4A.2: Optimization components
+        self.enable_optimizations = enable_optimizations
+        if enable_optimizations:
+            self.primitive_cache = FastPrimitiveCache(max_cache_size=256)
+            self.buffer_pool = GlyphBufferPool(pool_size=32, buffer_size=4096)
+            self.delta_compressor = IncrementalDeltaCompressor(max_context_size=256)
+            self.perf_metrics = PerformanceMetrics()
+        else:
+            self.primitive_cache = None
+            self.buffer_pool = None
+            self.delta_compressor = None
+            self.perf_metrics = None
         
         # Encoding statistics
         self.total_input_bytes = 0
@@ -440,6 +458,10 @@ class SigmaEncoder:
         3. Context delta (if context overlap)
         4. Full primitive encoding (baseline)
         """
+        # Phase 4A.2: Start performance tracking
+        import time as time_module
+        start_time = time_module.perf_counter() if self.enable_optimizations else None
+        
         original_size = len(original_text.encode('utf-8'))
         self.total_input_bytes += original_size
         
@@ -449,6 +471,7 @@ class SigmaEncoder:
             if pattern_id is not None:
                 result = self._encode_pattern_ref(pattern_id)
                 self._record_output(result)
+                self._record_timing("pattern_ref", start_time)
                 return result
         
         # Step 2: Check sigma bank for existing structure
@@ -458,6 +481,7 @@ class SigmaEncoder:
             self._record_output(result)
             # Update frequency
             self.sigma_bank.retrieve(sigma_hash)
+            self._record_timing("reference", start_time)
             return result
         
         # Step 3: Try delta encoding against context
@@ -466,6 +490,7 @@ class SigmaEncoder:
             result = self._encode_delta(tree, delta)
             self._record_output(result)
             self._store_and_update(tree, original_size)
+            self._record_timing("delta", start_time)
             return result
         
         # Step 4: Full primitive encoding
@@ -473,6 +498,7 @@ class SigmaEncoder:
         result = self._pack_glyphs(glyphs)
         self._record_output(result)
         self._store_and_update(tree, original_size)
+        self._record_timing("full_primitive", start_time)
         
         return result
     
@@ -480,6 +506,13 @@ class SigmaEncoder:
         """Record output statistics."""
         self.total_output_bytes += len(data)
         self.encoding_count += 1
+    
+    def _record_timing(self, operation: str, start_time: Optional[float]):
+        """Record timing for an operation using PerformanceMetrics."""
+        if start_time is not None and self.perf_metrics is not None:
+            import time as time_module
+            elapsed_us = (time_module.perf_counter() - start_time) * 1_000_000
+            self.perf_metrics.record_timing(operation, elapsed_us)
     
     def _store_and_update(self, tree: SemanticTree, original_size: int):
         """Store in bank and update context."""
@@ -583,7 +616,7 @@ class SigmaEncoder:
     
     def get_stats(self) -> Dict[str, Any]:
         """Get encoder statistics."""
-        return {
+        stats = {
             'total_input_bytes': self.total_input_bytes,
             'total_output_bytes': self.total_output_bytes,
             'compression_ratio': self.get_compression_ratio(),
@@ -591,6 +624,19 @@ class SigmaEncoder:
             'sigma_bank': self.sigma_bank.get_stats(),
             'context_depth': len(self.context_stack.frames)
         }
+        
+        # Add performance metrics if enabled
+        if self.perf_metrics:
+            for op in ['pattern_ref', 'reference', 'delta', 'full_primitive']:
+                perf_stats = self.perf_metrics.get_stats(op)
+                if perf_stats:
+                    stats[f'timing_{op}'] = perf_stats
+            
+            # Add cache metrics if available
+            if self.primitive_cache:
+                stats['primitive_cache_hit_rate'] = self.primitive_cache.hit_rate()
+        
+        return stats
 
 
 # ============================================================================
