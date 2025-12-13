@@ -64,9 +64,10 @@ test = [
 ]
 
 [project.scripts]
-sigmalang = "sigmalang.ryot_integration:main"
+sigmalang = "sigmalang.core.cli:main"
 sigmalang-train = "sigmalang.training.train:main"
 sigmalang-server = "sigmalang.core.api_server:main"
+sigmalang-legacy = "sigmalang.ryot_integration:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
