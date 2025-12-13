@@ -60,6 +60,23 @@ class FastPrimitiveCache:
             self._id_to_primitive[primitive_id] = primitive
             self._name_to_primitive[name] = primitive
     
+    def put(self, key: Tuple[int, Any], value: Any):
+        """Generic cache put operation for tuple keys (primitive_id, value)."""
+        if len(self._id_to_primitive) < self.max_cache_size:
+            # Use hash of key tuple as cache key
+            cache_key = hash(key) % self.max_cache_size
+            self._id_to_primitive[cache_key] = value
+    
+    def get(self, key: Tuple[int, Any]) -> Optional[Any]:
+        """Generic cache get operation for tuple keys (primitive_id, value)."""
+        cache_key = hash(key) % self.max_cache_size
+        if cache_key in self._id_to_primitive:
+            self.hits += 1
+            return self._id_to_primitive[cache_key]
+        
+        self.misses += 1
+        return None
+    
     def hit_rate(self) -> float:
         """Get cache hit rate."""
         total = self.hits + self.misses

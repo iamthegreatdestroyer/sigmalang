@@ -573,11 +573,77 @@ class SigmaEncoder:
         return glyphs
     
     def _encode_node(self, node: SemanticNode, glyphs: List[Glyph]):
-        """Recursively encode a node."""
+        """Iteratively encode a node using stack-based traversal.
+        
+        Task 3-4 Integration:
+        - Uses stack-based iterative traversal instead of recursion
+        - Integrates FastPrimitiveCache for primitive lookup optimization
+        - Maintains pre-order traversal with end-markers for composite nodes
+        - Performance: O(n) time, O(h) space where h = tree height
+        """
+        if not self.enable_optimizations:
+            # Fallback to recursive for compatibility
+            self._encode_node_recursive(node, glyphs)
+            return
+        
+        # Phase 4A.3 Task 3: Iterative traversal with stack (optimized, no metrics overhead)
+        # Stack entries: (node, needs_end_marker)
+        stack = [(node, False)]
+        
+        while stack:
+            current_node, needs_end_marker = stack.pop()
+            
+            if needs_end_marker:
+                # Post-order: End marker for composite nodes
+                glyphs.append(Glyph(
+                    glyph_type=GlyphType.PRIMITIVE,
+                    primitive_id=ExistentialPrimitive.COMPOSITE
+                ))
+                continue
+            
+            # Pre-order: Encode the node
+            payload = None
+            if current_node.value is not None:
+                value_str = str(current_node.value)
+                payload = value_str.encode('utf-8')
+            
+            # Task 4: Try to get from cache first
+            cache_key = None
+            if self.primitive_cache:
+                cache_key = (current_node.primitive, current_node.value)
+                cached = self.primitive_cache.get(cache_key)
+                if cached:
+                    glyphs.append(cached)
+                    # Still need to handle children
+                    if current_node.children:
+                        stack.append((current_node, True))  # End marker after children
+                        for child in reversed(current_node.children):
+                            stack.append((child, False))
+                    continue
+            
+            # Not in cache - encode normally
+            glyph = Glyph(
+                glyph_type=GlyphType.PRIMITIVE if not current_node.children else GlyphType.COMPOSITE,
+                primitive_id=current_node.primitive,
+                payload=payload
+            )
+            glyphs.append(glyph)
+            
+            # Cache the glyph
+            if cache_key and self.primitive_cache:
+                self.primitive_cache.put(cache_key, glyph)
+            
+            # Handle children
+            if current_node.children:
+                stack.append((current_node, True))  # End marker after children
+                for child in reversed(current_node.children):
+                    stack.append((child, False))
+    
+    def _encode_node_recursive(self, node: SemanticNode, glyphs: List[Glyph]):
+        """Fallback recursive encoding (for comparison/compatibility)."""
         # Create glyph for this node
         payload = None
         if node.value is not None:
-            # Encode value as payload
             value_str = str(node.value)
             payload = value_str.encode('utf-8')
         
@@ -590,13 +656,13 @@ class SigmaEncoder:
         
         # Encode children
         for child in node.children:
-            self._encode_node(child, glyphs)
+            self._encode_node_recursive(child, glyphs)
         
         # End composite marker (if has children)
         if node.children:
             glyphs.append(Glyph(
                 glyph_type=GlyphType.PRIMITIVE,
-                primitive_id=ExistentialPrimitive.COMPOSITE  # End marker
+                primitive_id=ExistentialPrimitive.COMPOSITE
             ))
     
     def _pack_glyphs(self, glyphs: List[Glyph]) -> bytes:
