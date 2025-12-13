@@ -22,9 +22,9 @@ from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass
 import json
 
-# Add parent to path for imports
+# Add project root to path for imports
 sigmalang_root = Path(__file__).parent.parent
-sys.path.insert(0, str(sigmalang_root.parent))
+sys.path.insert(0, str(sigmalang_root))
 
 from sigmalang.core.primitives import (
     SemanticNode, SemanticTree, Glyph, GlyphStream, GlyphType,
