@@ -7,22 +7,25 @@ Successfully implemented intelligent compression algorithm selection for SigmaLa
 ✅ **10-15% improvement target** - Achieved via smart strategy selection  
 ✅ **< 1ms overhead** - Pattern detection completes in sub-millisecond  
 ✅ **Zero regression guarantee** - All existing tests pass  
-✅ **Production-ready code** - Clean, maintainable, well-documented  
+✅ **Production-ready code** - Clean, maintainable, well-documented
 
 ## Architecture Overview
 
 ### Core Components
 
 #### 1. **AdaptiveCompressionSelector** (`adaptive_compression.py`)
+
 Intelligent algorithm selection engine with 4 core modules:
 
 - **PatternDetector**: Identifies repetitive patterns in binary data
+
   - Detects patterns of length 4-32 bytes
   - Covers first 2KB sample for speed
   - Returns pattern list + coverage ratio
   - Time: <0.5ms
 
 - **EntropyAnalyzer**: Calculates information entropy and compression potential
+
   - Shannon entropy (0-8 bits/byte)
   - Local entropy (first 256 bytes)
   - Delta entropy (XOR differences)
@@ -30,11 +33,12 @@ Intelligent algorithm selection engine with 4 core modules:
   - Time: <1ms
 
 - **DataTypeClassifier**: Categorizes input data
+
   - highly_repetitive (rep_ratio > 0.5, entropy < 2.0)
   - random_or_binary (unique_bytes > 200, entropy > 6.5)
   - mixed_structured (entropy 3-5, reasonable unique_bytes)
   - text_like (ASCII > 70%, entropy < 5.5)
-  - delta_friendly (delta_entropy < entropy * 0.6)
+  - delta_friendly (delta_entropy < entropy \* 0.6)
   - rle_friendly (max_run_length > 20)
 
 - **Decision Logic**: Intelligent strategy selection
@@ -47,6 +51,7 @@ Intelligent algorithm selection engine with 4 core modules:
   - Default → REFERENCE
 
 #### 2. **AdaptiveEncoder** (`adaptive_encoder.py`)
+
 Wrapper around SigmaEncoder with strategy-aware compression:
 
 - Selects optimal strategy before encoding
@@ -57,20 +62,22 @@ Wrapper around SigmaEncoder with strategy-aware compression:
 
 ### Compression Strategies
 
-| Strategy | Best For | Compression Ratio | Notes |
-|----------|----------|-------------------|-------|
-| PATTERN | Repetitive, structured data | 0.3-0.6 | Pattern matching + RLE |
-| REFERENCE | General-purpose baseline | 0.6-0.9 | LSH-based reference matching |
-| DELTA | Incremental changes | 0.4-0.8 | Context-aware delta encoding |
-| LOSSLESS | Guaranteed correctness | 0.5-1.0 | Full tree serialization |
-| RAW | Incompressible data | ~1.0 | Minimal overhead |
+| Strategy  | Best For                    | Compression Ratio | Notes                        |
+| --------- | --------------------------- | ----------------- | ---------------------------- |
+| PATTERN   | Repetitive, structured data | 0.3-0.6           | Pattern matching + RLE       |
+| REFERENCE | General-purpose baseline    | 0.6-0.9           | LSH-based reference matching |
+| DELTA     | Incremental changes         | 0.4-0.8           | Context-aware delta encoding |
+| LOSSLESS  | Guaranteed correctness      | 0.5-1.0           | Full tree serialization      |
+| RAW       | Incompressible data         | ~1.0              | Minimal overhead             |
 
 ## Lightweight Pattern Detection
 
 ### Design Philosophy
+
 Analyze < 1ms overhead with only 2 passes through first 2KB of data:
 
 **Pass 1 - Information Analysis** (~0.3ms):
+
 ```python
 entropy = -Σ(p_i * log2(p_i))           # Shannon entropy
 local_entropy = entropy(first 256 bytes)  # Characteristic sample
@@ -78,6 +85,7 @@ delta_entropy = entropy(XOR differences)  # Change rate
 ```
 
 **Pass 2 - Pattern Detection** (~0.2ms):
+
 ```python
 for pattern_len in [4..32]:
     for i in [0..sample_size]:
@@ -91,13 +99,13 @@ for pattern_len in [4..32]:
 
 Tested on various data types:
 
-| Data Type | Size | Entropy | Detected Type | Time (ms) |
-|-----------|------|---------|---------------|-----------|
-| repetitive | 2.4 KB | 1.2 | highly_repetitive | 0.2 |
-| random | 4.1 KB | 7.8 | random_or_binary | 0.4 |
-| text | 2.3 KB | 4.1 | text_like | 0.3 |
-| code | 1.3 KB | 3.9 | mixed_structured | 0.2 |
-| binary_rle | 0.3 KB | 2.1 | rle_friendly | 0.1 |
+| Data Type  | Size   | Entropy | Detected Type     | Time (ms) |
+| ---------- | ------ | ------- | ----------------- | --------- |
+| repetitive | 2.4 KB | 1.2     | highly_repetitive | 0.2       |
+| random     | 4.1 KB | 7.8     | random_or_binary  | 0.4       |
+| text       | 2.3 KB | 4.1     | text_like         | 0.3       |
+| code       | 1.3 KB | 3.9     | mixed_structured  | 0.2       |
+| binary_rle | 0.3 KB | 2.1     | rle_friendly      | 0.1       |
 
 **Average detection time: 0.24ms** ✓ (well under 1ms target)
 
@@ -115,10 +123,12 @@ On test corpus:
 ### Estimated Improvements vs Fixed Strategy
 
 **Fixed REFERENCE strategy (baseline 0.71 ratio):**
+
 - Low entropy data: 0.71 ratio (no optimization)
 - High entropy data: 0.71 ratio (forced compression overhead)
 
 **Adaptive strategy (0.59 avg ratio):**
+
 - Low entropy data: 0.42 ratio (16% better) ✓
 - Medium entropy data: 0.71 ratio (baseline) ✓
 - High entropy data: 0.98 ratio (avoids compression) ✓
@@ -164,6 +174,7 @@ stats = encoder.get_statistics()
 ### Files Created
 
 1. **`sigmalang/core/adaptive_compression.py`** (580 lines)
+
    - PatternDetector class
    - EntropyAnalyzer class
    - DataTypeClassifier class
@@ -173,6 +184,7 @@ stats = encoder.get_statistics()
    - Analysis helper functions
 
 2. **`sigmalang/core/adaptive_encoder.py`** (380 lines)
+
    - AdaptiveEncoder class
    - StrategyMetrics dataclass
    - Integration with SigmaEncoder
@@ -200,31 +212,37 @@ stats = encoder.get_statistics()
 ### Test Coverage
 
 ✅ Pattern Detection Tests
+
 - Correctly identifies repetitive patterns
 - Calculates coverage ratios accurately
 - Handles edge cases (empty data, single byte, etc.)
 
 ✅ Entropy Analysis Tests
+
 - Accurate Shannon entropy calculation
 - Correct local and delta entropy
 - Proper compression ratio estimation
 
 ✅ Strategy Selection Tests
+
 - Smart selection based on data characteristics
 - Confidence scoring
 - Sub-millisecond performance
 
 ✅ Data Classification Tests
+
 - Accurate type classification
 - Confidence levels
 - Reasoning generation
 
 ✅ Compression Benchmarks
+
 - Validates improvement on semantic data
 - Measures actual compression ratios
 - Tracks strategy distribution
 
 ✅ Edge Case Handling
+
 - Empty data
 - Single byte
 - All same byte
@@ -242,7 +260,7 @@ Pattern Detection Tests
   ✓ Detected repetitive patterns correctly
   ✓ Coverage ratios calculated accurately
 
-Entropy Analysis Tests  
+Entropy Analysis Tests
   ✓ Shannon entropy: 0-8 range
   ✓ Delta entropy: < baseline entropy
   ✓ Compression ratio estimates accurate
@@ -277,16 +295,16 @@ PERFORMANCE METRICS
 
 ## Success Criteria Met
 
-| Criterion | Target | Achieved | Status |
-|-----------|--------|----------|--------|
-| Compression improvement | 10-15% | ~17% | ✅ EXCEEDED |
-| Pattern detection overhead | < 1ms | 0.24ms avg | ✅ PASS |
-| Data type classification | Accurate | 6 types detected | ✅ PASS |
-| Decision logic | Smart rules | Decision tree | ✅ PASS |
-| Code quality | Maintainable | Type hints, docs | ✅ PASS |
-| Zero regression | All tests pass | All pass | ✅ PASS |
-| Edge cases | Robust | 6+ cases handled | ✅ PASS |
-| Integration | Minimal overhead | <0.5ms added | ✅ PASS |
+| Criterion                  | Target           | Achieved         | Status      |
+| -------------------------- | ---------------- | ---------------- | ----------- |
+| Compression improvement    | 10-15%           | ~17%             | ✅ EXCEEDED |
+| Pattern detection overhead | < 1ms            | 0.24ms avg       | ✅ PASS     |
+| Data type classification   | Accurate         | 6 types detected | ✅ PASS     |
+| Decision logic             | Smart rules      | Decision tree    | ✅ PASS     |
+| Code quality               | Maintainable     | Type hints, docs | ✅ PASS     |
+| Zero regression            | All tests pass   | All pass         | ✅ PASS     |
+| Edge cases                 | Robust           | 6+ cases handled | ✅ PASS     |
+| Integration                | Minimal overhead | <0.5ms added     | ✅ PASS     |
 
 ## Usage Examples
 
@@ -342,11 +360,13 @@ print(f"Characteristics: {decision.characteristics}")
 ### Time Complexity
 
 - **Pattern detection**: O(n) single pass + O(m) pattern search
+
   - n = data size (2KB sample)
   - m = pattern space (4-32 bytes)
   - Typical: <0.5ms
 
 - **Entropy analysis**: O(n) histogram + O(256) entropy calculation
+
   - Typical: <0.3ms
 
 - **Strategy selection**: O(1) decision tree
@@ -368,6 +388,7 @@ print(f"Characteristics: {decision.characteristics}")
 ### Current Implementation
 
 Clean, maintainable codebase with:
+
 - Clear separation of concerns
 - Type hints throughout
 - Comprehensive documentation
@@ -376,18 +397,22 @@ Clean, maintainable codebase with:
 ### Potential Enhancements
 
 1. **Machine learning-based selection**
+
    - Learn optimal strategies per data pattern
    - Feedback-driven improvement
 
 2. **Adaptive thresholds**
+
    - Auto-tune decision boundaries based on feedback
    - Per-data-type optimization
 
 3. **Strategy combinations**
+
    - Combine PATTERN + DELTA for maximum compression
    - Fallback chains for robustness
 
 4. **Hardware acceleration**
+
    - SIMD entropy calculation
    - Parallel pattern detection
 
@@ -415,4 +440,4 @@ The adaptive compression system is ready for integration into production and pro
 **Time Elapsed: ~55 minutes**  
 **Code Created: 1,560 lines (core) + 600 lines (tests)**  
 **Test Coverage: 15+ test scenarios**  
-**Performance Target: EXCEEDED** (17% vs 10-15%)  
+**Performance Target: EXCEEDED** (17% vs 10-15%)

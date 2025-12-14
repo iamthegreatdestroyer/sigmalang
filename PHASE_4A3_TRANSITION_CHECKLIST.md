@@ -5,6 +5,7 @@
 ### Pre-Phase 4A.3 Verification
 
 **Baseline Quality Checks:**
+
 - [x] All 8 file sizes profiled (10B to 10MB)
 - [x] Multiple runs collected (10 total measurements)
 - [x] Statistical confidence excellent (0.06% CV)
@@ -14,6 +15,7 @@
 - [x] Full technical report written
 
 **Infrastructure Readiness:**
+
 - [x] Memory profiler tested and working
 - [x] Test data generation validated
 - [x] JSON persistence functional
@@ -21,6 +23,7 @@
 - [x] Visualization pipeline successful
 
 **Documentation Complete:**
+
 - [x] WORKSTREAM_C_BASELINE_REPORT.md (8 pages)
 - [x] WORKSTREAM_C_COMPLETION_SUMMARY.md (executive summary)
 - [x] WORKSTREAM_C_QUICK_REFERENCE.md (quick stats)
@@ -34,6 +37,7 @@
 ### Optimization Strategy (Pick One)
 
 **[ ] Strategy A: Streaming Implementation (RECOMMENDED)**
+
 - Impact: 15-20MB potential savings
 - Complexity: HIGH
 - Duration: 6-8 hours
@@ -41,6 +45,7 @@
 - Key File to Modify: `sigmalang/core/encoder.py` (streaming methods)
 
 **[ ] Strategy B: Memory-Aware Structures**
+
 - Impact: 8-10MB potential savings
 - Complexity: MEDIUM
 - Duration: 3-4 hours
@@ -48,6 +53,7 @@
 - Key Files to Modify: `sigmalang/core/primitives.py` (SemanticNode/Tree)
 
 **[ ] Strategy C: Baseline & GC Tuning**
+
 - Impact: 5-8MB potential savings
 - Complexity: LOW
 - Duration: 2-3 hours
@@ -61,24 +67,28 @@
 ### Code Changes
 
 **Step 1: Assess Current Implementation**
+
 - [ ] Review Phase 4A.2 optimizations in encoder.py
 - [ ] Understand buffer pooling mechanism (GlyphBufferPool)
 - [ ] Analyze SemanticNode memory footprint
 - [ ] Identify bottlenecks from baseline report
 
 **Step 2: Implement Optimization**
+
 - [ ] Create feature branch: `optimize/phase-4a3`
 - [ ] Make targeted code changes
 - [ ] Maintain backward compatibility
 - [ ] Preserve compression quality
 
 **Step 3: Code Quality**
+
 - [ ] Run existing tests (pytest)
 - [ ] Check test coverage
 - [ ] Verify no regressions
 - [ ] Code review (if team project)
 
 **Step 4: Documentation**
+
 - [ ] Update docstrings
 - [ ] Document memory improvements
 - [ ] Add comments for key changes
@@ -91,6 +101,7 @@
 ### Re-profiling Phase 4A.3
 
 **Step 1: Run Baseline Profiler**
+
 ```bash
 # Quick re-profile (same sizes as before)
 python c:\Users\sgbil\sigmalang\tests\run_memory_quick_baseline.py
@@ -101,6 +112,7 @@ python c:\Users\sgbil\sigmalang\tests\run_memory_quick_baseline.py
 ```
 
 **Step 2: Run Analysis**
+
 ```bash
 # Generate statistical comparison
 python c:\Users\sgbil\sigmalang\tests\baseline_statistical_analysis.py
@@ -112,6 +124,7 @@ python c:\Users\sgbil\sigmalang\tests\baseline_statistical_analysis.py
 ```
 
 **Step 3: Generate Visualizations**
+
 ```bash
 # Create comparison plots
 python c:\Users\sgbil\sigmalang\generate_visualizations.py
@@ -125,6 +138,7 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
 ### Validation Tests
 
 **Functional Tests:**
+
 - [ ] Encoded output identical to Phase 4A.2 baseline?
   ```bash
   # Compare checksums of encoded output
@@ -138,6 +152,7 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
   - [x] Wide trees (breadth stress)
 
 **Performance Tests:**
+
 - [ ] Peak memory reduced as expected?
   - Target: 42-45MB baseline (from 42MB)
   - Target: Growth component improved
@@ -147,6 +162,7 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
   - Should not significantly regress
 
 **Regression Detection:**
+
 - [ ] No CV increase (should stay < 0.1%)?
 - [ ] No scaling degradation?
 - [ ] No compression loss?
@@ -157,23 +173,25 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
 
 ### Updated Success Criteria (Phase 4A.3)
 
-| Criterion | Phase 4A.2 | Phase 4A.3 Target | Validation Method |
-|-----------|-----------|------------------|-------------------|
-| **Peak Memory @ 10MB** | 54.8 MB | < 45 MB (18% reduction) | Compare peaks |
-| **Baseline Overhead** | 42 MB | 35-38 MB (10-15% reduction) | Measure @ 10B |
-| **Memory Growth Slope** | 0.055 | < 0.03 (45% improvement) | Power law fit |
-| **Measurement CV** | 0.06% | Maintain < 0.1% | Std dev analysis |
-| **Compression Ratio** | 0.077 | Maintain 0.07-0.09 | Ratio calculation |
+| Criterion               | Phase 4A.2 | Phase 4A.3 Target           | Validation Method |
+| ----------------------- | ---------- | --------------------------- | ----------------- |
+| **Peak Memory @ 10MB**  | 54.8 MB    | < 45 MB (18% reduction)     | Compare peaks     |
+| **Baseline Overhead**   | 42 MB      | 35-38 MB (10-15% reduction) | Measure @ 10B     |
+| **Memory Growth Slope** | 0.055      | < 0.03 (45% improvement)    | Power law fit     |
+| **Measurement CV**      | 0.06%      | Maintain < 0.1%             | Std dev analysis  |
+| **Compression Ratio**   | 0.077      | Maintain 0.07-0.09          | Ratio calculation |
 
 ### Pass/Fail Criteria
 
 **PASS if:**
+
 - ✓ Peak memory reduced by ≥ 10% (to ≤ 49MB @ 10MB)
 - ✓ Compression ratios maintained (± 5%)
 - ✓ Measurement quality stable (CV < 0.2%)
 - ✓ All tests pass (functional + regression)
 
 **FAIL if:**
+
 - ✗ Peak memory increases or doesn't improve
 - ✗ Compression ratio degrades > 5%
 - ✗ Measurement variance increases > 0.2%
@@ -191,19 +209,20 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
 # Phase 4A.3: Memory Optimization Results
 
 ## Optimization Strategy
+
 - [Strategy A/B/C] implemented
 - Key changes: [list]
 - Files modified: [list]
 
 ## Before/After Comparison
 
-| Metric | Phase 4A.2 | Phase 4A.3 | Improvement |
-|--------|-----------|-----------|------------|
-| Baseline Overhead | 42.0 MB | ___ MB | __% |
-| Peak @ 10MB | 54.8 MB | ___ MB | __% |
-| Scaling Slope | 0.055 | ___ | __% |
-| Avg CV | 0.06% | __% | ✓/✗ |
-| Compression Ratio | 0.077 | ___ | ±__% |
+| Metric            | Phase 4A.2 | Phase 4A.3 | Improvement |
+| ----------------- | ---------- | ---------- | ----------- |
+| Baseline Overhead | 42.0 MB    | \_\_\_ MB  | \_\_%       |
+| Peak @ 10MB       | 54.8 MB    | \_\_\_ MB  | \_\_%       |
+| Scaling Slope     | 0.055      | \_\_\_     | \_\_%       |
+| Avg CV            | 0.06%      | \_\_%      | ✓/✗         |
+| Compression Ratio | 0.077      | \_\_\_     | ±\_\_%      |
 
 ## Success Criteria Achievement
 
@@ -214,11 +233,13 @@ python c:\Users\sgbil\sigmalang\generate_visualizations.py
 - [ ] Documentation complete
 
 ## Lessons Learned
+
 - [Technical insights]
 - [Bottlenecks encountered]
 - [Optimization effectiveness]
 
 ## Recommendations for Phase 4A.4
+
 - [Next optimization opportunities]
 - [Scaling to 100MB targets]
 ```
@@ -287,15 +308,15 @@ pytest c:\Users\sgbil\sigmalang\tests\test_memory_profiling.py -v
 
 ## Time Estimates
 
-| Task | Duration | Effort | Notes |
-|------|----------|--------|-------|
-| Strategy Selection | 30 min | LOW | Review baseline report |
-| Implementation | 2-8 hrs | MEDIUM-HIGH | Depends on strategy |
-| Code Review | 1 hr | LOW | Internal verification |
-| Re-profiling | 30 min | LOW | Run existing scripts |
-| Analysis | 1 hr | LOW | Statistical comparison |
-| Documentation | 1-2 hrs | MEDIUM | Write results report |
-| **Total Estimate** | **6-13 hrs** | **MEDIUM** | **Full cycle** |
+| Task               | Duration     | Effort      | Notes                  |
+| ------------------ | ------------ | ----------- | ---------------------- |
+| Strategy Selection | 30 min       | LOW         | Review baseline report |
+| Implementation     | 2-8 hrs      | MEDIUM-HIGH | Depends on strategy    |
+| Code Review        | 1 hr         | LOW         | Internal verification  |
+| Re-profiling       | 30 min       | LOW         | Run existing scripts   |
+| Analysis           | 1 hr         | LOW         | Statistical comparison |
+| Documentation      | 1-2 hrs      | MEDIUM      | Write results report   |
+| **Total Estimate** | **6-13 hrs** | **MEDIUM**  | **Full cycle**         |
 
 ---
 
@@ -303,17 +324,18 @@ pytest c:\Users\sgbil\sigmalang\tests\test_memory_profiling.py -v
 
 ### Potential Issues & Mitigations
 
-| Risk | Probability | Impact | Mitigation |
-|------|------------|--------|-----------|
-| Optimization regresses performance | MEDIUM | HIGH | Early validation testing |
-| Memory leaks introduced | LOW | HIGH | Prolonged run testing |
-| Compression quality degrades | MEDIUM | MEDIUM | Verify ratio in tests |
-| Measurement variance increases | LOW | MEDIUM | Check CV < 0.2% |
-| Implementation complexity exceeds estimate | MEDIUM | MEDIUM | Start with Strategy C |
+| Risk                                       | Probability | Impact | Mitigation               |
+| ------------------------------------------ | ----------- | ------ | ------------------------ |
+| Optimization regresses performance         | MEDIUM      | HIGH   | Early validation testing |
+| Memory leaks introduced                    | LOW         | HIGH   | Prolonged run testing    |
+| Compression quality degrades               | MEDIUM      | MEDIUM | Verify ratio in tests    |
+| Measurement variance increases             | LOW         | MEDIUM | Check CV < 0.2%          |
+| Implementation complexity exceeds estimate | MEDIUM      | MEDIUM | Start with Strategy C    |
 
 ### Rollback Plan
 
 If Phase 4A.3 optimization doesn't meet targets:
+
 1. Keep Phase 4A.2 as baseline (confirmed working)
 2. Archive Phase 4A.3 attempt as reference
 3. Try alternative strategy
@@ -324,6 +346,7 @@ If Phase 4A.3 optimization doesn't meet targets:
 ## Sign-Off Checklist
 
 **Phase 4A.2 Baseline Verification:**
+
 - [x] All measurements complete
 - [x] Statistical analysis valid
 - [x] Report documentation thorough
@@ -331,6 +354,7 @@ If Phase 4A.3 optimization doesn't meet targets:
 - [x] Success criteria established
 
 **Ready for Phase 4A.3:**
+
 - [x] Optimization targets clear
 - [x] Implementation strategy options defined
 - [x] Profiling infrastructure tested
@@ -338,6 +362,7 @@ If Phase 4A.3 optimization doesn't meet targets:
 - [x] Documentation complete
 
 **Phase 4A.3 Approval:**
+
 - [ ] Optimization strategy selected
 - [ ] Code changes reviewed
 - [ ] Re-profiling complete
@@ -349,11 +374,13 @@ If Phase 4A.3 optimization doesn't meet targets:
 ## Contact & Support
 
 **Profiling Issues?**
+
 - Review: `MEMORY_PROFILING_GUIDE.py`
 - Check: `baseline_statistical_analysis.py` for examples
 - Reference: `WORKSTREAM_C_BASELINE_REPORT.md` appendices
 
 **Implementation Questions?**
+
 - See: Optimization strategy sections above
 - Review: Phase 4A.2 source code (encoder.py)
 - Check: Comments in `run_memory_quick_baseline.py`

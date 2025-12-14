@@ -4,7 +4,7 @@
 
 Phase 4A.2 baseline memory profiling has been completed with comprehensive statistical analysis. The SigmaLang encoder demonstrates **EXCELLENT** memory scaling characteristics:
 
-- **Scaling Type**: SUB-LINEAR (Memory ∝ Input^0.055)  
+- **Scaling Type**: SUB-LINEAR (Memory ∝ Input^0.055)
 - **Measurement Confidence**: 0.06% coefficient of variation (EXCELLENT)
 - **Peak Memory @10MB**: 54.2 MB
 - **Compression Efficiency**: 0.077 average ratio (highly efficient)
@@ -17,14 +17,14 @@ Phase 4A.2 baseline memory profiling has been completed with comprehensive stati
 
 ### 1.1 Test Configuration
 
-| Parameter | Value |
-|-----------|-------|
-| Test Sizes | 10B, 100B, 1KB, 10KB, 100KB, 1MB, 5MB, 10MB |
-| Tree Types | Balanced (primary), Deep (stress), Wide (breadth) |
-| Runs per Size | 1-3 (smaller sizes more runs for variance) |
-| Memory Measurement | RSS (Resident Set Size) + tracemalloc peaks |
-| Profiling Duration | 15 minutes |
-| Available System Memory | 3.48 GB |
+| Parameter               | Value                                             |
+| ----------------------- | ------------------------------------------------- |
+| Test Sizes              | 10B, 100B, 1KB, 10KB, 100KB, 1MB, 5MB, 10MB       |
+| Tree Types              | Balanced (primary), Deep (stress), Wide (breadth) |
+| Runs per Size           | 1-3 (smaller sizes more runs for variance)        |
+| Memory Measurement      | RSS (Resident Set Size) + tracemalloc peaks       |
+| Profiling Duration      | 15 minutes                                        |
+| Available System Memory | 3.48 GB                                           |
 
 ### 1.2 Statistical Methods
 
@@ -76,11 +76,13 @@ Size (MB) | Peak Memory | Std Dev | CV (%) | Runs | Compression
 ### 3.2 Interpretation
 
 The slope of **0.055** indicates:
+
 - Memory increases slower than input size
 - Approximately **O(1)** - near constant memory per additional input
 - This is significantly better than linear O(n)
 
 **Possible mechanisms**:
+
 - Glyph buffer pooling (Phase 4A.2) reuses buffers efficiently
 - Delta compression reduces memory footprint
 - Semantic tree pruning removes redundant nodes
@@ -88,10 +90,10 @@ The slope of **0.055** indicates:
 ### 3.3 Growth Rate Analysis
 
 | Size Jump | Memory Jump | Growth Factor | Efficiency |
-|-----------|------------|---------------|-----------|
-| 10x | 1.13x | 0.113x | **8.825x** |
-| 10x | 1.12x | 0.112x | **8.906x** |
-| 0.5x | 0.99x | 1.977x | 0.506x |
+| --------- | ----------- | ------------- | ---------- |
+| 10x       | 1.13x       | 0.113x        | **8.825x** |
+| 10x       | 1.12x       | 0.112x        | **8.906x** |
+| 0.5x      | 0.99x       | 1.977x        | 0.506x     |
 
 **Critical Finding**: When input increases 10x, memory only increases 1.13x!
 
@@ -99,16 +101,16 @@ The slope of **0.055** indicates:
 
 ## 4. Success Criteria Assessment
 
-| Criterion | Target | Current | Status |
-|-----------|--------|---------|--------|
-| **1. Peak Memory @ 100MB** | < 500MB | 54.2MB @10MB¹ | ✓ ON TRACK |
-| **2. Scaling Type** | Linear or sub-linear | **Sub-linear (0.055)** | ✓ **EXCEEDED** |
-| **3. Measurement Confidence** | < 1% CV | 0.06% CV | ✓ **EXCELLENT** |
-| **4. Compression Efficiency** | Reasonable | 0.077 ratio | ✓ **EXCELLENT** |
-| **5. Memory Freed Promptly** | Yes | Yes (post-run GC) | ✓ **YES** |
+| Criterion                     | Target               | Current                | Status          |
+| ----------------------------- | -------------------- | ---------------------- | --------------- |
+| **1. Peak Memory @ 100MB**    | < 500MB              | 54.2MB @10MB¹          | ✓ ON TRACK      |
+| **2. Scaling Type**           | Linear or sub-linear | **Sub-linear (0.055)** | ✓ **EXCEEDED**  |
+| **3. Measurement Confidence** | < 1% CV              | 0.06% CV               | ✓ **EXCELLENT** |
+| **4. Compression Efficiency** | Reasonable           | 0.077 ratio            | ✓ **EXCELLENT** |
+| **5. Memory Freed Promptly**  | Yes                  | Yes (post-run GC)      | ✓ **YES**       |
 
 ¹ Linear extrapolation: 100MB → ~55MB (stays near baseline overhead)
-  Sub-linear extrapolation: 100MB → ~50-60MB (even better due to exponential decay in slope)
+Sub-linear extrapolation: 100MB → ~50-60MB (even better due to exponential decay in slope)
 
 ---
 
@@ -116,7 +118,7 @@ The slope of **0.055** indicates:
 
 ### 5.1 Variance Analysis
 
-**Coefficient of Variation (CV)**: 
+**Coefficient of Variation (CV)**:
 
 ```
 Size (MB) | CV (%) | Quality Assessment
@@ -140,6 +142,7 @@ Average CV: **0.06%** - Among the best possible measurements
 ### 5.3 Statistical Power
 
 With CV < 0.1%, we can detect:
+
 - Changes > 0.5% with 99% confidence
 - Changes > 0.1% with 95% confidence
 - Phase 4A.3 optimizations will be detectable even with small improvements
@@ -167,11 +170,13 @@ TOTAL                        | ~55 MB
 **Immediate Wins (Phase 4A.3)**:
 
 1. **Baseline Reduction** (10-15MB potential):
+
    - Lazy buffer pool initialization
    - Minimal PyObject overhead
    - GC optimization for small objects
 
 2. **Streaming Processing** (5-10MB potential):
+
    - Process tree nodes one chunk at a time
    - Avoid holding entire tree in memory
    - Incremental output generation
@@ -198,6 +203,7 @@ Input Size | Encoded Size | Ratio | Interpretation
 ```
 
 **Key Insight**: Compression ratio **improves** with larger inputs!
+
 - Small files: Higher overhead (metadata, header)
 - Large files: Better amortization of overhead
 
@@ -207,16 +213,17 @@ Input Size | Encoded Size | Ratio | Interpretation
 
 ### 8.1 Priority Matrix
 
-| Priority | Target | Estimated Impact | Effort | Expected Result |
-|----------|--------|------------------|--------|-----------------|
-| **HIGH** | Reduce 42MB baseline | 10-15MB | Medium | 40-45MB @ 10MB |
-| **HIGH** | Optimize linear growth | 5-10MB | High | Better @ 100MB |
-| **MEDIUM** | Buffer pool tuning | 3-5MB | Low | Efficiency ↑ |
-| **LOW** | Compression tuning | 0-2MB | High | Minor impact |
+| Priority   | Target                 | Estimated Impact | Effort | Expected Result |
+| ---------- | ---------------------- | ---------------- | ------ | --------------- |
+| **HIGH**   | Reduce 42MB baseline   | 10-15MB          | Medium | 40-45MB @ 10MB  |
+| **HIGH**   | Optimize linear growth | 5-10MB           | High   | Better @ 100MB  |
+| **MEDIUM** | Buffer pool tuning     | 3-5MB            | Low    | Efficiency ↑    |
+| **LOW**    | Compression tuning     | 0-2MB            | High   | Minor impact    |
 
 ### 8.2 Technical Approaches
 
 **Approach A: Streaming (Recommended)**
+
 - Process input incrementally
 - Generate output without buffering entire tree
 - Estimated savings: 15-20MB
@@ -224,6 +231,7 @@ Input Size | Encoded Size | Ratio | Interpretation
 - Timeline: 4-6 hours
 
 **Approach B: Memory-aware Structures**
+
 - Replace standard Python lists with memory-mapped structures
 - Use `__slots__` for SemanticNode
 - Implement tree compaction
@@ -232,6 +240,7 @@ Input Size | Encoded Size | Ratio | Interpretation
 - Timeline: 2-3 hours
 
 **Approach C: GC Tuning + Pool Optimization**
+
 - Minimize baseline overhead
 - More aggressive pool reuse
 - Adjust GC thresholds
@@ -246,11 +255,13 @@ Input Size | Encoded Size | Ratio | Interpretation
 ### 9.1 Post-Optimization Verification
 
 **Re-profile with Phase 4A.3 code** at same file sizes:
+
 - 10B, 100B, 1KB, 10KB, 100KB, 1MB, 5MB, 10MB
 - 1-2 runs per size (fast validation)
 - Compare peak memory vs baseline
 
 **Success Criteria**:
+
 - [ ] Baseline overhead reduced by 10-20% (42MB → 35-38MB)
 - [ ] Linear growth component improved (slope → < 0.03)
 - [ ] Confidence intervals still < 0.5% CV
@@ -259,6 +270,7 @@ Input Size | Encoded Size | Ratio | Interpretation
 ### 9.2 Regression Testing
 
 **Ensure optimizations don't break functionality**:
+
 - [ ] Encoded output identical to Phase 4A.2
 - [ ] Compression ratios maintained
 - [ ] Peak memory during 100MB processing < 150MB target
@@ -271,23 +283,27 @@ Input Size | Encoded Size | Ratio | Interpretation
 ### 10.1 Completed (Phase 4A.2)
 
 ✓ **Profiling Infrastructure**
+
 - Memory measurement engine (RSS + tracemalloc)
 - Test data generator (balanced/deep/wide trees)
 - Automatic profiling runner with progress tracking
 - JSON result persistence
 
 ✓ **Baseline Measurements**
+
 - 8 file sizes: 10B to 10MB
 - 10 individual measurement files (JSON)
 - Summary report with statistics
 
 ✓ **Statistical Analysis**
+
 - Descriptive statistics (mean, std, CV)
 - Scaling law regression (R²=0.9905)
 - Growth rate analysis
 - Confidence assessment (0.06% CV)
 
 ✓ **Documentation**
+
 - This comprehensive report
 - Quick reference guide
 - Expected outcomes document
@@ -296,16 +312,19 @@ Input Size | Encoded Size | Ratio | Interpretation
 ### 10.2 Pending (Phase 4A.3)
 
 ⬜ **Optimization Implementation**
+
 - Streaming encoder or memory structure improvements
 - Buffer pool tuning
 - Baseline overhead reduction
 
 ⬜ **Post-Optimization Profiling**
+
 - Re-run with Phase 4A.3 code
 - Generate before/after comparison
 - Validate success criteria
 
 ⬜ **Performance Comparison Report**
+
 - Memory savings analysis
 - Scaling improvements
 - Bottleneck remediation results
@@ -317,17 +336,20 @@ Input Size | Encoded Size | Ratio | Interpretation
 ### Key Findings
 
 1. **Excellent Baseline Characteristics**
+
    - Sub-linear memory scaling (slope 0.055)
    - Extremely low variance (0.06% CV)
    - Efficient compression (0.077 ratio)
 
 2. **Success Criteria Status**
+
    - ✓ Sub-linear scaling confirmed
    - ✓ Measurement quality excellent
    - ✓ Compression efficient
    - ✓ Memory footprint reasonable
 
 3. **Optimization Headroom**
+
    - 42MB constant overhead (reducible by 10-20%)
    - Linear growth component (improvable with streaming)
    - Combined potential: 15-30MB savings
@@ -351,12 +373,14 @@ Input Size | Encoded Size | Ratio | Interpretation
 ## Appendix A: File Manifest
 
 **Generated Files**:
+
 - `memory_profiles/baseline_summary.json` - Main results
 - `memory_profiles/profile_*.json` - Individual measurements (10 files)
 - `baseline_statistical_analysis.py` - Analysis script
 - `WORKSTREAM_C_BASELINE_REPORT.md` - This document
 
 **Total Data**:
+
 - Summary: 1.2 KB JSON
 - Details: ~45 KB JSON (10 profiles × 4.5 KB each)
 - Analysis: Python code + narrative report
@@ -366,24 +390,28 @@ Input Size | Encoded Size | Ratio | Interpretation
 ## Appendix B: Statistical Formulas Used
 
 ### Power Law Fit
+
 ```
 Log(Memory) = intercept + slope × Log(Size)
 Memory = e^intercept × Size^slope
 ```
 
 ### 95% Confidence Interval (n < 5)
+
 ```
 CI = mean ± t_95% × (std / √n)
 Where t_95% from Student's t-distribution
 ```
 
 ### Coefficient of Variation
+
 ```
 CV = (std_dev / mean) × 100%
 Interpretation: CV < 1% = excellent, CV < 2% = good
 ```
 
 ### R² Goodness of Fit
+
 ```
 R² = 1 - (SS_residual / SS_total)
 0.9905 indicates 99.05% of variance explained by model
