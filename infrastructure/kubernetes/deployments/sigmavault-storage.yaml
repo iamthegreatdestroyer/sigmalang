@@ -1,0 +1,46 @@
+---
+# ΣVAULT Storage Configuration
+# Phase 14 Production Deployment
+# StorageClass for EBS GP3 volumes and resource quotas
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+  labels:
+    storage-class: gp3
+    component: storage
+provisioner: ebs.csi.aws.com
+allowVolumeExpansion: true
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+  kms-key-id: "arn:aws:kms:us-east-1:ACCOUNT_ID:key/KEY_ID" # Update with your KMS key
+volumeBindingMode: WaitForFirstConsumer
+
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: sigmavault-quota
+  namespace: neurectomy
+  labels:
+    app: sigmavault
+    component: storage
+spec:
+  hard:
+    persistentvolumeclaims: "10"
+    requests.storage: "50Ti"
+    limits.memory: "80Gi"
+    limits.cpu: "40"
+    requests.memory: "40Gi"
+    requests.cpu: "20"
+  scopeSelector:
+    matchExpressions:
+      - operator: In
+        scopeName: PriorityClass
+        values:
+          - high-priority
+          - default

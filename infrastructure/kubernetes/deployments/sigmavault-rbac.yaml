@@ -1,0 +1,51 @@
+---
+# ΣVAULT RBAC Configuration
+# Phase 14 Production Deployment
+# Role-based access control for Kubernetes API
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sigmavault-role
+  namespace: neurectomy
+  labels:
+    app: sigmavault
+    component: storage
+rules:
+  # Read ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+
+  # Read Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+
+  # Read Pods (for peer discovery and status)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["list", "watch", "get"]
+
+  # Read StatefulSets (for replica status)
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sigmavault-rolebinding
+  namespace: neurectomy
+  labels:
+    app: sigmavault
+    component: storage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sigmavault-role
+subjects:
+  - kind: ServiceAccount
+    name: sigmavault-sa
+    namespace: neurectomy

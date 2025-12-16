@@ -1,9 +1,15 @@
 # ============================================================================
+
 # PHASE 14 PRODUCTION DEPLOYMENT - NEURECTOMY PROJECT
+
 # ============================================================================
+
 # This is a standalone prompt file for the Neurectomy project
+
 # Copy this entire prompt directly into Copilot when working on Neurectomy
+
 # DO NOT reference other files - everything you need is here
+
 # ============================================================================
 
 **PHASE 14: Neurectomy API Gateway Production Deployment**
@@ -11,6 +17,7 @@
 You are implementing Kubernetes manifests for Neurectomy Phase 14 Production Deployment in the Neurectomy unified namespace. This is the core API gateway and orchestration service.
 
 **EXACT SPECIFICATIONS FOR NEURECTOMY:**
+
 - Namespace: `neurectomy` (core namespace for entire ecosystem)
 - Deployment name: `neurectomy-api`
 - Service name: `neurectomy-api` (type: LoadBalancer - external traffic)
@@ -36,6 +43,7 @@ You are implementing Kubernetes manifests for Neurectomy Phase 14 Production Dep
 Include ALL of the following in one YAML file:
 
 1. **Deployment** (name: neurectomy-api):
+
    - spec.replicas: 5
    - Pod anti-affinity (preferred, weight 100) to spread across nodes
    - Topology spread constraint for zone distribution
@@ -45,6 +53,7 @@ Include ALL of the following in one YAML file:
    - Security context: runAsNonRoot=true, runAsUser=1000, runAsGroup=1000, seccompProfile.type=RuntimeDefault
 
 2. **Init container** (name: wait-for-dependencies):
+
    - image: busybox:1.36
    - Wait for PostgreSQL (DATABASE_HOST:5432)
    - Wait for Redis (REDIS_HOST:6379)
@@ -52,6 +61,7 @@ Include ALL of the following in one YAML file:
    - Security context: readOnlyRootFilesystem=true
 
 3. **Container spec** (name: neurectomy-api):
+
    - image: neurectomy/api:latest
    - imagePullPolicy: Always
    - Ports: 8080 (http), 9093 (metrics)
@@ -60,48 +70,53 @@ Include ALL of the following in one YAML file:
    - envFrom configMapRef: neurectomy-config (SHARED - already exists)
    - envFrom secretRef: neurectomy-secrets (will be created)
    - env variables:
-     * DATABASE_USER: "neurectomy"
-     * DATABASE_PASSWORD: from secret neurectomy-secrets[db-password]
-     * REDIS_PASSWORD: from secret neurectomy-secrets[redis-password]
-     * JWT_SECRET: from secret neurectomy-secrets[jwt-secret]
-     * POD_NAME: from metadata.name
-     * POD_NAMESPACE: from metadata.namespace
-     * POD_IP: from status.podIP
-     * NODE_NAME: from spec.nodeName
+     - DATABASE_USER: "neurectomy"
+     - DATABASE_PASSWORD: from secret neurectomy-secrets[db-password]
+     - REDIS_PASSWORD: from secret neurectomy-secrets[redis-password]
+     - JWT_SECRET: from secret neurectomy-secrets[jwt-secret]
+     - POD_NAME: from metadata.name
+     - POD_NAMESPACE: from metadata.namespace
+     - POD_IP: from status.podIP
+     - NODE_NAME: from spec.nodeName
    - Volume mounts: /tmp (emptyDir), /config (ConfigMap)
    - securityContext: allowPrivilegeEscalation=false, readOnlyRootFilesystem=true, drop ALL capabilities
 
 4. **Health probes**:
+
    - livenessProbe: httpGet /health on port 8080, initialDelay=30s, period=30s, timeout=10s
    - readinessProbe: httpGet /ready on port 8080, initialDelay=15s, period=10s, timeout=5s
    - startupProbe: httpGet /health on port 8080, failureThreshold=30 (allows 155s startup)
 
 5. **Lifecycle hooks**:
+
    - preStop: 15-second grace period before SIGTERM
      ```
      exec: /bin/sh -c "echo 'Graceful shutdown initiated...' && sleep 15"
      ```
 
 6. **Volumes**:
+
    - config-volume: configMap (neurectomy-config)
    - tmp-volume: emptyDir (sizeLimit: 1Gi)
 
 7. **LoadBalancer Service** (name: neurectomy-api):
+
    - type: LoadBalancer (exposes external IP)
    - selector: app=neurectomy-api, component=gateway
    - ports:
-     * port: 80 (external)
-     * targetPort: 8080 (container)
-     * protocol: TCP
-     * name: http
+     - port: 80 (external)
+     - targetPort: 8080 (container)
+     - protocol: TCP
+     - name: http
    - ports:
-     * port: 9093 (metrics)
-     * targetPort: 9093
-     * protocol: TCP
-     * name: metrics
+     - port: 9093 (metrics)
+     - targetPort: 9093
+     - protocol: TCP
+     - name: metrics
    - sessionAffinity: None (round-robin across pods)
 
 8. **HorizontalPodAutoscaler** (name: neurectomy-api-hpa):
+
    - scaleTargetRef: Deployment neurectomy-api
    - minReplicas: 5
    - maxReplicas: 50
@@ -110,38 +125,41 @@ Include ALL of the following in one YAML file:
    - scaleUp: stabilizationWindow=60s, moderate (50% per 30s or 4 pods per 30s)
 
 9. **ServiceAccount** (name: neurectomy-api-sa):
+
    - automountServiceAccountToken: false
 
 10. **PodDisruptionBudget** (name: neurectomy-api-pdb):
+
     - minAvailable: 3 (keep 3 pods running during disruptions)
 
 11. **NetworkPolicy** (name: neurectomy-api-network-policy):
     - Ingress:
-      * from ingress-nginx namespace on port 8080
-      * from monitoring/observability namespace on port 9093 (Prometheus)
-      * from neurectomy namespace on port 8080 (internal services)
+      - from ingress-nginx namespace on port 8080
+      - from monitoring/observability namespace on port 9093 (Prometheus)
+      - from neurectomy namespace on port 8080 (internal services)
     - Egress:
-      * DNS resolution (port 53 UDP/TCP to any)
-      * PostgreSQL (port 5432 to neurectomy namespace)
-      * Redis (port 6379 to neurectomy namespace)
-      * Ryot LLM (port 8000 to neurectomy namespace)
-      * ΣLANG (port 8001 to neurectomy namespace)
-      * ΣVAULT (port 8002 to neurectomy namespace)
+      - DNS resolution (port 53 UDP/TCP to any)
+      - PostgreSQL (port 5432 to neurectomy namespace)
+      - Redis (port 6379 to neurectomy namespace)
+      - Ryot LLM (port 8000 to neurectomy namespace)
+      - ΣLANG (port 8001 to neurectomy namespace)
+      - ΣVAULT (port 8002 to neurectomy namespace)
 
 ---
 
 ### FILE 2: neurectomy-secrets.yaml
 
 Single Secret resource:
+
 - name: neurectomy-secrets
 - namespace: neurectomy
 - type: Opaque
 - Data to include (all base64 encoded):
-  * db-password: (PostgreSQL password for neurectomy user)
-  * redis-password: (Redis AUTH password)
-  * jwt-secret: (JWT signing secret, min 32 characters)
-  * api-key: (API key for external integrations, optional)
-  * encryption-key: (Master encryption key for sensitive data, optional)
+  - db-password: (PostgreSQL password for neurectomy user)
+  - redis-password: (Redis AUTH password)
+  - jwt-secret: (JWT signing secret, min 32 characters)
+  - api-key: (API key for external integrations, optional)
+  - encryption-key: (Master encryption key for sensitive data, optional)
 
 NOTE: In production, use external secret management (HashiCorp Vault, AWS Secrets Manager, etc.) instead of inline secrets.
 
@@ -152,11 +170,12 @@ NOTE: In production, use external secret management (HashiCorp Vault, AWS Secret
 Include BOTH:
 
 1. **ClusterRole** (name: neurectomy-api-role):
+
    - Rules:
-     * apiGroups: [""] - resources: ["configmaps"] - verbs: ["get", "list", "watch"] (all namespaces)
-     * apiGroups: [""] - resources: ["secrets"] - verbs: ["get", "list"] (all namespaces)
-     * apiGroups: [""] - resources: ["pods"] - verbs: ["list", "watch", "get"] (all namespaces)
-     * apiGroups: ["apps"] - resources: ["deployments", "statefulsets"] - verbs: ["list", "watch"]
+     - apiGroups: [""] - resources: ["configmaps"] - verbs: ["get", "list", "watch"] (all namespaces)
+     - apiGroups: [""] - resources: ["secrets"] - verbs: ["get", "list"] (all namespaces)
+     - apiGroups: [""] - resources: ["pods"] - verbs: ["list", "watch", "get"] (all namespaces)
+     - apiGroups: ["apps"] - resources: ["deployments", "statefulsets"] - verbs: ["list", "watch"]
 
 2. **RoleBinding** (name: neurectomy-api-rolebinding):
    - namespace: neurectomy
@@ -168,27 +187,28 @@ Include BOTH:
 ### FILE 4: neurectomy-ingress.yaml
 
 Single Ingress resource:
+
 - name: neurectomy-ingress
 - namespace: neurectomy
 - annotations:
-  * kubernetes.io/ingress.class: nginx
-  * cert-manager.io/cluster-issuer: letsencrypt-prod (or your issuer)
-  * nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  * nginx.ingress.kubernetes.io/rate-limit: "1000"
-  * nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-  * nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-  * nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
-  * nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  - kubernetes.io/ingress.class: nginx
+  - cert-manager.io/cluster-issuer: letsencrypt-prod (or your issuer)
+  - nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  - nginx.ingress.kubernetes.io/rate-limit: "1000"
+  - nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+  - nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+  - nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+  - nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
 - TLS:
-  * hosts: [api.neurectomy.ai, app.neurectomy.ai]
-  * secretName: neurectomy-tls
+  - hosts: [api.neurectomy.ai, app.neurectomy.ai]
+  - secretName: neurectomy-tls
 - Rules:
-  * host: api.neurectomy.ai
-    * path: / (pathType: Prefix)
-    * backend: service neurectomy-api, port 80
-  * host: app.neurectomy.ai
-    * path: / (pathType: Prefix)
-    * backend: service neurectomy-api, port 80
+  - host: api.neurectomy.ai
+    - path: / (pathType: Prefix)
+    - backend: service neurectomy-api, port 80
+  - host: app.neurectomy.ai
+    - path: / (pathType: Prefix)
+    - backend: service neurectomy-api, port 80
 
 ---
 
@@ -214,11 +234,13 @@ Single Ingress resource:
 **VALIDATION AFTER CREATING:**
 
 1. Check local files:
+
    ```bash
    ls -la infrastructure/kubernetes/deployments/neurectomy-api*
    ```
 
 2. Check YAML syntax:
+
    ```bash
    kubectl apply -k infrastructure/kubernetes/ --dry-run=client -o yaml | head -150
    ```
@@ -238,6 +260,7 @@ Single Ingress resource:
 This deployment follows the same patterns as the Phase 14 ΣLANG implementation (already in infrastructure/kubernetes/deployments/sigmalang-deployment.yaml). Use that as a template for structure and best practices.
 
 The main differences for Neurectomy:
+
 - LoadBalancer Service (instead of ClusterIP) for external traffic
 - 5 replicas (vs ΣLANG's 5, same)
 - HPA: 5-50 (vs ΣLANG's 5-20, much larger scaling)
@@ -250,6 +273,7 @@ The main differences for Neurectomy:
 - Smaller resources (1 CPU request vs ΣLANG's 2)
 
 **INFRASTRUCTURE ALREADY EXISTS** - do NOT recreate:
+
 - Namespace: neurectomy (created)
 - ConfigMap: neurectomy-config (created, shared by all 4 services)
 - kustomization.yaml (will be updated to include neurectomy-api-deployment.yaml)

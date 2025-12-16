@@ -1,0 +1,174 @@
+---
+# Neurectomy API RBAC - Phase 14 Production
+# ClusterRole and RoleBinding for minimal required permissions
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: neurectomy-api-role
+  labels:
+    app: neurectomy-api
+    component: gateway
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+  # ConfigMap permissions (all namespaces)
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  # Secret permissions (all namespaces - for cross-namespace secret access if needed)
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+  # Pod permissions (all namespaces)
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  # Deployment permissions (all namespaces)
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  # Services (all namespaces)
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  # Endpoints (for service discovery)
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  # Namespace permissions
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+
+---
+# RoleBinding to attach ClusterRole to ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: neurectomy-api-rolebinding
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: gateway
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: neurectomy-api-role
+subjects:
+  - kind: ServiceAccount
+    name: neurectomy-api-sa
+    namespace: neurectomy
+
+---
+# Additional namespaced role for neurectomy namespace-specific permissions
+# Provides tighter scoping for neurectomy namespace resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: neurectomy-api-namespace-role
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: gateway
+rules:
+  # ConfigMaps in neurectomy namespace
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+    resourceNames:
+      - neurectomy-config
+  # Secrets in neurectomy namespace (restricted to neurectomy-secrets)
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+    resourceNames:
+      - neurectomy-secrets
+  # Pods in neurectomy namespace
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - list
+      - watch
+  # Services in neurectomy namespace
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+  # Events (for observability)
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+
+---
+# Namespaced RoleBinding for tight scoping
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: neurectomy-api-namespace-rolebinding
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: gateway
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: neurectomy-api-namespace-role
+subjects:
+  - kind: ServiceAccount
+    name: neurectomy-api-sa
+    namespace: neurectomy

@@ -1,9 +1,15 @@
 # ============================================================================
+
 # PHASE 14 PRODUCTION DEPLOYMENT - ΣVAULT PROJECT
+
 # ============================================================================
+
 # This is a standalone prompt file for the ΣVAULT project
+
 # Copy this entire prompt directly into Copilot when working on ΣVAULT
+
 # DO NOT reference other files - everything you need is here
+
 # ============================================================================
 
 **PHASE 14: ΣVAULT Production Deployment**
@@ -11,6 +17,7 @@
 You are implementing Kubernetes manifests for ΣVAULT Phase 14 Production Deployment in the Neurectomy unified namespace.
 
 **EXACT SPECIFICATIONS FOR ΣVAULT:**
+
 - Namespace: `neurectomy` (shared - do NOT create project-specific namespace)
 - StatefulSet name: `sigmavault` (use StatefulSet, NOT Deployment)
 - Service name: `sigmavault` (headless service with clusterIP: None)
@@ -37,6 +44,7 @@ You are implementing Kubernetes manifests for ΣVAULT Phase 14 Production Deploy
 Include ALL of the following in one YAML file:
 
 1. **StatefulSet** (name: sigmavault):
+
    - spec.replicas: 3
    - serviceName: sigmavault (headless service for DNS)
    - Pod anti-affinity (preferred, weight 100) to spread across nodes/zones
@@ -46,12 +54,14 @@ Include ALL of the following in one YAML file:
    - DNS policy: ClusterFirst (default)
 
 2. **Init container** (name: wait-for-config):
+
    - image: busybox:1.36
    - Wait for ConfigMap volume mount
    - Ensure /config/COMPRESSION_WORKERS exists before proceeding
    - Security context: readOnlyRootFilesystem=true, allowPrivilegeEscalation=false
 
 3. **Container spec** (name: sigmavault):
+
    - image: neurectomy/sigmavault:latest
    - imagePullPolicy: Always
    - Ports: 8002 (http), 9092 (metrics)
@@ -60,31 +70,34 @@ Include ALL of the following in one YAML file:
    - envFrom configMapRef: neurectomy-config (SHARED - already exists)
    - envFrom secretRef: sigmavault-secrets (will be created)
    - env variables:
-     * POD_NAME: from metadata.name
-     * POD_NAMESPACE: from metadata.namespace
-     * POD_IP: from status.podIP
-     * REPLICATION_FACTOR: "3"
+     - POD_NAME: from metadata.name
+     - POD_NAMESPACE: from metadata.namespace
+     - POD_IP: from status.podIP
+     - REPLICATION_FACTOR: "3"
    - Volume mounts: /data (StatefulSet PVC), /secrets (Secret), /mnt/sigmavault
    - securityContext:
-     * allowPrivilegeEscalation: false
-     * runAsNonRoot: true
-     * runAsUser: 1000
-     * runAsGroup: 1000
-     * privileged: true
-     * capabilities: add [SYS_ADMIN]
+     - allowPrivilegeEscalation: false
+     - runAsNonRoot: true
+     - runAsUser: 1000
+     - runAsGroup: 1000
+     - privileged: true
+     - capabilities: add [SYS_ADMIN]
 
 4. **Health probes**:
+
    - livenessProbe: httpGet /health on port 8002, initialDelay=30s, period=30s
    - readinessProbe: httpGet /ready on port 8002, initialDelay=15s, period=10s
    - startupProbe: httpGet /health on port 8002, failureThreshold=30 (allows 155s startup)
 
 5. **Volumes**:
+
    - config-volume: configMap (neurectomy-config)
    - secrets: secret (sigmavault-secrets)
    - tmp-volume: emptyDir (sizeLimit: 1Gi)
    - cache-volume: emptyDir (sizeLimit: 2Gi)
 
 6. **Headless Service** (name: sigmavault):
+
    - type: ClusterIP
    - clusterIP: None (headless - required for StatefulSet)
    - selector: app=sigmavault
@@ -92,6 +105,7 @@ Include ALL of the following in one YAML file:
    - sessionAffinity: None
 
 7. **volumeClaimTemplates**:
+
    - metadata.name: data
    - accessModes: ReadWriteOnce
    - storageClassName: gp3
@@ -99,6 +113,7 @@ Include ALL of the following in one YAML file:
    - This creates a separate 1Ti PVC for each StatefulSet pod
 
 8. **HorizontalPodAutoscaler** (name: sigmavault-hpa):
+
    - scaleTargetRef: StatefulSet sigmavault
    - minReplicas: 1
    - maxReplicas: 5
@@ -107,9 +122,11 @@ Include ALL of the following in one YAML file:
    - scaleUp: stabilizationWindow=60s, moderate pace
 
 9. **ServiceAccount** (name: sigmavault-sa):
+
    - automountServiceAccountToken: false
 
 10. **PodDisruptionBudget** (name: sigmavault-pdb):
+
     - minAvailable: 2 (keep 2 pods running during disruptions)
 
 11. **NetworkPolicy** (name: sigmavault-network-policy):
@@ -121,13 +138,14 @@ Include ALL of the following in one YAML file:
 ### FILE 2: sigmavault-secrets.yaml
 
 Single Secret resource:
+
 - name: sigmavault-secrets
 - namespace: neurectomy
 - type: Opaque
 - Data to include:
-  * encryption.key: (32-byte base64 encoded AES-256 key)
-  * replication-peers: (base64 encoded comma-separated pod list: sigmavault-0,sigmavault-1,sigmavault-2)
-  * master-key-passphrase: (base64 encoded passphrase for encryption key)
+  - encryption.key: (32-byte base64 encoded AES-256 key)
+  - replication-peers: (base64 encoded comma-separated pod list: sigmavault-0,sigmavault-1,sigmavault-2)
+  - master-key-passphrase: (base64 encoded passphrase for encryption key)
 
 ---
 
@@ -136,12 +154,13 @@ Single Secret resource:
 Include BOTH:
 
 1. **Role** (name: sigmavault-role):
+
    - namespace: neurectomy
    - Rules:
-     * apiGroups: [""] - resources: ["configmaps"] - verbs: ["get", "list", "watch"]
-     * apiGroups: [""] - resources: ["secrets"] - verbs: ["get", "list", "watch"]
-     * apiGroups: [""] - resources: ["pods"] - verbs: ["list", "watch", "get"]
-     * apiGroups: [""] - resources: ["statefulsets"] - verbs: ["list", "watch"]
+     - apiGroups: [""] - resources: ["configmaps"] - verbs: ["get", "list", "watch"]
+     - apiGroups: [""] - resources: ["secrets"] - verbs: ["get", "list", "watch"]
+     - apiGroups: [""] - resources: ["pods"] - verbs: ["list", "watch", "get"]
+     - apiGroups: [""] - resources: ["statefulsets"] - verbs: ["list", "watch"]
 
 2. **RoleBinding** (name: sigmavault-rolebinding):
    - namespace: neurectomy
@@ -155,17 +174,18 @@ Include BOTH:
 Include BOTH:
 
 1. **StorageClass** (name: gp3):
+
    - provisioner: ebs.csi.aws.com
    - parameters:
-     * type: gp3
-     * iops: "3000"
-     * throughput: "125"
+     - type: gp3
+     - iops: "3000"
+     - throughput: "125"
    - allowVolumeExpansion: true
 
 2. **ResourceQuota** (optional, name: sigmavault-quota):
    - hard:
-     * persistentvolumeclaims: "10"
-     * requests.storage: "50Ti"
+     - persistentvolumeclaims: "10"
+     - requests.storage: "50Ti"
 
 ---
 
@@ -190,11 +210,13 @@ Include BOTH:
 **VALIDATION AFTER CREATING:**
 
 1. Check local files:
+
    ```bash
    ls -la infrastructure/kubernetes/deployments/sigmavault*
    ```
 
 2. Check YAML syntax:
+
    ```bash
    kubectl apply -k infrastructure/kubernetes/ --dry-run=client -o yaml | head -100
    ```
@@ -213,6 +235,7 @@ Include BOTH:
 This deployment follows the same patterns as the Phase 14 ΣLANG implementation (already in infrastructure/kubernetes/deployments/sigmalang-deployment.yaml). Use that as a template for structure and best practices.
 
 The main differences for ΣVAULT:
+
 - StatefulSet (instead of Deployment) for stateful workload
 - Headless service (clusterIP: None) for pod discovery
 - volumeClaimTemplates (1Ti per pod, instead of single shared PVC)
@@ -222,6 +245,7 @@ The main differences for ΣVAULT:
 - privileged mode + SYS_ADMIN for FUSE filesystem mounting
 
 **INFRASTRUCTURE ALREADY EXISTS** - do NOT recreate:
+
 - Namespace: neurectomy (created)
 - ConfigMap: neurectomy-config (created, shared by all 4 services)
 - kustomization.yaml (will be updated to include sigmavault-statefulset.yaml)

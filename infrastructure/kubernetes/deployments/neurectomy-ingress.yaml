@@ -1,0 +1,199 @@
+---
+# Neurectomy API Ingress - Phase 14 Production
+# TLS-terminated ingress with domain routing and security annotations
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: neurectomy-ingress
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: gateway
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # SSL/TLS Configuration
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    # Rate Limiting
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    # Proxy Configuration
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "4k"
+    # Security Headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubdomains; preload";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+    # CORS Configuration (if needed)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://app.neurectomy.ai"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    # Logging
+    nginx.ingress.kubernetes.io/enable-access-log: "true"
+    # Web Application Firewall (optional - requires modsecurity)
+    # nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    # nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+spec:
+  tls:
+    - hosts:
+        - api.neurectomy.ai
+        - app.neurectomy.ai
+      secretName: neurectomy-tls
+  rules:
+    # API endpoint routing
+    - host: api.neurectomy.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: neurectomy-api
+                port:
+                  number: 80
+    # Application endpoint routing
+    - host: app.neurectomy.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: neurectomy-api
+                port:
+                  number: 80
+
+---
+# Certificate for TLS termination (managed by cert-manager)
+# This will be automatically created and renewed by cert-manager
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: neurectomy-tls-cert
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: gateway
+spec:
+  secretName: neurectomy-tls
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days before expiry
+  commonName: neurectomy.ai
+  dnsNames:
+    - neurectomy.ai
+    - api.neurectomy.ai
+    - app.neurectomy.ai
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+---
+# Ingress for metrics endpoint (internal only)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: neurectomy-metrics-ingress
+  namespace: neurectomy
+  labels:
+    app: neurectomy-api
+    component: metrics
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Restrict access to internal networks only
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    # Disable SSL redirect for metrics (internal)
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - host: metrics.neurectomy.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: neurectomy-api
+                port:
+                  number: 9093
+
+---
+# IMPORTANT NOTES:
+#
+# 1. CERT-MANAGER REQUIREMENTS:
+#    - Ensure cert-manager is installed in the cluster
+#    - Ensure a letsencrypt-prod ClusterIssuer exists:
+#
+#    apiVersion: cert-manager.io/v1
+#    kind: ClusterIssuer
+#    metadata:
+#      name: letsencrypt-prod
+#    spec:
+#      acme:
+#        server: https://acme-v02.api.letsencrypt.org/directory
+#        email: your-email@neurectomy.ai
+#        privateKeySecretRef:
+#          name: letsencrypt-prod
+#        solvers:
+#          - http01:
+#              ingress:
+#                class: nginx
+#
+# 2. DNS CONFIGURATION:
+#    Ensure these DNS records are configured:
+#    - A record: api.neurectomy.ai → LoadBalancer IP
+#    - A record: app.neurectomy.ai → LoadBalancer IP
+#    - A record (optional): metrics.neurectomy.local → Cluster IP
+#
+# 3. INGRESS-NGINX REQUIREMENTS:
+#    - Ensure ingress-nginx controller is installed and running
+#    - Ensure LoadBalancer service is properly configured
+#
+# 4. RATE LIMITING:
+#    - Global rate limit: 1000 requests per second
+#    - Per-connection rate: 100 requests per second
+#    - Adjust based on your API's actual capacity
+#
+# 5. SECURITY HEADERS:
+#    - HSTS: Forces HTTPS for 1 year (31536000 seconds)
+#    - X-Frame-Options: DENY (prevents clickjacking)
+#    - X-Content-Type-Options: nosniff (prevents MIME sniffing)
+#    - X-XSS-Protection: Enables browser XSS filters
+#    - Referrer-Policy: Restricts referrer header
+#
+# 6. CORS CONFIGURATION:
+#    - Currently allows requests from app.neurectomy.ai
+#    - Modify cors-allow-origin to match your application domain
+#    - Add additional origins as needed
+#
+# 7. TLS CERTIFICATE:
+#    - Automatically created and renewed by cert-manager
+#    - Valid for 90 days
+#    - Renewal starts 30 days before expiry
+#    - Monitor certificate status: kubectl get certificate -n neurectomy
+#
+# 8. TROUBLESHOOTING:
+#    # Check ingress status
+#    kubectl describe ingress neurectomy-ingress -n neurectomy
+#
+#    # Check certificate status
+#    kubectl describe certificate neurectomy-tls-cert -n neurectomy
+#
+#    # Check ingress-nginx controller
+#    kubectl get pod -n ingress-nginx
+#
+#    # Test HTTPS connectivity
+#    curl -v https://api.neurectomy.ai/health
+#
+#    # View ingress-nginx logs
+#    kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx -f
