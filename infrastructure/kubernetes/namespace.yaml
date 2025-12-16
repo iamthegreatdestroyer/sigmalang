@@ -1,0 +1,70 @@
+# ============================================================================
+# NEURECTOMY UNIFIED NAMESPACE
+# Phase 14: Production Deployment
+# ============================================================================
+# This namespace isolates all Neurectomy ecosystem services
+# Components: Ryot LLM, ΣLANG, ΣVAULT, Core Neurectomy
+# ============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: neurectomy
+  labels:
+    name: neurectomy
+    environment: production
+    project: neurectomy-unified-architecture
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+    tier: production
+  annotations:
+    description: "Neurectomy Unified Production Namespace"
+    owner: "neurectomy-team"
+    phase: "phase-14-production"
+---
+# Resource Quota for namespace protection
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: neurectomy-quota
+  namespace: neurectomy
+  labels:
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+spec:
+  hard:
+    requests.cpu: "40"
+    requests.memory: "80Gi"
+    limits.cpu: "80"
+    limits.memory: "160Gi"
+    pods: "100"
+    services: "20"
+    configmaps: "50"
+    secrets: "50"
+    persistentvolumeclaims: "20"
+---
+# Limit Range for default resource constraints
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: neurectomy-limits
+  namespace: neurectomy
+  labels:
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "1"
+        memory: "2Gi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "512Mi"
+      max:
+        cpu: "8"
+        memory: "16Gi"
+      min:
+        cpu: "50m"
+        memory: "64Mi"
+    - type: PersistentVolumeClaim
+      max:
+        storage: "100Gi"
+      min:
+        storage: "1Gi"

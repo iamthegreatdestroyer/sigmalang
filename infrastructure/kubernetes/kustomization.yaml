@@ -1,0 +1,58 @@
+# =============================================================================
+# ΣLANG Phase 14 Kustomization
+# =============================================================================
+# Kustomize configuration for Neurectomy production deployment
+# Usage: kubectl apply -k infrastructure/kubernetes/
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: sigmalang-phase14
+  annotations:
+    description: "ΣLANG Phase 14 Production Deployment"
+
+# Namespace for all resources
+namespace: neurectomy
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/part-of: neurectomy-ecosystem
+  app.kubernetes.io/managed-by: kustomize
+  phase: "14"
+
+# Common annotations
+commonAnnotations:
+  neurectomy.io/phase: "14"
+  neurectomy.io/component: "sigmalang"
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - configmaps/app-config.yaml
+  - deployments/sigmalang-deployment.yaml
+
+# ConfigMap generator (optional - for environment-specific overrides)
+configMapGenerator:
+  - name: sigmalang-env-config
+    behavior: create
+    literals:
+      - ENVIRONMENT=production
+      - PHASE=14
+      - DEPLOYED_BY=kustomize
+
+# Image transformations (for different environments)
+images:
+  - name: neurectomy/sigmalang
+    newTag: latest
+
+# Patches for environment-specific adjustments
+patches:
+  # Production replica count patch (optional override)
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 5
+    target:
+      kind: Deployment
+      name: sigmalang-deployment

@@ -1,0 +1,93 @@
+# ============================================================================
+# NEURECTOMY UNIFIED CONFIGURATION
+# Phase 14: Production Deployment
+# ============================================================================
+# Shared ConfigMap for all Neurectomy ecosystem services
+# Used by: Ryot LLM, ΣLANG, ΣVAULT, Core Neurectomy
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: neurectomy-config
+  namespace: neurectomy
+  labels:
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+    app.kubernetes.io/managed-by: neurectomy-infrastructure
+    environment: production
+  annotations:
+    description: "Unified configuration for all Neurectomy services"
+    phase: "phase-14-production"
+data:
+  # ============================================================================
+  # SERVICE ENDPOINTS - Internal Kubernetes DNS resolution
+  # ============================================================================
+  RYOT_ENDPOINT: "http://ryot-service.neurectomy.svc.cluster.local:8000"
+  SIGMALANG_ENDPOINT: "http://sigmalang-service.neurectomy.svc.cluster.local:8001"
+  SIGMAVAULT_ENDPOINT: "http://sigmavault-service.neurectomy.svc.cluster.local:8002"
+  NEURECTOMY_ENDPOINT: "http://neurectomy-service.neurectomy.svc.cluster.local:8003"
+
+  # ============================================================================
+  # METRICS ENDPOINTS - Prometheus scrape targets
+  # ============================================================================
+  RYOT_METRICS_ENDPOINT: "http://ryot-service.neurectomy.svc.cluster.local:9090/metrics"
+  SIGMALANG_METRICS_ENDPOINT: "http://sigmalang-service.neurectomy.svc.cluster.local:9091/metrics"
+  SIGMAVAULT_METRICS_ENDPOINT: "http://sigmavault-service.neurectomy.svc.cluster.local:9092/metrics"
+  NEURECTOMY_METRICS_ENDPOINT: "http://neurectomy-service.neurectomy.svc.cluster.local:9093/metrics"
+
+  # ============================================================================
+  # DATABASE CONFIGURATION
+  # ============================================================================
+  POSTGRES_HOST: "postgres-service.neurectomy.svc.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "neurectomy"
+  POSTGRES_POOL_SIZE: "20"
+  POSTGRES_MAX_OVERFLOW: "10"
+
+  REDIS_HOST: "redis-service.neurectomy.svc.cluster.local"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  REDIS_POOL_SIZE: "50"
+
+  # ============================================================================
+  # APPLICATION SETTINGS
+  # ============================================================================
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+
+  # Performance tuning
+  WORKER_CONCURRENCY: "4"
+  REQUEST_TIMEOUT: "30"
+  KEEPALIVE_TIMEOUT: "65"
+
+  # ============================================================================
+  # SIGMALANG-SPECIFIC CONFIGURATION
+  # ============================================================================
+  COMPRESSION_WORKERS: "8"
+  COMPRESSION_LEVEL: "9"
+  BUFFER_POOL_SIZE: "1000"
+  CACHE_SIZE_MB: "512"
+  MAX_PAYLOAD_SIZE_MB: "100"
+
+  # Streaming configuration
+  STREAMING_ENABLED: "true"
+  STREAMING_CHUNK_SIZE: "65536"
+  STREAMING_BUFFER_SIZE: "262144"
+
+  # Token optimization
+  TOKEN_CACHE_TTL: "3600"
+  TOKEN_BATCH_SIZE: "1000"
+
+  # ============================================================================
+  # OBSERVABILITY
+  # ============================================================================
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "true"
+  TRACING_SAMPLE_RATE: "0.1"
+  JAEGER_AGENT_HOST: "jaeger-agent.observability.svc.cluster.local"
+  JAEGER_AGENT_PORT: "6831"
+
+  # Health check configuration
+  HEALTH_CHECK_INTERVAL: "10"
+  READINESS_CHECK_INTERVAL: "5"

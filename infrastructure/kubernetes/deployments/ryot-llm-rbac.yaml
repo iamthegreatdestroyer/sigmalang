@@ -1,0 +1,67 @@
+---
+# PHASE 14: Ryot LLM RBAC
+# Role-Based Access Control for Ryot LLM service account
+# Minimal permissions following principle of least privilege
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ryot-llm-role
+  namespace: neurectomy
+  labels:
+    app: ryot-llm
+    phase: 14
+rules:
+  # ConfigMap read permissions
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Secret read permissions (for credentials)
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+
+  # Pod read permissions (for service discovery)
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - list
+      - watch
+
+  # PersistentVolumeClaim read permissions
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ryot-llm-rolebinding
+  namespace: neurectomy
+  labels:
+    app: ryot-llm
+    phase: 14
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ryot-llm-role
+subjects:
+  - kind: ServiceAccount
+    name: ryot-sa
+    namespace: neurectomy

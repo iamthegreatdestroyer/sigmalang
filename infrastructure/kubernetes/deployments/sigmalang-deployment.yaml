@@ -1,0 +1,469 @@
+# ============================================================================
+# SIGMALANG (ΣLANG) PRODUCTION DEPLOYMENT
+# Phase 14: Production Deployment - Neurectomy Unified Architecture
+# ============================================================================
+# Component: ΣLANG - Compression & Tokenization Service
+# Namespace: neurectomy (unified ecosystem)
+# Port: 8001 (HTTP API), 9091 (Prometheus Metrics)
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sigmalang-deployment
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    component: compression
+    version: "1.0.0"
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+    app.kubernetes.io/component: compression-service
+    tier: backend
+    environment: production
+  annotations:
+    description: "ΣLANG Compression & Tokenization Service"
+    phase: "phase-14-production"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9091"
+    prometheus.io/path: "/metrics"
+spec:
+  replicas: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: sigmalang
+      component: compression
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  template:
+    metadata:
+      labels:
+        app: sigmalang
+        component: compression
+        version: "1.0.0"
+        app.kubernetes.io/name: sigmalang
+        app.kubernetes.io/part-of: neurectomy-ecosystem
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9091"
+        prometheus.io/path: "/metrics"
+        # Force rolling update on config change
+        checksum/config: '{{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}'
+    spec:
+      serviceAccountName: sigmalang-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      # Pod anti-affinity for high availability
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: sigmalang
+                topologyKey: kubernetes.io/hostname
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: sigmalang
+                topologyKey: topology.kubernetes.io/zone
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: node-type
+                    operator: In
+                    values:
+                      - compute-optimized
+
+      # Topology spread for even distribution
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: sigmalang
+
+      terminationGracePeriodSeconds: 60
+
+      initContainers:
+        - name: wait-for-config
+          image: busybox:1.36
+          command:
+            - "sh"
+            - "-c"
+            - |
+              echo "Waiting for ConfigMap to be available..."
+              until [ -f /config/COMPRESSION_WORKERS ]; do
+                echo "ConfigMap not ready, waiting..."
+                sleep 2
+              done
+              echo "ConfigMap ready, proceeding..."
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+      containers:
+        - name: sigmalang
+          image: neurectomy/sigmalang:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 8001
+              protocol: TCP
+            - name: metrics
+              containerPort: 9091
+              protocol: TCP
+
+          env:
+            # Primary configuration
+            - name: COMPRESSION_WORKERS
+              value: "8"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+
+          envFrom:
+            - configMapRef:
+                name: neurectomy-config
+            - secretRef:
+                name: sigmalang-secrets
+                optional: true
+
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+              ephemeral-storage: "1Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+              ephemeral-storage: "5Gi"
+
+          # Liveness probe - is the container alive?
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+
+          # Readiness probe - is the container ready to serve traffic?
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+
+          # Startup probe - allow slow starts
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 30
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: cache-volume
+              mountPath: /app/cache
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    echo "Graceful shutdown initiated..."
+                    # Allow in-flight requests to complete
+                    sleep 15
+                    echo "Shutdown complete"
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: neurectomy-config
+        - name: tmp-volume
+          emptyDir:
+            sizeLimit: 1Gi
+        - name: cache-volume
+          emptyDir:
+            sizeLimit: 2Gi
+
+      imagePullSecrets:
+        - name: neurectomy-registry-credentials
+---
+# ============================================================================
+# SIGMALANG SERVICE
+# ============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: sigmalang-service
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9091"
+spec:
+  type: ClusterIP
+  selector:
+    app: sigmalang
+    component: compression
+  ports:
+    - name: http
+      port: 8001
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 9091
+      targetPort: metrics
+      protocol: TCP
+  sessionAffinity: None
+---
+# ============================================================================
+# SIGMALANG HORIZONTAL POD AUTOSCALER
+# ============================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sigmalang-hpa
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sigmalang-deployment
+  minReplicas: 5
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 30
+        - type: Pods
+          value: 4
+          periodSeconds: 30
+      selectPolicy: Max
+---
+# ============================================================================
+# SIGMALANG SERVICE ACCOUNT
+# ============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sigmalang-sa
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+automountServiceAccountToken: false
+---
+# ============================================================================
+# SIGMALANG POD DISRUPTION BUDGET
+# ============================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sigmalang-pdb
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: sigmalang
+      component: compression
+---
+# ============================================================================
+# SIGMALANG NETWORK POLICY
+# ============================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sigmalang-network-policy
+  namespace: neurectomy
+  labels:
+    app: sigmalang
+    app.kubernetes.io/name: sigmalang
+    app.kubernetes.io/part-of: neurectomy-ecosystem
+spec:
+  podSelector:
+    matchLabels:
+      app: sigmalang
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from other neurectomy services
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: neurectomy
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: neurectomy-ecosystem
+      ports:
+        - port: 8001
+          protocol: TCP
+        - port: 9091
+          protocol: TCP
+    # Allow Prometheus scraping from monitoring namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - namespaceSelector:
+            matchLabels:
+              name: observability
+      ports:
+        - port: 9091
+          protocol: TCP
+    # Allow ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - port: 8001
+          protocol: TCP
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow communication with other neurectomy services
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: neurectomy
+      ports:
+        - port: 8000
+          protocol: TCP
+        - port: 8001
+          protocol: TCP
+        - port: 8002
+          protocol: TCP
+        - port: 8003
+          protocol: TCP
+    # Allow database access
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: neurectomy
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - port: 5432
+          protocol: TCP
+    # Allow Redis access
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: neurectomy
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - port: 6379
+          protocol: TCP

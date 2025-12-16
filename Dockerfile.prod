@@ -1,0 +1,252 @@
+# =============================================================================
+# ΣLANG Production Dockerfile - Phase 14 Neurectomy Integration
+# =============================================================================
+# Optimized multi-stage build for Kubernetes deployment
+# Target: <400MB image, <3s startup, non-root execution
+# Ports: 8001 (HTTP API), 9091 (Prometheus metrics)
+#
+# Build: docker build -f Dockerfile.prod -t neurectomy/sigmalang:latest .
+# Run:   docker run -p 8001:8001 -p 9091:9091 neurectomy/sigmalang:latest
+# =============================================================================
+
+# =============================================================================
+# STAGE 1: Builder - Compile dependencies with build tools
+# =============================================================================
+FROM python:3.12-slim-bookworm AS builder
+
+# Prevent Python from writing bytecode and buffering stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Install minimal build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip and install build tools
+RUN pip install --upgrade pip setuptools wheel
+
+# Set working directory for build
+WORKDIR /build
+
+# Copy dependency files first (layer caching optimization)
+COPY pyproject.toml README.md ./
+COPY sigmalang/__init__.py sigmalang/__init__.py
+
+# Install numpy first (required by scipy/scikit-learn)
+RUN pip install numpy==1.26.4
+
+# Copy full source and install package
+COPY . .
+
+# Install package in production mode (no dev dependencies)
+RUN pip install --no-deps . && \
+    pip install \
+    "scipy>=1.10.0" \
+    "scikit-learn>=1.2.0" \
+    "fastapi>=0.100.0" \
+    "uvicorn[standard]>=0.23.0" \
+    "pydantic>=2.0.0" \
+    "pydantic-settings>=2.0.0" \
+    "click>=8.1.0" \
+    "rich>=13.0.0" \
+    "prometheus-client>=0.17.0" \
+    "structlog>=23.1.0" \
+    "redis>=4.5.0"
+
+# Remove unnecessary files from venv to reduce size
+RUN find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/venv -type f -name "*.pyc" -delete 2>/dev/null || true && \
+    find /opt/venv -type f -name "*.pyo" -delete 2>/dev/null || true && \
+    find /opt/venv -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/venv -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
+
+# =============================================================================
+# STAGE 2: Production Runtime - Minimal secure image
+# =============================================================================
+FROM python:3.12-slim-bookworm AS production
+
+# OCI Image Labels for Phase 14 Neurectomy ecosystem
+LABEL org.opencontainers.image.title="ΣLANG" \
+    org.opencontainers.image.description="Neural-inspired semantic compression framework - Phase 14 Production" \
+    org.opencontainers.image.version="1.0.0" \
+    org.opencontainers.image.vendor="Neurectomy Project" \
+    org.opencontainers.image.source="https://github.com/neurectomy/sigmalang" \
+    org.opencontainers.image.licenses="MIT" \
+    org.opencontainers.image.authors="Neurectomy Team" \
+    # Neurectomy ecosystem labels
+    neurectomy.service="sigmalang" \
+    neurectomy.tier="compression" \
+    neurectomy.phase="14" \
+    neurectomy.port.http="8001" \
+    neurectomy.port.metrics="9091"
+
+# Production environment configuration
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    # Disable pip version check for faster startup
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # Virtual environment path
+    PATH="/opt/venv/bin:$PATH" \
+    # =======================================================================
+    # ΣLANG Phase 14 Configuration - Neurectomy Integration
+    # =======================================================================
+    # API Server Settings (overridable via ConfigMap)
+    SIGMALANG_API_HOST=0.0.0.0 \
+    SIGMALANG_API_PORT=8001 \
+    SIGMALANG_METRICS_PORT=9091 \
+    # Logging Configuration
+    SIGMALANG_LOG_LEVEL=INFO \
+    SIGMALANG_LOG_FORMAT=json \
+    # Performance Tuning
+    SIGMALANG_WORKERS=4 \
+    COMPRESSION_WORKERS=8 \
+    # Feature Flags
+    SIGMALANG_METRICS_ENABLED=true \
+    SIGMALANG_HEALTH_ENABLED=true \
+    # Cache Configuration (Redis integration)
+    SIGMALANG_CACHE_ENABLED=true \
+    SIGMALANG_CACHE_TTL=3600 \
+    # Neurectomy Ecosystem Endpoints (defaults, overridden by ConfigMap)
+    RYOT_ENDPOINT=http://ryot-service.neurectomy.svc.cluster.local:8000 \
+    PROMETHEUS_GATEWAY=http://prometheus.monitoring.svc.cluster.local:9090
+
+# Install minimal runtime dependencies and create user in single layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Health check utilities
+    curl \
+    # TLS/SSL support
+    ca-certificates \
+    # Timezone data for proper logging
+    tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    # Create non-root user for security (UID 1000 for Kubernetes compatibility)
+    && groupadd --gid 1000 sigmalang \
+    && useradd --uid 1000 --gid sigmalang --shell /bin/bash --create-home sigmalang \
+    # Create required directories
+    && mkdir -p /app /app/tmp /app/cache /app/logs \
+    && chown -R sigmalang:sigmalang /app
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code with proper ownership
+COPY --chown=sigmalang:sigmalang sigmalang/ ./sigmalang/
+COPY --chown=sigmalang:sigmalang pyproject.toml README.md ./
+
+# Create startup script for Kubernetes integration
+RUN cat > /app/entrypoint.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "=== ΣLANG Production Container Starting ==="
+echo "Phase: 14 - Neurectomy Integration"
+echo "API Port: ${SIGMALANG_API_PORT:-8001}"
+echo "Metrics Port: ${SIGMALANG_METRICS_PORT:-9091}"
+echo "Workers: ${SIGMALANG_WORKERS:-4}"
+echo "Compression Workers: ${COMPRESSION_WORKERS:-8}"
+echo "============================================"
+
+# Wait for dependent services if CHECK_DEPENDENCIES is set
+if [ "${CHECK_DEPENDENCIES:-false}" = "true" ]; then
+echo "Checking dependencies..."
+
+# Wait for Redis if cache is enabled
+if [ "${SIGMALANG_CACHE_ENABLED:-true}" = "true" ] && [ -n "${REDIS_HOST}" ]; then
+echo "Waiting for Redis at ${REDIS_HOST}:${REDIS_PORT:-6379}..."
+for i in $(seq 1 30); do
+if nc -z "${REDIS_HOST}" "${REDIS_PORT:-6379}" 2>/dev/null; then
+echo "Redis is available"
+break
+fi
+echo "Waiting for Redis... ($i/30)"
+sleep 1
+done
+fi
+fi
+
+# Start uvicorn with production settings
+exec uvicorn sigmalang.core.api_server:create_app \
+    --factory \
+    --host "${SIGMALANG_API_HOST:-0.0.0.0}" \
+    --port "${SIGMALANG_API_PORT:-8001}" \
+    --workers "${SIGMALANG_WORKERS:-4}" \
+    --loop uvloop \
+    --http httptools \
+    --access-log \
+    --log-level "${SIGMALANG_LOG_LEVEL:-info}" \
+    --timeout-keep-alive 65 \
+    --limit-concurrency 1000 \
+    --backlog 2048
+EOF
+
+RUN chmod +x /app/entrypoint.sh && \
+    chown sigmalang:sigmalang /app/entrypoint.sh
+
+# Switch to non-root user (security best practice)
+USER sigmalang
+
+# Expose ports for API and metrics
+# Port 8001: HTTP API (Phase 14 specification)
+# Port 9091: Prometheus metrics endpoint
+EXPOSE 8001 9091
+
+# Health check for Kubernetes probes backup
+# Primary health checks should use Kubernetes livenessProbe/readinessProbe
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${SIGMALANG_API_PORT:-8001}/health || exit 1
+
+# Set stop signal for graceful shutdown
+STOPSIGNAL SIGTERM
+
+# Production entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# =============================================================================
+# STAGE 3: Debug - Production with debugging tools (optional)
+# =============================================================================
+FROM production AS debug
+
+USER root
+
+# Install debugging tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    vim \
+    less \
+    htop \
+    strace \
+    net-tools \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python debugging packages
+RUN pip install --no-cache-dir \
+    debugpy \
+    ipython \
+    py-spy
+
+USER sigmalang
+
+# Override for debug mode
+ENV SIGMALANG_LOG_LEVEL=DEBUG
+
+CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", \
+    "-m", "uvicorn", "sigmalang.core.api_server:create_app", "--factory", \
+    "--host", "0.0.0.0", "--port", "8001", "--reload"]

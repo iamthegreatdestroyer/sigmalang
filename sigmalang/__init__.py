@@ -61,6 +61,18 @@ from .training.codebook import (
     PatternSignature
 )
 
+# Phase 2A: Adapter imports for Ryot LLM integration
+try:
+    from .adapters import (
+        SigmaCompressionAdapter,
+        create_ryot_compression_adapter,
+        RyotTokenSequence,
+        RyotSigmaEncodedContext,
+    )
+except ImportError:
+    # Adapters may not be available in all contexts
+    pass
+
 __all__ = [
     # Core structures
     'SemanticNode',
@@ -98,4 +110,10 @@ __all__ = [
     'TrainingConfig',
     'TrainingCorpusBuilder',
     'PatternSignature',
+    
+    # Adapters (Phase 2A: Ryot Integration)
+    'SigmaCompressionAdapter',
+    'create_ryot_compression_adapter',
+    'RyotTokenSequence',
+    'RyotSigmaEncodedContext',
 ]
