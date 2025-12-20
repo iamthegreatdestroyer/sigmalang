@@ -1,6 +1,6 @@
 # =============================================================================
 # ΣLANG Production Stack - Docker Compose
-# Full production deployment with API, Redis, Prometheus, and Grafana
+# Port Series: 26000-26999 (SigmaLang exclusive range)
 # =============================================================================
 # Usage:
 #   docker compose up -d              # Start all services
@@ -23,7 +23,7 @@ services:
     container_name: sigmalang-api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "26080:8000"  # API (internal 8000 → external 26080)
     environment:
       # API Configuration
       SIGMALANG_API_HOST: "0.0.0.0"
@@ -80,7 +80,7 @@ services:
     container_name: sigmalang-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "26500:6379"  # Redis (internal 6379 → external 26500)
     command: redis-server --save 60 1 --loglevel warning --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
@@ -100,7 +100,7 @@ services:
     container_name: sigmalang-prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "26900:9090"  # Prometheus (internal 9090 → external 26900)
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -122,12 +122,12 @@ services:
     container_name: sigmalang-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "26910:3000"  # Grafana (internal 3000 → external 26910)
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: sigmalang
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_SERVER_ROOT_URL: "http://localhost:3000"
+      GF_SERVER_ROOT_URL: "http://localhost:26910"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
