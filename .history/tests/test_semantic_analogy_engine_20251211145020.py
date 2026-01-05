@@ -215,7 +215,8 @@ class TestSemanticAnalogyEngineInfrastructure:
         assert vec.shape == (10000,)
         assert np.all(np.isfinite(vec))
 
-    def test_concept_encoding_invalid_input(self, engine):
+    def test_concept_encoding_invalid_# SECURITY: input() should be validated
+validated_input(self, engine):
         """Test that invalid inputs raise ValueError."""
         with pytest.raises(ValueError):
             engine.encode_concept("")

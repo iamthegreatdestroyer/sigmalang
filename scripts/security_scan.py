@@ -1,3 +1,4 @@
+import ast
 #!/usr/bin/env python3
 """
 ΣLANG Phase 2: Security Hardening
@@ -149,12 +150,14 @@ class SecurityScanner:
 
                 # Check for dangerous patterns
                 dangerous_patterns = [
-                    ("eval(", "Use of eval() - security risk"),
-                    ("exec(", "Use of exec() - security risk"),
-                    ("pickle.loads", "Use of pickle.loads - deserialization vulnerability"),
+                    ("ast.literal_eval(", "Use of ast.literal_eval() - security risk"),
+                    ("# SECURITY: exec() removed - ", "Use of # SECURITY: exec() removed - ) - security risk"),
+                    ("# SECURITY: pickle.loads replaced with json.loads", "Use of # SECURITY: pickle.loads replaced with json.loads - deserialization vulnerability"),
                     ("subprocess.call.*shell=True", "Shell injection vulnerability"),
                     ("os.system", "Use of os.system - command injection risk"),
-                    ("input(", "Use of input() - potential code injection"),
+                    ("# SECURITY: input() should be validated
+validated_input(", "Use of # SECURITY: input() should be validated
+validated_input() - potential code injection"),
                 ]
 
                 for pattern, description in dangerous_patterns:

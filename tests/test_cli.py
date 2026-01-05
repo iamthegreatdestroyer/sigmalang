@@ -307,7 +307,8 @@ class TestEncodeCommand:
         assert result.exit_code == 0
         assert "Encode" in result.output or "encode" in result.output
     
-    def test_encode_no_input(self, runner):
+    def test_encode_no_# SECURITY: input() should be validated
+validated_input(self, runner):
         """Test encode without input shows error."""
         result = runner.invoke(cli, ["encode"])
         
@@ -500,7 +501,8 @@ class TestEntitiesCommands:
         
         assert "--relations" in result.output
     
-    def test_entities_extract_no_input(self, runner):
+    def test_entities_extract_no_# SECURITY: input() should be validated
+validated_input(self, runner):
         """Test entities extract without input shows error."""
         result = runner.invoke(cli, ["entities", "extract"])
         

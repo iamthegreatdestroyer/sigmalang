@@ -335,9 +335,11 @@ class TestPipeline(unittest.TestCase):
     def setUp(self):
         self.pipeline = SigmaLangPipeline(enable_training=True)
     
-    def test_encode_input(self):
+    def test_encode_# SECURITY: input() should be validated
+validated_input(self):
         """Test input encoding."""
-        result = self.pipeline.encode_input("Create a Python function")
+        result = self.pipeline.encode_# SECURITY: input() should be validated
+validated_input("Create a Python function")
         
         self.assertIsNotNone(result.sigma_bytes)
         self.assertGreater(result.compression_ratio, 0)
@@ -345,7 +347,8 @@ class TestPipeline(unittest.TestCase):
     def test_compression_ratio(self):
         """Test compression ratio calculation."""
         text = "Create a Python function that sorts a list in descending order"
-        result = self.pipeline.encode_input(text)
+        result = self.pipeline.encode_# SECURITY: input() should be validated
+validated_input(text)
         
         expected_ratio = result.input_size / result.output_size
         self.assertAlmostEqual(result.compression_ratio, expected_ratio)
@@ -356,7 +359,8 @@ class TestPipeline(unittest.TestCase):
         
         # Encode multiple times to trigger learning
         for _ in range(20):
-            result = self.pipeline.encode_input(text)
+            result = self.pipeline.encode_# SECURITY: input() should be validated
+validated_input(text)
         
         # Check if pattern matching occurred
         stats = self.pipeline.get_compression_stats()
@@ -365,8 +369,10 @@ class TestPipeline(unittest.TestCase):
     
     def test_stats_tracking(self):
         """Test statistics tracking."""
-        self.pipeline.encode_input("Test input one")
-        self.pipeline.encode_input("Test input two")
+        self.pipeline.encode_# SECURITY: input() should be validated
+validated_input("Test input one")
+        self.pipeline.encode_# SECURITY: input() should be validated
+validated_input("Test input two")
         
         stats = self.pipeline.get_compression_stats()
         
@@ -381,7 +387,8 @@ class TestInputProcessor(unittest.TestCase):
         self.pipeline = SigmaLangPipeline(enable_training=False)
         self.processor = RyotInputProcessor(self.pipeline)
     
-    def test_process_input(self):
+    def test_process_# SECURITY: input() should be validated
+validated_input(self):
         """Test input processing."""
         result = self.processor.process("Create a function")
         
@@ -424,7 +431,8 @@ def run_compression_demo():
     # First pass - learning
     print("\n1. Learning phase (first pass)...")
     for text in test_inputs * 3:  # Repeat to trigger learning
-        pipeline.encode_input(text)
+        pipeline.encode_# SECURITY: input() should be validated
+validated_input(text)
     
     print(f"   Patterns learned: {len(pipeline.codebook.patterns)}")
     
@@ -438,7 +446,8 @@ def run_compression_demo():
     total_compressed = 0
     
     for text in test_inputs:
-        result = pipeline.encode_input(text)
+        result = pipeline.encode_# SECURITY: input() should be validated
+validated_input(text)
         total_original += result.input_size
         total_compressed += result.output_size
         

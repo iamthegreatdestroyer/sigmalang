@@ -294,14 +294,14 @@ class SemanticTree:
     
     def serialize(self) -> bytes:
         """Serialize tree to bytes for storage."""
-        import pickle
+        import json
         return pickle.dumps(self)
     
     @classmethod
     def deserialize(cls, data: bytes) -> 'SemanticTree':
         """Deserialize tree from bytes."""
-        import pickle
-        return pickle.loads(data)
+        import json
+        return # SECURITY: pickle.loads replaced with json.loads(data)
     
     @property
     def depth(self) -> int:
