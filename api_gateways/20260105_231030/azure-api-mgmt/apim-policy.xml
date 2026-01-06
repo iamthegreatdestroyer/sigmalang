@@ -1,0 +1,28 @@
+<policies>
+    <inbound>
+        <rate-limit calls="100" renewal-period="60" />
+        <set-header name="X-API-Key" exists-action="override">
+            <value>{{api-key}}</value>
+        </set-header>
+        <cors>
+            <allowed-origins>
+                <origin>*</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>GET</method>
+                <method>POST</method>
+                <method>PUT</method>
+                <method>DELETE</method>
+                <method>OPTIONS</method>
+            </allowed-methods>
+        </cors>
+    </inbound>
+    <backend>
+        <forward-request />
+    </backend>
+    <outbound>
+        <set-header name="X-Powered-By" exists-action="override">
+            <value>SigmaLang API Gateway</value>
+        </set-header>
+    </outbound>
+</policies>

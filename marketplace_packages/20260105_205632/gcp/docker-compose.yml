@@ -1,0 +1,156 @@
+# =============================================================================
+# ΣLANG Production Stack - Docker Compose
+# Port Series: 26000-26999 (SigmaLang exclusive range)
+# =============================================================================
+# Usage:
+#   docker compose up -d              # Start all services
+#   docker compose logs -f sigmalang  # View API logs
+#   docker compose down               # Stop all services
+# =============================================================================
+
+name: sigmalang
+
+services:
+  # ===========================================================================
+  # ΣLANG API Server
+  # ===========================================================================
+  sigmalang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: ghcr.io/iamthegreatdestroyer/sigmalang:latest
+    container_name: sigmalang-api
+    restart: unless-stopped
+    ports:
+      - "26080:8000"  # API (internal 8000 → external 26080)
+    environment:
+      # API Configuration
+      SIGMALANG_API_HOST: "0.0.0.0"
+      SIGMALANG_API_PORT: "8000"
+      SIGMALANG_API_WORKERS: "4"
+      SIGMALANG_DEBUG: "false"
+
+      # Logging
+      SIGMALANG_LOG_LEVEL: "INFO"
+      SIGMALANG_LOG_FORMAT: "json"
+
+      # Cache (Redis)
+      SIGMALANG_CACHE_ENABLED: "true"
+      SIGMALANG_CACHE_BACKEND: "redis"
+      SIGMALANG_REDIS_URL: "redis://redis:6379/0"
+
+      # Monitoring
+      SIGMALANG_METRICS_ENABLED: "true"
+      SIGMALANG_METRICS_PORT: "9090"
+
+      # Rate Limiting
+      SIGMALANG_RATE_LIMIT_ENABLED: "true"
+      SIGMALANG_RATE_LIMIT_REQUESTS: "100"
+      SIGMALANG_RATE_LIMIT_WINDOW: "60"
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+    networks:
+      - sigmalang-network
+
+  # ===========================================================================
+  # Redis Cache
+  # ===========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sigmalang-redis
+    restart: unless-stopped
+    ports:
+      - "26500:6379"  # Redis (internal 6379 → external 26500)
+    command: redis-server --save 60 1 --loglevel warning --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sigmalang-network
+
+  # ===========================================================================
+  # Prometheus Metrics
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: sigmalang-prometheus
+    restart: unless-stopped
+    ports:
+      - "26900:9090"  # Prometheus (internal 9090 → external 26900)
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - sigmalang
+    networks:
+      - sigmalang-network
+
+  # ===========================================================================
+  # Grafana Dashboards
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: sigmalang-grafana
+    restart: unless-stopped
+    ports:
+      - "26910:3000"  # Grafana (internal 3000 → external 26910)
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: sigmalang
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "http://localhost:26910"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - sigmalang-network
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  sigmalang-network:
+    driver: bridge
+    name: sigmalang-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  redis-data:
+    name: sigmalang-redis-data
+  prometheus-data:
+    name: sigmalang-prometheus-data
+  grafana-data:
+    name: sigmalang-grafana-data

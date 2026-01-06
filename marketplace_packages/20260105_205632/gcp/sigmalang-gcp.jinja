@@ -1,0 +1,42 @@
+{
+  "resources": [
+    {
+      "name": "sigmalang-vm",
+      "type": "compute.v1.instance",
+      "properties": {
+        "zone": "us-central1-a",
+        "machineType": "zones/us-central1-a/machineTypes/n1-standard-1",
+        "disks": [
+          {
+            "deviceName": "boot",
+            "type": "PERSISTENT",
+            "boot": true,
+            "autoDelete": true,
+            "initializeParams": {
+              "sourceImage": "projects/cos-cloud/global/images/family/cos-stable"
+            }
+          }
+        ],
+        "networkInterfaces": [
+          {
+            "network": "global/networks/default",
+            "accessConfigs": [
+              {
+                "name": "External NAT",
+                "type": "ONE_TO_ONE_NAT"
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "items": [
+            {
+              "key": "startup-script",
+              "value": "#!/bin/bash\\n# Install \u03a3LANG\\necho 'Installing \u03a3LANG...'"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

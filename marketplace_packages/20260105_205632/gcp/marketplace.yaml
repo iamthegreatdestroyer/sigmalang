@@ -1,0 +1,33 @@
+{
+  "name": "sigmalang-semantic-compression",
+  "displayName": "\u03a3LANG Semantic Compression",
+  "description": "Enterprise semantic compression service for AI applications",
+  "version": "1.0.0",
+  "specVersion": "v2",
+  "tags": [
+    "ai",
+    "compression",
+    "semantic",
+    "nlp"
+  ],
+  "pricing": {
+    "type": "paid",
+    "tiers": [
+      {
+        "name": "starter",
+        "description": "Up to 1M requests/month",
+        "price": 49.99
+      },
+      {
+        "name": "professional",
+        "description": "Up to 10M requests/month",
+        "price": 199.99
+      },
+      {
+        "name": "enterprise",
+        "description": "Unlimited requests",
+        "price": 999.99
+      }
+    ]
+  }
+}
