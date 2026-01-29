@@ -6,10 +6,20 @@ AI-powered security remediation with zero human intervention
 
 import os
 import sys
+import io
 import json
 import re
 import subprocess
 from pathlib import Path
+
+# Fix Windows console Unicode encoding
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    try:
+        os.system('chcp 65001 > nul 2>&1')
+    except Exception:
+        pass
 from datetime import datetime
 from typing import Dict, List, Any, Tuple
 import shutil
@@ -98,13 +108,19 @@ class AutonomousSecurityFixer:
         return false_positives
 
     def fix_owasp_issues(self, owasp_report: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """AI-powered OWASP issue remediation"""
-        self.print_status("Applying AI-driven OWASP fixes...")
+        """
+        OWASP issue analysis and reporting.
+        
+        SAFETY NOTE: This method now REPORTS issues but does NOT auto-modify files.
+        Auto-modification was causing file corruption by breaking Python syntax.
+        All fixes require manual review to ensure code correctness.
+        """
+        self.print_status("Analyzing OWASP security issues (report-only mode)...")
 
-        fixes_applied = []
+        issues_found = []
 
         if "issues" not in owasp_report:
-            return fixes_applied
+            return issues_found
 
         for issue in owasp_report["issues"]:
             file_path = self.project_root / issue["file"]
@@ -116,60 +132,48 @@ class AutonomousSecurityFixer:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
 
-                lines = content.split('\n')
                 pattern = issue["pattern"]
+                recommendation = ""
 
-                # AI-driven fix generation based on pattern
+                # Generate recommendations (but do NOT modify files)
                 if "eval(" in pattern:
-                    # Replace eval with ast.literal_eval for safe evaluation
-                    new_content = content.replace("eval(", "ast.literal_eval(")
-                    # Add import if not present
-                    if "import ast" not in new_content:
-                        new_content = "import ast\n" + new_content
-
+                    recommendation = "Replace eval() with ast.literal_eval() for safe evaluation"
                 elif "exec(" in pattern:
-                    # Remove or replace exec usage
-                    new_content = content.replace("exec(", "# SECURITY: exec() removed - ")
-                    self.print_warning(f"Removed exec() usage in {file_path}")
-
+                    recommendation = "Remove exec() - use safer alternatives like importlib or explicit function calls"
                 elif "pickle.loads" in pattern:
-                    # Replace with safe alternative
-                    new_content = content.replace("pickle.loads", "# SECURITY: pickle.loads replaced with json.loads")
-                    new_content = new_content.replace("import pickle", "import json")
-
-                elif "subprocess.call.*shell=True" in pattern:
-                    # Remove shell=True for security
-                    new_content = re.sub(r'subprocess\.call\([^,]+,.*shell=True', lambda m: m.group().replace('shell=True', 'shell=False'), content)
-
+                    recommendation = "Replace pickle with json for untrusted data"
+                elif "subprocess.call.*shell=True" in pattern or "shell=True" in pattern:
+                    recommendation = "Remove shell=True and pass command as list"
                 elif "os.system" in pattern:
-                    # Replace with subprocess.run
-                    new_content = content.replace("os.system(", "subprocess.run(")
-                    if "import subprocess" not in new_content:
-                        new_content = "import subprocess\n" + new_content
-
+                    recommendation = "Replace os.system() with subprocess.run()"
                 elif "input(" in pattern:
-                    # Add input validation
-                    new_content = content.replace("input(", "# SECURITY: input() should be validated\nvalidated_input(")
-
+                    recommendation = "Add input validation and sanitization"
                 else:
-                    continue
+                    recommendation = "Manual review required"
 
-                # Write the fixed content
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(new_content)
-
-                fixes_applied.append({
+                issues_found.append({
                     "file": str(file_path.relative_to(self.project_root)),
-                    "issue": issue["description"],
-                    "fix_applied": f"AI-generated fix for {pattern}"
+                    "issue": issue.get("description", pattern),
+                    "pattern": pattern,
+                    "recommendation": recommendation,
+                    "status": "REPORTED - requires manual fix"
                 })
 
-                self.print_success(f"Applied security fix to {file_path}")
+                self.print_warning(f"Security issue in {file_path}: {pattern}")
+                self.print_status(f"  Recommendation: {recommendation}")
 
             except Exception as e:
-                self.print_warning(f"Could not fix {file_path}: {e}")
+                self.print_warning(f"Could not analyze {file_path}: {e}")
 
-        return fixes_applied
+        # Write issues report
+        report_path = self.fixed_dir / "owasp_issues_report.json"
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(issues_found, f, indent=2)
+
+        self.print_success(f"Found {len(issues_found)} OWASP issues - report saved to {report_path}")
+        self.print_status("NOTE: Files NOT modified. Manual fixes required for safety.")
+        
+        return issues_found
 
     def install_security_tools(self) -> bool:
         """Ensure security tools are properly installed"""
