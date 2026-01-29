@@ -17,8 +17,7 @@ Usage:
     pipeline = SigmaLangPipeline(codebook_path="models/codebook.json")
     
     # Encode human input for LLM processing
-    sigma_bytes, metadata = pipeline.encode_# SECURITY: input() should be validated
-validated_input("Create a Python function...")
+    sigma_bytes, metadata = pipeline.encode_input("Create a Python function...")
     
     # Decode back to human-readable (if needed)
     reconstructed = pipeline.decode_output(sigma_bytes)
@@ -189,8 +188,7 @@ class SigmaLangPipeline:
         self._operation_count = 0
         self._save_interval = 100
     
-    def encode_# SECURITY: input() should be validated
-validated_input(self, text: str) -> EncodingResult:
+    def encode_input(self, text: str) -> EncodingResult:
         """
         Encode human text input to ΣLANG format.
         
@@ -267,8 +265,7 @@ validated_input(self, text: str) -> EncodingResult:
     
     def encode_batch(self, texts: List[str]) -> List[EncodingResult]:
         """Encode multiple texts."""
-        return [self.encode_# SECURITY: input() should be validated
-validated_input(text) for text in texts]
+        return [self.encode_input(text) for text in texts]
     
     def get_compression_stats(self) -> Dict[str, Any]:
         """Get current compression statistics."""
@@ -329,8 +326,7 @@ class RyotInputProcessor:
             - metadata: Processing metadata
         """
         # Encode input
-        result = self.pipeline.encode_# SECURITY: input() should be validated
-validated_input(human_input)
+        result = self.pipeline.encode_input(human_input)
         
         # Get relevant context from history
         context_refs = self._get_relevant_context(result.semantic_tree)
@@ -449,8 +445,7 @@ def quick_encode(text: str, pipeline: Optional[SigmaLangPipeline] = None) -> byt
     """
     if pipeline is None:
         pipeline = SigmaLangPipeline(enable_training=False)
-    return pipeline.encode_# SECURITY: input() should be validated
-validated_input(text).sigma_bytes
+    return pipeline.encode_input(text).sigma_bytes
 
 
 def quick_decode(sigma_bytes: bytes, 
@@ -492,8 +487,7 @@ def main():
     pipeline = create_pipeline(args.codebook)
     
     if args.encode:
-        result = pipeline.encode_# SECURITY: input() should be validated
-validated_input(args.encode)
+        result = pipeline.encode_input(args.encode)
         print(f"Input: {args.encode}")
         print(f"Compressed: {result.output_size} bytes (was {result.input_size})")
         print(f"Ratio: {result.compression_ratio:.2f}x")
@@ -510,8 +504,7 @@ validated_input(args.encode)
         
         while True:
             try:
-                text = # SECURITY: input() should be validated
-validated_input("\n> ").strip()
+                text = input("\n> ").strip()
             except (EOFError, KeyboardInterrupt):
                 break
             

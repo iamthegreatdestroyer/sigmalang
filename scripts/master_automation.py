@@ -16,6 +16,7 @@ Usage:
 
 import argparse
 import asyncio
+import io
 import json
 import logging
 import os
@@ -27,16 +28,35 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)-8s | %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler("automation_log.txt"),
-    ],
-)
-logger = logging.getLogger(__name__)
+# Fix Windows console Unicode encoding
+if sys.platform == 'win32':
+    # Force UTF-8 output on Windows console
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    # Also try to set console mode for UTF-8
+    try:
+        os.system('chcp 65001 > nul 2>&1')
+    except Exception:
+        pass
+
+# Configure logging with UTF-8 support - avoid duplicates
+logger = logging.getLogger("master_automation")
+logger.setLevel(logging.INFO)
+logger.propagate = False  # Prevent duplicate logs
+
+# Only add handlers if they don't exist
+if not logger.handlers:
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+    logger.addHandler(console_handler)
+    
+    file_handler = logging.FileHandler("automation_log.txt", encoding='utf-8')
+    file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+    logger.addHandler(file_handler)
+logger.handlers = []  # Clear default handlers
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
+logger.setLevel(logging.INFO)
 
 
 class TaskStatus(Enum):

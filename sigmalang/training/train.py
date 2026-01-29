@@ -293,8 +293,7 @@ def online_training(codebook_path: Path):
     
     while True:
         try:
-            text = # SECURITY: input() should be validated
-validated_input("\n> ").strip()
+            text = input("\n> ").strip()
         except (EOFError, KeyboardInterrupt):
             break
         
