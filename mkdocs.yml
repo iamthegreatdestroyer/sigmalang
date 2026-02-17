@@ -1,0 +1,130 @@
+site_name: ΣLANG Documentation
+site_description: Sub-Linear Algorithmic Neural Glyph Language for LLM compression
+site_author: Ryot LLM Project
+site_url: https://sigmalang.io
+
+repo_name: iamthegreatdestroyer/sigmalang
+repo_url: https://github.com/iamthegreatdestroyer/sigmalang
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2025 Ryot LLM Project
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/iamthegreatdestroyer/sigmalang
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/sigmalang/sigmalang
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/sigmalang/
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: en
+  - minify:
+      minify_html: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+      - Basic Usage: getting-started/basic-usage.md
+  - Concepts:
+      - Overview: concepts/overview.md
+      - Semantic Primitives: concepts/primitives.md
+      - Compression: concepts/compression.md
+      - Analogy Engine: concepts/analogy.md
+  - API Reference:
+      - Overview: api/overview.md
+      - REST API: api/rest-api.md
+      - Python API: api/python-api.md
+      - CLI: api/cli.md
+  - SDKs:
+      - JavaScript/TypeScript: sdks/javascript.md
+      - Java: sdks/java.md
+      - Python: sdks/python.md
+  - Deployment:
+      - Docker: deployment/docker.md
+      - Kubernetes: deployment/kubernetes.md
+      - Helm: deployment/helm.md
+  - Operations:
+      - Monitoring: operations/monitoring.md
+      - Logging: operations/logging.md
+      - Performance: operations/performance.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Architecture: development/architecture.md
+      - Testing: development/testing.md
+  - About:
+      - License: about/license.md
+      - Changelog: about/changelog.md

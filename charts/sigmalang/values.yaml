@@ -1,0 +1,329 @@
+# Default values for sigmalang Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+##
+global:
+  ## @param global.imageRegistry Global Docker image registry
+  ##
+  imageRegistry: ""
+  ## @param global.imagePullSecrets Global Docker registry secret names as an array
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+
+## @section Common parameters
+##
+## @param nameOverride String to partially override sigmalang.fullname template (will maintain the release name)
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override sigmalang.fullname template
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override the namespace
+##
+namespaceOverride: ""
+
+## @section ΣLANG API parameters
+##
+## ΣLANG image version
+## ref: https://hub.docker.com/r/sigmalang/sigmalang/tags/
+## @param image.registry ΣLANG image registry
+## @param image.repository ΣLANG image repository
+## @param image.tag ΣLANG image tag (immutable tags are recommended)
+## @param image.pullPolicy ΣLANG image pull policy
+## @param image.pullSecrets Specify docker-registry secret names as an array
+##
+image:
+  registry: docker.io
+  repository: sigmalang/sigmalang
+  tag: "1.0.0"
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## Example:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+
+## @param replicaCount Number of ΣLANG replicas to deploy
+##
+replicaCount: 3
+
+## @param revisionHistoryLimit Number of old ReplicaSets to retain
+##
+revisionHistoryLimit: 5
+
+## @section Service parameters
+##
+service:
+  ## @param service.type Kubernetes service type
+  ##
+  type: ClusterIP
+  ## @param service.port ΣLANG HTTP API service port
+  ##
+  port: 8000
+  ## @param service.metricsPort Prometheus metrics service port
+  ##
+  metricsPort: 9091
+  ## @param service.annotations Service annotations
+  ##
+  annotations: {}
+
+## @section Ingress parameters
+##
+ingress:
+  ## @param ingress.enabled Enable ingress controller resource
+  ##
+  enabled: true
+  ## @param ingress.className Ingress class name
+  ##
+  className: "nginx"
+  ## @param ingress.annotations Ingress annotations
+  ## For a full list of possible ingress annotations, please see
+  ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+  ##
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  ## @param ingress.hostname Default host for the ingress resource
+  ##
+  hostname: sigmalang.example.com
+  ## @param ingress.tls Enable TLS configuration for the hostname
+  ##
+  tls: true
+  ## @param ingress.tlsSecret TLS secret name
+  ##
+  tlsSecret: sigmalang-tls
+
+## @section Resource limits and requests
+##
+resources:
+  ## @param resources.limits.cpu The resources limits for the container (CPU)
+  ## @param resources.limits.memory The resources limits for the container (memory)
+  ##
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  ## @param resources.requests.cpu The requested resources for the container (CPU)
+  ## @param resources.requests.memory The requested resources for the container (memory)
+  ##
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+## @section Autoscaling parameters
+##
+autoscaling:
+  ## @param autoscaling.enabled Enable Horizontal Pod Autoscaler
+  ##
+  enabled: true
+  ## @param autoscaling.minReplicas Minimum number of replicas
+  ##
+  minReplicas: 3
+  ## @param autoscaling.maxReplicas Maximum number of replicas
+  ##
+  maxReplicas: 10
+  ## @param autoscaling.targetCPUUtilizationPercentage Target CPU utilization percentage
+  ##
+  targetCPUUtilizationPercentage: 70
+  ## @param autoscaling.targetMemoryUtilizationPercentage Target Memory utilization percentage
+  ##
+  targetMemoryUtilizationPercentage: 80
+
+## @section Health checks
+##
+livenessProbe:
+  ## @param livenessProbe.enabled Enable livenessProbe
+  ##
+  enabled: true
+  ## @param livenessProbe.httpGet.path Path for livenessProbe
+  ##
+  httpGet:
+    path: /health
+    port: http
+  ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ##
+  initialDelaySeconds: 30
+  ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+  ##
+  periodSeconds: 10
+  ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ##
+  timeoutSeconds: 5
+  ## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ##
+  failureThreshold: 3
+
+readinessProbe:
+  ## @param readinessProbe.enabled Enable readinessProbe
+  ##
+  enabled: true
+  ## @param readinessProbe.httpGet.path Path for readinessProbe
+  ##
+  httpGet:
+    path: /health
+    port: http
+  ## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ##
+  initialDelaySeconds: 10
+  ## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+  ##
+  periodSeconds: 5
+  ## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ##
+  timeoutSeconds: 3
+  ## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ##
+  failureThreshold: 3
+
+## @section ΣLANG configuration
+##
+config:
+  ## @param config.logLevel Log level (DEBUG, INFO, WARNING, ERROR)
+  ##
+  logLevel: INFO
+  ## @param config.logFormat Log format (json, text)
+  ##
+  logFormat: json
+  ## @param config.workers Number of uvicorn workers
+  ##
+  workers: 4
+  ## @param config.compressionWorkers Number of compression workers
+  ##
+  compressionWorkers: 8
+  ## @param config.metricsEnabled Enable Prometheus metrics
+  ##
+  metricsEnabled: true
+  ## @param config.cacheEnabled Enable Redis caching
+  ##
+  cacheEnabled: true
+  ## @param config.cacheTTL Cache TTL in seconds
+  ##
+  cacheTTL: 3600
+
+## @section Redis dependency
+##
+redis:
+  ## @param redis.enabled Deploy Redis subchart
+  ##
+  enabled: true
+  ## @param redis.architecture Redis architecture (standalone or replication)
+  ##
+  architecture: standalone
+  ## @param redis.auth.enabled Enable Redis password authentication
+  ##
+  auth:
+    enabled: true
+    password: ""  # Auto-generated if not set
+  ## @param redis.master.persistence.enabled Enable Redis data persistence
+  ##
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+## @section Security context
+##
+podSecurityContext:
+  ## @param podSecurityContext.runAsNonRoot Run container as non-root user
+  ##
+  runAsNonRoot: true
+  ## @param podSecurityContext.runAsUser User ID to run container as
+  ##
+  runAsUser: 1000
+  ## @param podSecurityContext.runAsGroup Group ID to run container as
+  ##
+  runAsGroup: 1000
+  ## @param podSecurityContext.fsGroup Filesystem group for volume mounts
+  ##
+  fsGroup: 1000
+
+securityContext:
+  ## @param securityContext.allowPrivilegeEscalation Allow privilege escalation
+  ##
+  allowPrivilegeEscalation: false
+  ## @param securityContext.capabilities.drop Capabilities to drop
+  ##
+  capabilities:
+    drop:
+      - ALL
+  ## @param securityContext.readOnlyRootFilesystem Mount root filesystem as read-only
+  ##
+  readOnlyRootFilesystem: true
+
+## @section Affinity and topology
+##
+affinity:
+  ## @param affinity.podAntiAffinity Pod anti-affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  ## Allowed values: soft, hard
+  ##
+  podAntiAffinity: soft
+
+## @param topologySpreadConstraints Topology spread constraints
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+##
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+
+## @section Service Account
+##
+serviceAccount:
+  ## @param serviceAccount.create Enable creation of ServiceAccount
+  ##
+  create: true
+  ## @param serviceAccount.name The name of the ServiceAccount to use
+  ## If not set and create is true, a name is generated using the fullname template
+  ##
+  name: ""
+  ## @param serviceAccount.annotations Annotations for service account
+  ##
+  annotations: {}
+
+## @section Monitoring
+##
+monitoring:
+  ## @param monitoring.serviceMonitor.enabled Create ServiceMonitor for Prometheus Operator
+  ##
+  serviceMonitor:
+    enabled: false
+    ## @param monitoring.serviceMonitor.interval Scrape interval
+    ##
+    interval: 30s
+    ## @param monitoring.serviceMonitor.scrapeTimeout Scrape timeout
+    ##
+    scrapeTimeout: 10s
+
+## @section Network Policy
+##
+networkPolicy:
+  ## @param networkPolicy.enabled Enable NetworkPolicy
+  ##
+  enabled: true
+  ## @param networkPolicy.ingress.enabled Enable ingress rules
+  ##
+  ingress:
+    enabled: true
+    ## @param networkPolicy.ingress.namespaceSelector Namespace selector for ingress
+    ##
+    namespaceSelector: {}
+  ## @param networkPolicy.egress.enabled Enable egress rules
+  ##
+  egress:
+    enabled: true
