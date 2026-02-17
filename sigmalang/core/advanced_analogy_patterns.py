@@ -11,8 +11,8 @@ Classes:
     AnalogyCacheManager: Manage cache statistics and performance
 
 Example:
-    >>> from core.semantic_analogy_engine import SemanticAnalogyEngine
-    >>> from core.advanced_analogy_patterns import (
+    >>> from sigmalang.core.semantic_analogy_engine import SemanticAnalogyEngine
+    >>> from sigmalang.core.advanced_analogy_patterns import (
     ...     AnalogyCachingLayer,
     ...     FuzzyAnalogyMatcher,
     ...     InverseAnalogyResolver

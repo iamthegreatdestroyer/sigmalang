@@ -447,7 +447,7 @@ class TestAnalogyCompositionEngine:
 
     def test_compose_two_analogies(self, composition_engine):
         """Test composing two analogies."""
-        from core.advanced_analogy_patterns import CompositeAnalogyResult
+        from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
         result = composition_engine.compose_analogies(
             ("king", "male"), ("queen", "female")
         )
@@ -465,7 +465,7 @@ class TestAnalogyCompositionEngine:
 
     def test_composite_pattern_solving(self, composition_engine):
         """Test solving analogy using composite pattern."""
-        from core.advanced_analogy_patterns import CompositeAnalogyResult
+        from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
         pattern = composition_engine.create_pattern(
             [("king", "male"), ("queen", "female")]
         )
@@ -490,7 +490,7 @@ class TestAnalogyCompositionEngine:
         pattern = composition_engine.create_pattern(
             [("king", "male"), ("queen", "female")]
         )
-        from core.advanced_analogy_patterns import CompositeAnalogyResult
+        from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
         result = composition_engine.solve_composite(
             pattern, ("prince", "male", "?")
         )
@@ -561,7 +561,7 @@ class TestAnalogySolver:
 
     def test_unified_interface(self, unified_solver):
         """Test unified solver interface."""
-        from core.analogy_composition import CompositeAnalogyQuery
+        from sigmalang.core.analogy_composition import CompositeAnalogyQuery
         query = CompositeAnalogyQuery(a="king", b="man", c="queen")
         result = unified_solver.solve(query)
         assert isinstance(result, dict)
@@ -569,7 +569,7 @@ class TestAnalogySolver:
 
     def test_batch_solving(self, unified_solver):
         """Test batch solving multiple analogies."""
-        from core.analogy_composition import CompositeAnalogyQuery
+        from sigmalang.core.analogy_composition import CompositeAnalogyQuery
         queries = [
             CompositeAnalogyQuery(a="king", b="man", c="queen"),
             CompositeAnalogyQuery(a="prince", b="boy", c="princess"),

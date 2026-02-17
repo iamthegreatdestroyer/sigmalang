@@ -314,7 +314,7 @@ class TestEncodeCommand:
         # Should show error about no input
         assert result.exit_code != 0 or "Error" in result.output or "error" in result.output.lower()
     
-    @patch("core.cli.CLIContext.api", new_callable=lambda: property(lambda self: MagicMock()))
+    @patch("sigmalang.core.cli.CLIContext.api", new_callable=lambda: property(lambda self: MagicMock()))
     def test_encode_text_argument(self, mock_api_prop, runner, mock_api):
         """Test encode with text argument."""
         with patch.object(CLIContext, 'api', mock_api):
@@ -678,13 +678,13 @@ class TestEntryPoint:
     
     def test_main_function_exists(self):
         """Test main function exists."""
-        from core.cli import main
+        from sigmalang.core.cli import main
         
         assert callable(main)
     
     def test_cli_callable(self):
         """Test cli is callable."""
-        from core.cli import cli
+        from sigmalang.core.cli import cli
         
         assert callable(cli)
 

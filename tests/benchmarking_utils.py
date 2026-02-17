@@ -96,13 +96,13 @@ class BenchmarkResult:
             "dataset_size": self.dataset_size,
             "dataset_complexity": self.dataset_complexity.value,
             "metric_type": self.metric_type.value,
-            "mean": self.mean,
-            "std": self.std,
-            "median": self.median,
-            "min": self.min,
-            "max": self.max,
-            "p95": self.p95,
-            "p99": self.p99,
+            "mean": float(self.mean),
+            "std": float(self.std),
+            "median": float(self.median),
+            "min": float(self.min),
+            "max": float(self.max),
+            "p95": float(self.p95),
+            "p99": float(self.p99),
             "sample_count": len(self.values),
             "metadata": self.metadata
         }
@@ -168,10 +168,10 @@ class ComparativeResult:
         return {
             "metric_type": self.metric_type.value,
             "dataset_complexity": self.dataset_complexity.value,
-            "hd_mean": self.hd_result.mean,
-            "lsh_mean": self.lsh_result.mean,
-            "hd_better": self.hd_better,
-            "improvement_factor": self.improvement_factor,
+            "hd_mean": float(self.hd_result.mean),
+            "lsh_mean": float(self.lsh_result.mean),
+            "hd_better": bool(self.hd_better),
+            "improvement_factor": float(self.improvement_factor),
             "hd_full": self.hd_result.to_dict(),
             "lsh_full": self.lsh_result.to_dict()
         }

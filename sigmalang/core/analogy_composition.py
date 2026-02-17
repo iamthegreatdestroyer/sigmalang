@@ -9,7 +9,7 @@ Classes:
     AnalogySolver: Unified interface for all analogy types
 
 Example:
-    >>> from core.analogy_composition import (
+    >>> from sigmalang.core.analogy_composition import (
     ...     AnalogyCompositionEngine,
     ...     AnalogySolver
     ... )
@@ -119,7 +119,7 @@ class AnalogyCompositionEngine:
             CompositeAnalogyResult
         """
         # Placeholder for implementation
-        from core.advanced_analogy_patterns import CompositeAnalogyResult
+        from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
         return CompositeAnalogyResult(answer="", component_count=2)
 
     def create_pattern(
@@ -165,7 +165,7 @@ class AnalogyCompositionEngine:
             CompositeAnalogyResult
         """
         # Placeholder for implementation
-        from core.advanced_analogy_patterns import CompositeAnalogyResult
+        from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
         return CompositeAnalogyResult(
             answer="",
             component_count=len(pattern.analogies)
@@ -380,13 +380,13 @@ class AnalogySolver:
         - Interactive solving with feedback
 
     Example:
-        >>> from core.semantic_analogy_engine import SemanticAnalogyEngine
-        >>> from core.advanced_analogy_patterns import (
+        >>> from sigmalang.core.semantic_analogy_engine import SemanticAnalogyEngine
+        >>> from sigmalang.core.advanced_analogy_patterns import (
         ...     AnalogyCachingLayer,
         ...     FuzzyAnalogyMatcher,
         ...     AnalogyChainingEngine
         ... )
-        >>> from core.analogy_composition import AnalogySolver
+        >>> from sigmalang.core.analogy_composition import AnalogySolver
         >>> base_engine = SemanticAnalogyEngine()
         >>> cache = AnalogyCachingLayer()
         >>> fuzzy = FuzzyAnalogyMatcher()

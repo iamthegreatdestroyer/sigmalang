@@ -241,7 +241,7 @@ class BidirectionalSemanticCodec:
                         original_snapshot=original_snapshot,
                         decoded_snapshot=decoded_snapshot,
                         round_trip_successful=True,
-                        compression_ratio=len(encoded) / len(tree.source_text.encode('utf-8')),
+                        compression_ratio=len(encoded) / max(1, len(tree.source_text.encode('utf-8'))),
                         diagnostics={
                             'strategy': mode.name,
                             'verification': 'passed',
@@ -270,7 +270,7 @@ class BidirectionalSemanticCodec:
                             original_snapshot=original_snapshot,
                             decoded_snapshot=decoded_snapshot,
                             round_trip_successful=True,
-                            compression_ratio=len(encoded) / len(tree.source_text.encode('utf-8')),
+                            compression_ratio=len(encoded) / max(1, len(tree.source_text.encode('utf-8'))),
                             diagnostics={
                                 'strategy': 'lossless_fallback',
                                 'verification': 'passed_after_fallback',
@@ -288,7 +288,7 @@ class BidirectionalSemanticCodec:
                             original_snapshot=original_snapshot,
                             decoded_snapshot=decoded_snapshot,
                             round_trip_successful=False,
-                            compression_ratio=len(encoded) / len(tree.source_text.encode('utf-8')),
+                            compression_ratio=len(encoded) / max(1, len(tree.source_text.encode('utf-8'))),
                             diagnostics={
                                 'strategy': mode.name,
                                 'verification': 'failed',
@@ -314,7 +314,7 @@ class BidirectionalSemanticCodec:
                         original_snapshot=original_snapshot,
                         decoded_snapshot=None,
                         round_trip_successful=True,
-                        compression_ratio=len(encoded) / len(tree.source_text.encode('utf-8')),
+                        compression_ratio=len(encoded) / max(1, len(tree.source_text.encode('utf-8'))),
                         diagnostics={
                             'strategy': 'lossless_fallback',
                             'verification': 'fallback_due_to_exception',
@@ -330,7 +330,7 @@ class BidirectionalSemanticCodec:
                 mode=mode,
                 original_snapshot=original_snapshot,
                 round_trip_successful=None,
-                compression_ratio=len(encoded) / len(tree.source_text.encode('utf-8')),
+                compression_ratio=len(encoded) / max(1, len(tree.source_text.encode('utf-8'))),
                 diagnostics={
                     'strategy': mode.name,
                     'verification': 'skipped',

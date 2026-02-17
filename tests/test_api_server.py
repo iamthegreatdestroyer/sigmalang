@@ -560,7 +560,7 @@ class TestAPIFactory:
     def test_get_api_creates_instance(self):
         """Test get_api creates instance."""
         # Reset to ensure clean state
-        import core.api_server as api_module
+        import sigmalang.core.api_server as api_module
         api_module._api_instance = None
         
         api = get_api()

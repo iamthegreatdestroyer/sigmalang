@@ -27,9 +27,9 @@ from typing import List, Tuple
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.primitives import SemanticTree, SemanticNode, ExistentialPrimitive
-from core.parser import SemanticParser
-from core.encoder import SigmaEncoder, SigmaDecoder
+from sigmalang.core.primitives import SemanticTree, SemanticNode, ExistentialPrimitive
+from sigmalang.core.parser import SemanticParser
+from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
 from training.codebook import (
     LearnedCodebook, CodebookTrainer, TrainingConfig, TrainingCorpusBuilder
 )

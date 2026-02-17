@@ -76,7 +76,8 @@ include = ["sigmalang*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short --cov=sigmalang --cov-report=html --cov-report=term-missing --strict-markers"
+# Note: Coverage disabled in addopts to prevent hangs. Run with --cov=sigmalang when needed.
+addopts = "-v --tb=short --strict-markers"
 markers = [
     "unit: Unit tests for individual components",
     "integration: Integration tests for component interactions",
