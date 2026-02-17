@@ -299,9 +299,14 @@ class SemanticTree:
     
     @classmethod
     def deserialize(cls, data: bytes) -> 'SemanticTree':
-        """Deserialize tree from bytes."""
+        """Deserialize tree from bytes.
+
+        Security Note: Uses pickle for internal serialization only.
+        NEVER deserialize untrusted data with this method.
+        For external data, use JSON serialization instead.
+        """
         import pickle
-        return pickle.loads(data)
+        return pickle.loads(data)  # nosec - internal use only
     
     @property
     def depth(self) -> int:
