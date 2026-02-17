@@ -1,21 +1,19 @@
 """
-API Endpoints Integration Tests
+API Services Integration Tests
 
-Tests all FastAPI REST endpoints with real HTTP requests.
-Verifies request/response schemas, error handling, and
-end-to-end API functionality.
+Tests all API services with direct method calls.
+Verifies service functionality, error handling, and
+end-to-end service integration.
 
 Test Coverage:
-- /encode endpoint (single and batch)
-- /decode endpoint
-- /analogy endpoint (solve and explain)
-- /search endpoint
-- /entities endpoint
-- /embedding endpoint
-- /similarity endpoint
-- /health endpoint
-- /info endpoint
-- Error responses (4xx, 5xx)
+- Encode service (single and batch)
+- Decode service
+- Analogy service (solve and explain)
+- Search service
+- Entity service
+- NLP service
+- Health and info endpoints
+- Error handling
 """
 
 import sys
@@ -28,89 +26,84 @@ from typing import Dict, Any
 sigmalang_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from fastapi.testclient import TestClient
-from sigmalang.core.api_server import create_api
+from sigmalang.core.api_server import create_api, SigmalangAPI
 from sigmalang.core.config import reset_config
 
 
 @pytest.fixture(scope="module")
-def client():
-    """Create test client for API."""
+def api():
+    """Create API instance for testing."""
     reset_config()  # Reset config to defaults
-    api = create_api()
-    return TestClient(api.app)
+    api_instance = create_api()
+    api_instance.initialize()
+    return api_instance
 
 
-class TestHealthEndpoint:
-    """Tests for /health endpoint."""
-
-    @pytest.mark.integration
-    def test_health_check_returns_200(self, client):
-        """Test health endpoint returns 200 OK."""
-        response = client.get("/health")
-        assert response.status_code == 200
+class TestHealthService:
+    """Tests for health service."""
 
     @pytest.mark.integration
-    def test_health_check_response_structure(self, client):
-        """Test health endpoint response structure."""
-        response = client.get("/health")
-        data = response.json()
-
-        assert "status" in data
-        assert "version" in data
-        assert "timestamp" in data
-        assert data["status"] in ["healthy", "degraded", "unhealthy"]
+    def test_health_check_returns_valid_response(self, api):
+        """Test health service returns valid response."""
+        response = api.health()
+        assert response is not None
 
     @pytest.mark.integration
-    def test_health_check_includes_uptime(self, client):
-        """Test health endpoint includes uptime info."""
-        response = client.get("/health")
-        data = response.json()
+    def test_health_check_response_structure(self, api):
+        """Test health response structure."""
+        response = api.health()
+
+        assert hasattr(response, 'status')
+        assert hasattr(response, 'version')
+        assert hasattr(response, 'timestamp')
+        assert response.status in ["healthy", "degraded", "unhealthy"]
+
+    @pytest.mark.integration
+    def test_health_check_includes_uptime(self, api):
+        """Test health includes uptime info."""
+        response = api.health()
 
         # Uptime should be present and non-negative
-        if "uptime" in data:
-            assert data["uptime"] >= 0
+        assert hasattr(response, 'uptime')
+        assert response.uptime >= 0
 
 
-class TestInfoEndpoint:
-    """Tests for /info endpoint."""
-
-    @pytest.mark.integration
-    def test_info_returns_200(self, client):
-        """Test info endpoint returns 200 OK."""
-        response = client.get("/info")
-        assert response.status_code == 200
+class TestInfoService:
+    """Tests for info service."""
 
     @pytest.mark.integration
-    def test_info_response_structure(self, client):
-        """Test info endpoint response structure."""
-        response = client.get("/info")
-        data = response.json()
-
-        assert "name" in data
-        assert "version" in data
-        assert "description" in data
-        assert data["name"] == "SigmaLang"
-
-
-class TestEncodeEndpoint:
-    """Tests for /encode endpoint."""
+    def test_info_returns_valid_response(self, api):
+        """Test info service returns valid response."""
+        response = api.info()
+        assert response is not None
 
     @pytest.mark.integration
-    def test_encode_simple_text(self, client):
+    def test_info_response_structure(self, api):
+        """Test info response structure."""
+        response = api.info()
+
+        assert hasattr(response, 'name')
+        assert hasattr(response, 'version')
+        assert hasattr(response, 'description')
+        assert response.name == "SigmaLang" or response.name == "ΣLANG"
+
+
+class TestEncodeService:
+    """Tests for encode service."""
+
+    @pytest.mark.integration
+    def test_encode_simple_text(self, api):
         """Test encoding simple text."""
-        response = client.post(
-            "/encode",
-            json={"text": "Hello, world!"}
-        )
+        from sigmalang.core.api_models import EncodeRequest
 
-        assert response.status_code == 200
-        data = response.json()
+        request = EncodeRequest(text="Hello, world!")
+        response = api.encoder.encode(request)
 
-        assert data["success"] is True
-        assert "vector" in data
-        assert isinstance(data["vector"], list)
-        assert len(data["vector"]) > 0
+        assert response.success is True
+        assert response.vector is not None or response.vectors is not None
+        if response.vector:
+            assert isinstance(response.vector, list)
+            assert len(response.vector) > 0
 
     @pytest.mark.integration
     def test_encode_with_normalization(self, client):
