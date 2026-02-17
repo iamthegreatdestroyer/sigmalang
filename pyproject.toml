@@ -47,6 +47,7 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "pytest-asyncio>=0.21.0",
+    "pytest-timeout>=2.1.0",
     "hypothesis>=6.70.0",
     "pytest-benchmark>=4.0.0",
     "black>=23.0.0",
@@ -59,6 +60,7 @@ test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "pytest-asyncio>=0.21.0",
+    "pytest-timeout>=2.1.0",
     "hypothesis>=6.70.0",
     "httpx>=0.24.0",  # Phase 3: Async HTTP testing
 ]
@@ -76,13 +78,15 @@ include = ["sigmalang*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-# Note: Coverage disabled in addopts to prevent hangs. Run with --cov=sigmalang when needed.
-addopts = "-v --tb=short --strict-markers"
+# Note: Coverage can now be enabled safely with timeout protection
+addopts = "-v --tb=short --strict-markers --timeout=300"
+timeout = 300
+timeout_method = "thread"
 markers = [
     "unit: Unit tests for individual components",
     "integration: Integration tests for component interactions",
     "e2e: End-to-end tests for full pipeline",
     "performance: Performance and benchmarking tests",
     "round_trip: Encoder/decoder round-trip validation tests",
-    "slow: Slow tests that should run separately",
+    "slow: Slow tests that should run separately (timeout=600)",
 ]
