@@ -1,0 +1,254 @@
+groups:
+  - name: sigmalang_latency_alerts
+    interval: 30s
+    rules:
+      - alert: HighLatencyWarning
+        expr: histogram_quantile(0.95, sum(rate(sigmalang_request_latency_seconds_bucket[5m])) by (le)) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "High P95 latency detected"
+          description: "P95 latency is {{ $value | humanizeDuration }} (threshold: 200ms) for 5 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/high-latency"
+
+      - alert: VeryHighLatency
+        expr: histogram_quantile(0.95, sum(rate(sigmalang_request_latency_seconds_bucket[5m])) by (le)) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Very high P95 latency detected"
+          description: "P95 latency is {{ $value | humanizeDuration }} (threshold: 500ms)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/very-high-latency"
+
+  - name: sigmalang_error_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: (sum(rate(sigmalang_error_count_total[2m])) / sum(rate(sigmalang_request_count_total[2m]))) * 100 > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 1%) for 2 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/high-error-rate"
+
+      - alert: Http5xxErrors
+        expr: sum(rate(sigmalang_request_count_total{status=~"5.."}[2m])) > 10
+        for: 1m
+        labels:
+          severity: warning
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Elevated HTTP 5xx errors"
+          description: "{{ $value }} HTTP 5xx errors per second in the last 2 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+  - name: sigmalang_resource_alerts
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: (process_resident_memory_bytes{job="sigmalang"} / on() group_left() kube_pod_container_resource_limits{resource="memory",container="sigmalang"}) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }} of limit for 10 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/high-memory"
+
+      - alert: CriticalMemoryUsage
+        expr: (process_resident_memory_bytes{job="sigmalang"} / on() group_left() kube_pod_container_resource_limits{resource="memory",container="sigmalang"}) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Critical memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} of limit (threshold: 95%)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/critical-memory"
+
+      - alert: BufferPoolNearCapacity
+        expr: sigmalang_buffer_pool_utilization_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+          component: encoder
+          sprint: "4"
+        annotations:
+          summary: "Buffer pool near capacity"
+          description: "Buffer pool utilization is {{ $value }}% (threshold: 90%)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+  - name: sigmalang_circuit_breaker_alerts
+    interval: 30s
+    rules:
+      - alert: CircuitBreakerOpen
+        expr: sigmalang_circuit_breaker_open == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Circuit breaker is OPEN"
+          description: "Circuit breaker for {{ $labels.service }} has been OPEN for more than 1 minute"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/circuit-breaker-open"
+
+      - alert: FrequentCircuitBreakerChanges
+        expr: sum(increase(sigmalang_circuit_breaker_state_changes_total[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Frequent circuit breaker state changes"
+          description: "{{ $value }} circuit breaker state changes in last 5 minutes (threshold: 10)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+  - name: sigmalang_pod_alerts
+    interval: 30s
+    rules:
+      - alert: HighPodRestarts
+        expr: increase(kube_pod_container_status_restarts_total{container="sigmalang"}[15m]) > 3
+        for: 1m
+        labels:
+          severity: critical
+          component: kubernetes
+          sprint: "4"
+        annotations:
+          summary: "High pod restart count"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in last 15 minutes (threshold: 3)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/pod-restarts"
+
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total{container="sigmalang"}[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: kubernetes
+          sprint: "4"
+        annotations:
+          summary: "Pod is crash looping"
+          description: "Pod {{ $labels.pod }} is in CrashLoopBackOff state"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/crash-loop"
+
+  - name: sigmalang_rate_limit_alerts
+    interval: 30s
+    rules:
+      - alert: HighRateLimitRejections
+        expr: sum(rate(sigmalang_rate_limit_rejections_total[5m])) > 100
+        for: 2m
+        labels:
+          severity: warning
+          component: rate-limiter
+          sprint: "4"
+        annotations:
+          summary: "High rate limit rejections"
+          description: "{{ $value }} requests/second are being rate limited (threshold: 100)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+      - alert: CriticalRateLimitRejections
+        expr: sum(rate(sigmalang_rate_limit_rejections_total[2m])) / sum(rate(sigmalang_request_count_total[2m])) > 0.5
+        for: 1m
+        labels:
+          severity: critical
+          component: rate-limiter
+          sprint: "4"
+        annotations:
+          summary: "More than 50% of requests are being rate limited"
+          description: "{{ $value | humanizePercentage }} of requests are hitting rate limits"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/rate-limit-capacity"
+
+  - name: sigmalang_cache_alerts
+    interval: 30s
+    rules:
+      - alert: LowCacheHitRate
+        expr: (sum(rate(sigmalang_cache_hits_total[10m])) / (sum(rate(sigmalang_cache_hits_total[10m])) + sum(rate(sigmalang_cache_misses_total[10m])))) * 100 < 50
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+          sprint: "4"
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (threshold: 50%) for 10 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+  - name: sigmalang_encoding_alerts
+    interval: 30s
+    rules:
+      - alert: LowCompressionRatio
+        expr: avg(sigmalang_compression_ratio) < 3
+        for: 15m
+        labels:
+          severity: warning
+          component: encoder
+          sprint: "4"
+        annotations:
+          summary: "Low compression ratio"
+          description: "Average compression ratio is {{ $value }} (expected: >3) for 15 minutes"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+      - alert: EncodingFailureRate
+        expr: (sum(rate(sigmalang_encode_count_total{status="error"}[5m])) / sum(rate(sigmalang_encode_count_total[5m]))) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: encoder
+          sprint: "4"
+        annotations:
+          summary: "High encoding failure rate"
+          description: "{{ $value | humanizePercentage }} of encoding operations are failing (threshold: 5%)"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+
+  - name: sigmalang_health_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up{job="sigmalang"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "ΣLANG service is down"
+          description: "Service {{ $labels.instance }} has been down for more than 1 minute"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/service-down"
+
+      - alert: HealthCheckFailing
+        expr: sigmalang_health_check_status != 1
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+          sprint: "4"
+        annotations:
+          summary: "Health check failing"
+          description: "Health check for {{ $labels.check }} is failing"
+          dashboard: "https://grafana.example.com/d/sigmalang-sprint4"
+          runbook: "https://docs.sigmalang.io/runbooks/health-check"
