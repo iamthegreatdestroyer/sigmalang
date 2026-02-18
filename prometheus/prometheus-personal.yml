@@ -1,0 +1,54 @@
+# Prometheus Configuration for SigmaLang Personal Stack
+# Phase 6 Task 6.1 - Local development and personal deployment
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'sigmalang-personal'
+    environment: 'personal'
+
+# Load alerting rules
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+
+# Alertmanager integration (optional - for webhook/email notifications)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []  # Add alertmanager target when deployed
+
+# Scrape configurations
+scrape_configs:
+  # SigmaLang API Server
+  - job_name: 'sigmalang-api'
+    static_configs:
+      - targets: ['sigmalang-api:9091']
+        labels:
+          service: 'sigmalang'
+          component: 'api'
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Redis metrics (via API)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['sigmalang-api:9091']
+        labels:
+          service: 'redis'
+          component: 'cache'
+    metrics_path: /metrics/redis
+    scrape_interval: 30s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Grafana health
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    metrics_path: /metrics
+    scrape_interval: 30s

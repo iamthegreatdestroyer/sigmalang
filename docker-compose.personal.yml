@@ -1,0 +1,218 @@
+###############################################################################
+# SigmaLang Personal Docker Stack - Phase 6 Task 6.1
+#
+# Complete local deployment: API + Redis + Prometheus + Grafana
+#
+# Usage:
+#   docker-compose -f docker-compose.personal.yml up -d
+#   docker-compose -f docker-compose.personal.yml logs -f sigmalang-api
+#   docker-compose -f docker-compose.personal.yml down
+#
+# Endpoints:
+#   API:        http://localhost:8000
+#   Prometheus: http://localhost:9090
+#   Grafana:    http://localhost:3000 (admin/sigmalang)
+#   Redis:      localhost:6379
+###############################################################################
+
+version: "3.8"
+
+services:
+  # ===========================================================================
+  # SigmaLang API Server
+  # ===========================================================================
+  sigmalang-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sigmalang-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "9091:9091"  # Metrics port
+    environment:
+      - SIGMALANG_LOG_LEVEL=INFO
+      - SIGMALANG_LOG_FORMAT=json
+      - SIGMALANG_WORKERS=4
+      - SIGMALANG_REDIS_HOST=redis
+      - SIGMALANG_REDIS_PORT=6379
+      - SIGMALANG_METRICS_ENABLED=true
+      - SIGMALANG_CACHE_ENABLED=true
+      - SIGMALANG_CACHE_TTL=3600
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - sigmalang-data:/app/data
+      - sigmalang-cache:/app/cache
+      - sigmalang-logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - sigmalang-net
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+    labels:
+      - "com.sigmalang.service=api"
+      - "com.sigmalang.version=1.0.0"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=9091"
+      - "prometheus.io/path=/metrics"
+
+  # ===========================================================================
+  # Redis - Caching and Session Storage
+  # ===========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sigmalang-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 60 1000
+      --save 300 100
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sigmalang-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 768M
+
+  # ===========================================================================
+  # Prometheus - Metrics Collection
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: sigmalang-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--storage.tsdb.retention.size=5GB"
+      - "--web.enable-lifecycle"
+      - "--web.enable-admin-api"
+    volumes:
+      - ./prometheus/prometheus-personal.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - sigmalang-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1G
+
+  # ===========================================================================
+  # Grafana - Dashboards and Visualization
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: sigmalang-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=sigmalang
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/sigmalang-monitoring.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - sigmalang-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+  # ===========================================================================
+  # Watchtower - Auto-Update Container Images
+  # ===========================================================================
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: sigmalang-watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_ROLLING_RESTART=true
+      - WATCHTOWER_INCLUDE_STOPPED=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - sigmalang-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  sigmalang-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  sigmalang-data:
+    driver: local
+  sigmalang-cache:
+    driver: local
+  sigmalang-logs:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

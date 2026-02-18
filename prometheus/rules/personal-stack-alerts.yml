@@ -1,0 +1,231 @@
+# Personal Stack Alert Rules - Phase 6 Task 6.3
+# Docker Compose-specific alerts for the personal deployment stack
+# Designed for local/personal monitoring (not Kubernetes)
+
+groups:
+  # =========================================================================
+  # Service Availability
+  # =========================================================================
+  - name: personal_service_availability
+    interval: 15s
+    rules:
+      - alert: APIServiceDown
+        expr: up{job="sigmalang-api"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          stack: personal
+          component: api
+        annotations:
+          summary: "SigmaLang API is unreachable"
+          description: "Prometheus cannot scrape the API at {{ $labels.instance }} for 30 seconds"
+          action: "Check container: docker-compose -f docker-compose.personal.yml logs sigmalang-api"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          stack: personal
+          component: redis
+        annotations:
+          summary: "Redis cache is unreachable"
+          description: "Redis metrics endpoint at {{ $labels.instance }} is down"
+          action: "Check container: docker-compose -f docker-compose.personal.yml logs redis"
+
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          stack: personal
+          component: grafana
+        annotations:
+          summary: "Grafana dashboard is unreachable"
+          description: "Grafana at {{ $labels.instance }} is not responding"
+
+  # =========================================================================
+  # API Performance (Personal Stack)
+  # =========================================================================
+  - name: personal_api_performance
+    interval: 15s
+    rules:
+      - alert: APIHighLatency
+        expr: histogram_quantile(0.95, sum(rate(sigmalang_request_latency_seconds_bucket{job="sigmalang-api"}[5m])) by (le)) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          stack: personal
+          component: api
+        annotations:
+          summary: "API P95 latency above 500ms"
+          description: "P95 latency is {{ $value | humanizeDuration }} for 3 minutes"
+
+      - alert: APIErrorRate
+        expr: |
+          (
+            sum(rate(sigmalang_request_count_total{job="sigmalang-api",status=~"5.."}[5m]))
+            / sum(rate(sigmalang_request_count_total{job="sigmalang-api"}[5m]))
+          ) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          stack: personal
+          component: api
+        annotations:
+          summary: "API error rate above 5%"
+          description: "{{ $value | humanizePercentage }} of requests returning 5xx errors"
+
+      - alert: APISlowEncoding
+        expr: avg(sigmalang_encode_duration_seconds{job="sigmalang-api"}) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: encoder
+        annotations:
+          summary: "Encoding operations are slow"
+          description: "Average encoding time is {{ $value | humanizeDuration }} (threshold: 1s)"
+
+  # =========================================================================
+  # Resource Usage (Docker Container Metrics)
+  # =========================================================================
+  - name: personal_resource_usage
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="sigmalang-api"} > 3221225472
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: api
+        annotations:
+          summary: "API memory usage above 3GB"
+          description: "API is using {{ $value | humanize1024 }}B of memory (limit: 4GB)"
+          action: "Consider restarting: docker-compose -f docker-compose.personal.yml restart sigmalang-api"
+
+      - alert: CriticalMemoryUsage
+        expr: process_resident_memory_bytes{job="sigmalang-api"} > 3758096384
+        for: 2m
+        labels:
+          severity: critical
+          stack: personal
+          component: api
+        annotations:
+          summary: "API memory usage above 3.5GB (near 4GB limit)"
+          description: "API is using {{ $value | humanize1024 }}B, approaching OOM kill threshold"
+          action: "Restart immediately: docker-compose -f docker-compose.personal.yml restart sigmalang-api"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="sigmalang-api"}[5m]) > 1.8
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: api
+        annotations:
+          summary: "API CPU usage near limit (2 cores)"
+          description: "API is using {{ $value }} CPU cores (limit: 2)"
+
+  # =========================================================================
+  # Compression Health
+  # =========================================================================
+  - name: personal_compression_health
+    interval: 30s
+    rules:
+      - alert: LowCompressionRatio
+        expr: avg(sigmalang_compression_ratio{job="sigmalang-api"}) < 5
+        for: 15m
+        labels:
+          severity: warning
+          stack: personal
+          component: encoder
+        annotations:
+          summary: "Compression ratio below 5x"
+          description: "Average compression ratio is {{ $value }}x (expected: >5x)"
+
+      - alert: CodebookUtilizationHigh
+        expr: sigmalang_codebook_utilization_percent{job="sigmalang-api"} > 90
+        for: 10m
+        labels:
+          severity: warning
+          stack: personal
+          component: codebook
+        annotations:
+          summary: "Codebook utilization above 90%"
+          description: "Tier 2 codebook is {{ $value }}% full, consider pruning"
+
+      - alert: EncodingFailures
+        expr: rate(sigmalang_encode_count_total{job="sigmalang-api",status="error"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: encoder
+        annotations:
+          summary: "Encoding failures detected"
+          description: "{{ $value }} encoding failures per second"
+
+  # =========================================================================
+  # Redis Cache Health
+  # =========================================================================
+  - name: personal_redis_health
+    interval: 30s
+    rules:
+      - alert: RedisCacheHitRateLow
+        expr: |
+          (
+            sum(rate(sigmalang_cache_hits_total{job="sigmalang-api"}[10m]))
+            / (
+              sum(rate(sigmalang_cache_hits_total{job="sigmalang-api"}[10m]))
+              + sum(rate(sigmalang_cache_misses_total{job="sigmalang-api"}[10m]))
+            )
+          ) * 100 < 40
+        for: 10m
+        labels:
+          severity: warning
+          stack: personal
+          component: redis
+        annotations:
+          summary: "Redis cache hit rate below 40%"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}, codebook may need warming"
+
+      - alert: RedisMemoryHigh
+        expr: sigmalang_redis_memory_bytes{job="sigmalang-api"} > 536870912
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: redis
+        annotations:
+          summary: "Redis memory above 512MB"
+          description: "Redis is using {{ $value | humanize1024 }}B (limit: 768MB)"
+
+  # =========================================================================
+  # Prometheus Self-Monitoring
+  # =========================================================================
+  - name: personal_prometheus_health
+    interval: 30s
+    rules:
+      - alert: PrometheusStorageHigh
+        expr: prometheus_tsdb_storage_blocks_bytes > 858993459
+        for: 10m
+        labels:
+          severity: warning
+          stack: personal
+          component: prometheus
+        annotations:
+          summary: "Prometheus storage above 800MB"
+          description: "TSDB storage is {{ $value | humanize1024 }}B, consider reducing retention"
+
+      - alert: PrometheusScrapeFailures
+        expr: increase(prometheus_target_scrapes_exceeded_sample_limit_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          stack: personal
+          component: prometheus
+        annotations:
+          summary: "Prometheus scrape sample limit exceeded"
+          description: "Some scrapes are exceeding sample limits"

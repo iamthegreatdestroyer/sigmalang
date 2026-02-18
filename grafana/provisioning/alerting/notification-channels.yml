@@ -1,0 +1,52 @@
+# Grafana Alert Notification Channels - Phase 6 Task 6.3
+# Provisioned automatically with docker-compose personal stack
+
+apiVersion: 1
+
+contactPoints:
+  # File-based logging (always available locally)
+  - orgId: 1
+    name: local-file-log
+    receivers:
+      - uid: file-log-1
+        type: webhook
+        settings:
+          url: "http://sigmalang-api:9091/webhooks/alert"
+          httpMethod: POST
+        disableResolveMessage: false
+
+  # Console output for local debugging
+  - orgId: 1
+    name: console-alerts
+    receivers:
+      - uid: console-1
+        type: webhook
+        settings:
+          url: "http://sigmalang-api:9091/webhooks/alert"
+          httpMethod: POST
+        disableResolveMessage: false
+
+policies:
+  - orgId: 1
+    receiver: local-file-log
+    group_by:
+      - grafana_folder
+      - alertname
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+    routes:
+      # Critical alerts: shorter repeat interval
+      - receiver: local-file-log
+        matchers:
+          - severity = critical
+        group_wait: 10s
+        group_interval: 1m
+        repeat_interval: 1h
+      # Warning alerts: standard timing
+      - receiver: local-file-log
+        matchers:
+          - severity = warning
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
