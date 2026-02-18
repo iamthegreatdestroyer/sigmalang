@@ -2,8 +2,23 @@
 ΣLANG Contracts Module
 ======================
 
-Contract definitions for ΣLANG interfaces.
+Re-exports core interface protocols from sigmalang.api.interfaces
+for convenient access. All contract definitions live in the API module.
+
+Usage:
+    from sigmalang.contracts import CompressionEngine, CodebookProtocol
 """
 
-# This module is reserved for contract implementations.
-# See sigmalang.api for actual protocols and types.
+from sigmalang.api.interfaces import (
+    CompressionEngine,
+    RSUManager,
+    CodebookProtocol,
+    StorageBackend,
+)
+
+__all__ = [
+    "CompressionEngine",
+    "RSUManager",
+    "CodebookProtocol",
+    "StorageBackend",
+]

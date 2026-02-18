@@ -34,8 +34,7 @@ jobs:
 
     - name: Run integration tests
       run: |
-        python -m pytest tests/integration/ -v --timeout=600 || echo "⚠️  Some integration tests failed"
-      continue-on-error: true
+        python -m pytest tests/integration/ -v --timeout=600
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
@@ -63,11 +62,11 @@ jobs:
 
     - name: Run Ruff linter
       run: |
-        ruff check sigmalang/ --ignore E501,F401 || echo "⚠️  Lint issues found - see above"
+        ruff check sigmalang/ --ignore E501,F401
 
     - name: Run type checking
       run: |
-        mypy sigmalang/ --ignore-missing-imports --no-error-summary || echo "⚠️  Type errors found - see above"
+        mypy sigmalang/ --ignore-missing-imports --no-error-summary
 
   benchmark:
     runs-on: ubuntu-latest
