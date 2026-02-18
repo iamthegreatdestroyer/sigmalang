@@ -135,6 +135,65 @@ AGI theory, neurosymbolic AI systems, meta-learning, and AI alignment research.
 - **Self-Improvement**: Modify own algorithms
 - **Introspection**: Understand own reasoning
 
+## ΣLANG Hyperdimensional Computing Primitives
+
+### HD Computing in SigmaLang
+
+NEURAL provides cognitive computing expertise for ΣLANG's hyperdimensional encoding system:
+
+- **Hyperdimensional Vectors**: 10,000-dim binary vectors for semantic representation
+- **VSA Operations**: Binding (XOR), bundling (majority), permutation (shift)
+- **Holographic Reduced Representations**: Compositional distributed representations
+- **Similarity Search**: Cosine/Hamming distance for semantic matching
+
+### HD Encoding Architecture
+
+```
+Text Input → Semantic Primitives → HD Binding
+                                      |
+                                 HD Bundle (majority vote)
+                                      |
+                                 Compressed HD Vector
+                                      |
+                                 LSH Index (O(1) lookup)
+```
+
+### Key Operations
+
+| Operation | Symbol | HD Implementation | Purpose |
+|-----------|--------|-------------------|---------|
+| Binding | ⊗ | XOR / circular convolution | Combine two concepts |
+| Bundling | + | Element-wise majority vote | Merge multiple items |
+| Permutation | π | Circular bit shift | Encode sequence order |
+| Similarity | δ | Cosine / Hamming distance | Semantic matching |
+| Encoding | Σ | Map to HD space | Primitive compression |
+
+### Neurosymbolic Integration
+
+ΣLANG's primitive system maps to cognitive architecture:
+
+| Tier | Cognitive Analogue | HD Representation |
+|------|-------------------|-------------------|
+| Tier 0 (Existential) | Core knowledge | Frozen HD prototypes |
+| Tier 1 (Domain) | Semantic memory | Domain-specific HD codebook |
+| Tier 2 (Learned) | Episodic memory | Trainable HD embeddings |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `sigmalang/core/hyperdimensional_encoder.py` | HD vector encoding engine |
+| `sigmalang/core/encoder.py` | LSH semantic hashing integration |
+| `sigmalang/core/cascaded_codebook.py` | Multi-layer codebook with HD embeddings |
+| `sigmalang/core/equal_info_windows.py` | Information-theoretic windowing |
+
+### Research Foundation
+
+- **Torchhd** (Heddes et al. 2022): GPU-accelerated HD computing
+- **Kanerva's Sparse Distributed Memory**: Theoretical foundation
+- **Holographic Reduced Representations**: Plate (1995)
+- **Vector Symbolic Architectures**: Gayler (2003)
+
 ## Invocation Examples
 
 ```
@@ -142,6 +201,9 @@ AGI theory, neurosymbolic AI systems, meta-learning, and AI alignment research.
 @NEURAL design neurosymbolic system for reasoning
 @NEURAL propose AI alignment approach for this system
 @NEURAL analyze few-shot learning for domain adaptation
+@NEURAL optimize HD encoding for SigmaLang primitives
+@NEURAL design cognitive architecture for context compression
+@NEURAL implement VSA operations for semantic binding
 ```
 
 ## AGI Development Path

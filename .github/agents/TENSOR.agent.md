@@ -138,6 +138,63 @@ Deep learning architectures, training optimization, and model deployment for int
 - **ONNX**: Model interchange format
 - **Docker**: Containerized deployment
 
+## ΣLANG Encoding Patterns & Training
+
+### SigmaLang ML Integration
+
+TENSOR provides deep learning expertise for ΣLANG's learned compression system:
+
+- **Codebook Training**: Train Tier 2 learned primitives via gradient optimization
+- **Cascaded Architecture**: Frozen (Tier 0-1) + trainable (Tier 2) codebook layers
+- **Online Learning**: Continuous codebook refinement from usage patterns
+- **A/B Testing**: Statistical comparison of compression strategies
+
+### Encoding Architecture Patterns
+
+| Component | Architecture | Purpose |
+|-----------|-------------|---------|
+| Semantic Encoder | Transformer encoder | Text → semantic embeddings |
+| Codebook Quantizer | VQ-VAE style | Embeddings → discrete primitives |
+| Cascaded Layers | UniCode² (frozen+trainable) | Stable + adaptive codebook |
+| Hypertoken Generator | LZW + neural | Adaptive vocabulary expansion |
+| HD Encoder | Hyperdimensional computing | High-dimensional vector binding |
+
+### Training Pipeline
+
+```python
+# Key training files
+# sigmalang/training/train.py - Main training loop
+# sigmalang/training/codebook.py - Codebook learning
+# sigmalang/training/online_learner.py - Online refinement
+# sigmalang/training/ab_tester.py - Strategy comparison
+# sigmalang/training/adaptive_pruner.py - Primitive pruning
+
+# Cascaded codebook training (only Tier 2 is trainable)
+from sigmalang.core.cascaded_codebook import CascadedCodebook, CascadedCodebookTrainer
+
+codebook = CascadedCodebook(embedding_dim=512)
+trainer = CascadedCodebookTrainer(codebook, learning_rate=0.001)
+metrics = trainer.train_step(indices, target_embeddings)
+# Tier 0-1 frozen, only Tier 2 receives gradients
+```
+
+### Optimization Targets
+
+| Metric | Current | Target | Technique |
+|--------|---------|--------|-----------|
+| Compression Ratio | 10-50x | 15-75x | LZW hypertokens + codebook |
+| Primitive Reuse | ~70% | ~85% | Morphological analysis |
+| Training Convergence | Baseline | 2x faster | Cascaded freeze/train |
+| Codebook Utilization | ~60% | ~90% | Adaptive pruning |
+
+### Research Papers Implemented
+
+- **zip2zip** (2025): LZW adaptive vocabulary → `lzw_hypertoken.py`
+- **UniCode²** (2025): Cascaded codebooks → `cascaded_codebook.py`
+- **Semantic Tokenizer** (2023): Stemming-based primitives → `enhanced_semantic_tokenizer.py`
+- **Neural Compressed Text** (2024): Equal-info windows → `equal_info_windows.py`
+- **Torchhd** (2022): HD computing → `hyperdimensional_encoder.py`
+
 ## Invocation Examples
 
 ```
@@ -146,6 +203,9 @@ Deep learning architectures, training optimization, and model deployment for int
 @TENSOR optimize model for inference on mobile devices
 @TENSOR fine-tune BERT for domain-specific NLP task
 @TENSOR design diffusion model for image generation
+@TENSOR train SigmaLang codebook with cascaded architecture
+@TENSOR optimize compression ratio via A/B testing
+@TENSOR design online learning pipeline for codebook
 ```
 
 ## Data Requirements

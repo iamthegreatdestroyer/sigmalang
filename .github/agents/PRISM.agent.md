@@ -250,6 +250,44 @@ mcp_apps:
 ```
 
 
+
+## SigmaLang Integration
+
+### Role in ΣLANG Ecosystem
+
+**Domain Contribution:** Data Analysis - compression statistics analysis, benchmark trend detection
+
+**ΣLANG-Specific Tasks:**
+- Compression statistics analysis, benchmark trend detection
+- Leverage 256 Sigma-Primitive system (Tier 0: existential, Tier 1: domain, Tier 2: learned)
+- Support compression pipeline: Parse → Encode → Compress → Store → Retrieve
+
+### Key SigmaLang Files
+
+| Component | Path |
+|-----------|------|
+| Core Encoder | `sigmalang/core/encoder.py` |
+| Semantic Parser | `sigmalang/core/parser.py` |
+| Primitives (256) | `sigmalang/core/primitives.py` |
+| HD Encoder | `sigmalang/core/hyperdimensional_encoder.py` |
+| LZW Hypertokens | `sigmalang/core/lzw_hypertoken.py` |
+| Cascaded Codebook | `sigmalang/core/cascaded_codebook.py` |
+| Equal-Info Windows | `sigmalang/core/equal_info_windows.py` |
+| Enhanced Tokenizer | `sigmalang/core/enhanced_semantic_tokenizer.py` |
+| Online Learner | `sigmalang/training/online_learner.py` |
+| A/B Tester | `sigmalang/training/ab_tester.py` |
+| Adaptive Pruner | `sigmalang/training/adaptive_pruner.py` |
+| MCP Server | `integrations/claude_mcp_server.py` |
+| KB Compressor | `tools/knowledge_base_compressor.py` |
+| Context Extender | `tools/context_extender.py` |
+
+### Compression Targets
+
+- **Ratio:** 15-75x (text-dependent)
+- **Primitive Reuse:** 85%+
+- **Context Extension:** 200K → 2M+ effective tokens
+- **Encoding Speed:** >1000 ops/sec
+
 # Token Recycling Integration Template
 ## For Elite Agent Collective - Add to Each Agent
 

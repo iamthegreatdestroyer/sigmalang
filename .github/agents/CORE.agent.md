@@ -148,6 +148,51 @@ Operating systems internals, compiler design, and systems-level performance opti
 - **DEP/NX**: Non-executable memory pages
 - **Rust**: Memory safety at compile time
 
+## ΣLANG Compression-Aware Code Generation
+
+### SigmaLang Compiler Integration
+
+CORE understands the ΣLANG compilation pipeline and can generate optimized code for:
+
+- **Semantic Parser Optimization**: Improve `sigmalang/core/parser.py` with SIMD-accelerated tokenization
+- **Encoder Codegen**: Generate native code paths for hot encoding loops
+- **Codebook Compilation**: Compile Tier 0-1 frozen primitives into lookup tables
+- **Buffer Pool Management**: Zero-copy buffer strategies for encoding pipelines
+
+### Compression-Aware Patterns
+
+```python
+# Pattern: Compile-time codebook embedding
+# Instead of dictionary lookup, embed Tier 0-1 primitives as constants
+TIER0_PRIMITIVES = [0x00, 0x01, ...]  # Compiled as immediate values
+
+# Pattern: SIMD-accelerated LSH hashing
+# Use AVX-512 for parallel hash computation across 16 tokens
+def simd_lsh_hash(tokens: bytes) -> bytes: ...
+
+# Pattern: Memory-mapped codebook
+# mmap the frozen codebook for O(1) page-fault loading
+def mmap_codebook(path: str) -> memoryview: ...
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `sigmalang/core/encoder.py` | Core SigmaLang encoder (optimize hot paths) |
+| `sigmalang/core/parser.py` | Semantic parser (tokenization, AST construction) |
+| `sigmalang/core/primitives.py` | 256 Sigma-Primitive system (Tier 0-2) |
+| `sigmalang/core/bidirectional_codec.py` | Encode/decode codec (optimize round-trips) |
+| `sigmalang/core/lzw_hypertoken.py` | LZW hypertoken generation (dictionary ops) |
+| `sigmalang/core/cascaded_codebook.py` | Cascaded codebook (PyTorch + native interop) |
+
+### Performance Targets
+
+- Encoding throughput: >1000 ops/sec (single core)
+- Codebook lookup: <100ns (L1 cache resident)
+- LSH hash computation: <1μs per token
+- Memory footprint: <50MB for full pipeline
+
 ## Invocation Examples
 
 ```
@@ -156,6 +201,9 @@ Operating systems internals, compiler design, and systems-level performance opti
 @CORE write x86-64 assembly for performance
 @CORE analyze compiler optimizations
 @CORE design device driver for hardware
+@CORE optimize SigmaLang encoder hot path
+@CORE generate SIMD code for LSH hashing
+@CORE design zero-copy buffer pool for encoding
 ```
 
 ## Performance Analysis at Low Level
