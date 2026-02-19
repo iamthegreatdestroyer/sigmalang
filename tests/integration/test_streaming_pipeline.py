@@ -32,6 +32,7 @@ from sigmalang.core.streaming_encoder import (
     ChunkedReader,
     StreamBuffer,
     BoundaryHandler,
+    Chunk,
     get_optimal_chunk_size,
     estimate_memory_usage
 )
@@ -81,31 +82,33 @@ class TestStreamingBasicFunctionality:
     """Basic streaming functionality tests."""
 
     @pytest.mark.integration
-    def test_streaming_encoder_small_file(self, small_test_file):
+    def test_streaming_encoder_small_file(self, small_test_file, temp_dir):
         """Test streaming encoder with small file."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "small_output.sigma")
 
-        result = encoder.encode_file(str(small_test_file))
+        result = encoder.encode_file(str(small_test_file), output_path)
 
         assert result is not None
-        assert "encoded" in result or "success" in result
 
     @pytest.mark.integration
-    def test_streaming_encoder_medium_file(self, medium_test_file):
+    def test_streaming_encoder_medium_file(self, medium_test_file, temp_dir):
         """Test streaming encoder with medium file (10 MB)."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "medium_output.sigma")
 
-        result = encoder.encode_file(str(medium_test_file))
+        result = encoder.encode_file(str(medium_test_file), output_path)
 
         assert result is not None
 
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_streaming_encoder_large_file(self, large_test_file):
+    def test_streaming_encoder_large_file(self, large_test_file, temp_dir):
         """Test streaming encoder with large file (50 MB)."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "large_output.sigma")
 
-        result = encoder.encode_file(str(large_test_file))
+        result = encoder.encode_file(str(large_test_file), output_path)
 
         assert result is not None
 
@@ -128,18 +131,19 @@ class TestStreamingMemoryUsage:
     """Memory usage validation for streaming."""
 
     @pytest.mark.integration
-    def test_memory_remains_constant(self, medium_test_file):
+    def test_memory_remains_constant(self, medium_test_file, temp_dir):
         """Test that memory usage remains constant during streaming."""
         import tracemalloc
 
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "memory_test_output.sigma")
 
         # Start memory tracking
         tracemalloc.start()
         initial_memory = tracemalloc.get_traced_memory()[0]
 
         # Encode file in streaming mode
-        result = encoder.encode_file(str(medium_test_file))
+        result = encoder.encode_file(str(medium_test_file), output_path)
 
         # Check memory after encoding
         peak_memory = tracemalloc.get_traced_memory()[1]
@@ -154,16 +158,17 @@ class TestStreamingMemoryUsage:
 
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_memory_scaling_large_file(self, large_test_file):
+    def test_memory_scaling_large_file(self, large_test_file, temp_dir):
         """Test memory scaling with large file (50 MB)."""
         import tracemalloc
 
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "memory_scaling_output.sigma")
 
         tracemalloc.start()
         initial_memory = tracemalloc.get_traced_memory()[0]
 
-        result = encoder.encode_file(str(large_test_file))
+        result = encoder.encode_file(str(large_test_file), output_path)
 
         peak_memory = tracemalloc.get_traced_memory()[1]
         tracemalloc.stop()
@@ -202,7 +207,8 @@ class TestStreamingVsNonStreaming:
 
         # Streaming
         streaming_encoder = StreamingEncoder()
-        result_streaming = streaming_encoder.encode_file(str(small_test_file))
+        streaming_output = str(small_test_file.parent / "streaming_output.sigma")
+        result_streaming = streaming_encoder.encode_file(str(small_test_file), streaming_output)
 
         # Both should produce valid output
         assert len(encoded_normal) > 0
@@ -218,12 +224,13 @@ class TestStreamingVsNonStreaming:
 
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_streaming_performance(self, medium_test_file):
+    def test_streaming_performance(self, medium_test_file, temp_dir):
         """Test streaming performance metrics."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "perf_output.sigma")
 
         start_time = time.perf_counter()
-        result = encoder.encode_file(str(medium_test_file))
+        result = encoder.encode_file(str(medium_test_file), output_path)
         end_time = time.perf_counter()
 
         duration = end_time - start_time
@@ -263,14 +270,15 @@ class TestBoundaryHandling:
         assert isinstance(glyphs, list)
 
     @pytest.mark.integration
-    def test_streaming_with_random_chunk_sizes(self, small_test_file):
+    def test_streaming_with_random_chunk_sizes(self, small_test_file, temp_dir):
         """Test streaming with random chunk sizes."""
         # Use various chunk sizes to stress-test boundary handling
         chunk_sizes = [1024, 4096, 8192, 16384, 65536]
 
         for chunk_size in chunk_sizes:
             encoder = StreamingEncoder(chunk_size=chunk_size)
-            result = encoder.encode_file(str(small_test_file))
+            output_path = str(temp_dir / f"chunk_{chunk_size}_output.sigma")
+            result = encoder.encode_file(str(small_test_file), output_path)
 
             assert result is not None, \
                 f"Failed with chunk size {chunk_size}"
@@ -280,12 +288,13 @@ class TestStreamingErrorHandling:
     """Error handling and recovery tests."""
 
     @pytest.mark.integration
-    def test_streaming_nonexistent_file(self):
+    def test_streaming_nonexistent_file(self, temp_dir):
         """Test streaming with nonexistent file."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "nonexistent_output.sigma")
 
-        with pytest.raises((FileNotFoundError, IOError)):
-            encoder.encode_file("/nonexistent/file.txt")
+        with pytest.raises((FileNotFoundError, IOError, OSError)):
+            encoder.encode_file("/nonexistent/file.txt", output_path)
 
     @pytest.mark.integration
     def test_streaming_empty_file(self, temp_dir):
@@ -294,7 +303,8 @@ class TestStreamingErrorHandling:
         empty_file.touch()
 
         encoder = StreamingEncoder()
-        result = encoder.encode_file(str(empty_file))
+        output_path = str(temp_dir / "empty_output.sigma")
+        result = encoder.encode_file(str(empty_file), output_path)
 
         # Should handle empty file gracefully
         assert result is not None
@@ -306,10 +316,11 @@ class TestStreamingErrorHandling:
         binary_file.write_bytes(bytes(range(256)) * 1000)
 
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "binary_output.sigma")
 
         # Should either handle or raise appropriate error
         try:
-            result = encoder.encode_file(str(binary_file))
+            result = encoder.encode_file(str(binary_file), output_path)
             assert result is not None
         except (ValueError, UnicodeDecodeError):
             # Acceptable to reject binary data
@@ -322,17 +333,17 @@ class TestStreamBuffer:
     @pytest.mark.integration
     def test_stream_buffer_basic(self):
         """Test StreamBuffer basic functionality."""
-        buffer = StreamBuffer(max_size=3)
+        buffer = StreamBuffer(name="test", max_size=3)
 
         # Add items
-        buffer.put(b"chunk1")
-        buffer.put(b"chunk2")
-        buffer.put(b"chunk3")
+        buffer.put(Chunk(chunk_id=0, data=b"chunk1"))
+        buffer.put(Chunk(chunk_id=1, data=b"chunk2"))
+        buffer.put(Chunk(chunk_id=2, data=b"chunk3"))
 
         # Retrieve items
-        assert buffer.get() == b"chunk1"
-        assert buffer.get() == b"chunk2"
-        assert buffer.get() == b"chunk3"
+        assert buffer.get().data == b"chunk1"
+        assert buffer.get().data == b"chunk2"
+        assert buffer.get().data == b"chunk3"
 
     @pytest.mark.integration
     def test_stream_buffer_backpressure(self):
@@ -340,16 +351,16 @@ class TestStreamBuffer:
         import threading
         import queue
 
-        buffer = StreamBuffer(max_size=2)
+        buffer = StreamBuffer(name="test_backpressure", max_size=2)
 
         # Fill buffer
-        buffer.put(b"chunk1")
-        buffer.put(b"chunk2")
+        buffer.put(Chunk(chunk_id=0, data=b"chunk1"))
+        buffer.put(Chunk(chunk_id=1, data=b"chunk2"))
 
         # Try to add one more (should block or raise)
         def try_put():
             try:
-                buffer.put(b"chunk3", timeout=0.1)
+                buffer.put(Chunk(chunk_id=2, data=b"chunk3"), timeout=0.1)
             except queue.Full:
                 pass
 
@@ -362,29 +373,33 @@ class TestStreamingStatistics:
     """Tests for streaming statistics and monitoring."""
 
     @pytest.mark.integration
-    def test_streaming_stats_collection(self, small_test_file):
+    def test_streaming_stats_collection(self, small_test_file, temp_dir):
         """Test that streaming collects statistics."""
         encoder = StreamingEncoder()
+        output_path = str(temp_dir / "stats_output.sigma")
 
-        result = encoder.encode_file(str(small_test_file))
+        result = encoder.encode_file(str(small_test_file), output_path)
 
-        # Check if stats are available
-        if hasattr(encoder, 'stats') or (isinstance(result, dict) and 'stats' in result):
-            stats = encoder.stats if hasattr(encoder, 'stats') else result['stats']
+        # result is a StreamStats dataclass; verify it has expected fields
+        stats = result if hasattr(result, 'total_chunks') else encoder.stats
 
-            # Verify stats have expected fields
-            assert 'chunks_processed' in stats or 'bytes_processed' in stats
+        # Verify stats have expected fields
+        assert hasattr(stats, 'total_chunks') or hasattr(stats, 'total_bytes_read')
+        assert stats.total_chunks > 0 or stats.total_bytes_read > 0
 
     @pytest.mark.integration
     def test_estimate_memory_usage(self):
         """Test memory usage estimation."""
-        # Estimate for 100 MB file
-        estimated = estimate_memory_usage(100 * 1024 * 1024)
+        # Estimate for 100 MB file with 64KB chunk size
+        estimated = estimate_memory_usage(100 * 1024 * 1024, 65536)
+
+        # estimate_memory_usage returns a dict of memory components
+        total_estimated = sum(estimated.values())
 
         # Estimate should be reasonable (less than file size)
-        assert 0 < estimated < 100 * 1024 * 1024
+        assert 0 < total_estimated < 100 * 1024 * 1024
         # Should be in the range of a few MB
-        assert estimated < 50 * 1024 * 1024
+        assert total_estimated < 50 * 1024 * 1024
 
 
 if __name__ == "__main__":

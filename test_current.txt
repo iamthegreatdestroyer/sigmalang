@@ -1,0 +1,126 @@
+============================= test session starts =============================
+collected 1692 items
+
+tests\claude_integration\test_code_execution.py ..                       [  0%]
+tests\integration\test_api_services.py .........s...                     [  0%]
+tests\integration\test_cli_commands.py ........................s.......  [  2%]
+tests\integration\test_e2e_pipeline.py ................................. [  4%]
+..                                                                       [  4%]
+tests\integration\test_generated_integration.py ...........              [  5%]
+tests\integration\test_generated_properties.py ...                       [  5%]
+tests\integration\test_streaming_pipeline.py ...................         [  6%]
+tests\test_advanced_analogy_integration.py ............................. [  8%]
+....                                                                     [  8%]
+tests\test_advanced_analogy_patterns.py ................................ [ 10%]
+....................                                                     [ 11%]
+tests\test_analytics_engine.py ......................................... [ 14%]
+........................................                                 [ 16%]
+tests\test_api_server.py ............................................... [ 19%]
+.                                                                        [ 19%]
+tests\test_bidirectional_codec.py ..........................             [ 20%]
+tests\test_cli.py ...................................................... [ 24%]
+.........                                                                [ 24%]
+tests\test_config.py ............................................        [ 27%]
+tests\test_cross_modal_analogies.py .................................... [ 29%]
+...............................                                          [ 31%]
+tests\test_entity_relation_extraction.py ............................... [ 33%]
+..................................                                       [ 35%]
+tests\test_feature_expansion.py .......................................  [ 37%]
+tests\test_federation.py ............................                    [ 39%]
+tests\test_hybrid_optimization.py ............                           [ 39%]
+tests\test_memory_profiling.py FFFFFFF                                   [ 40%]
+tests\test_ml_models.py ................................................ [ 43%]
+........................................................                 [ 46%]
+tests\test_monitoring.py ............................................... [ 49%]
+....                                                                     [ 49%]
+tests\test_multilingual_support.py ..................................... [ 51%]
+............................                                             [ 53%]
+tests\test_optimizations.py .....F...............                        [ 54%]
+tests\test_parallel_processor.py ....................................... [ 56%]
+.........                                                                [ 57%]
+tests\test_pattern_evolution.py ........................................ [ 59%]
+......                                                                   [ 59%]
+tests\test_pattern_intelligence.py ...................................   [ 62%]
+tests\test_pattern_persistence.py ...................................... [ 64%]
+.                                                                        [ 64%]
+tests\test_production_hardening.py ..................................... [ 66%]
+...................................................................      [ 70%]
+tests\test_roundtrip.py ...........................................      [ 73%]
+tests\test_ryot_integration.py ..........                                [ 73%]
+tests\test_semantic_analogy_engine.py ................................   [ 75%]
+tests\test_semantic_search.py .......................................... [ 78%]
+..................                                                       [ 79%]
+tests\test_sigmalang.py ...........s...............                      [ 80%]
+tests\test_streaming_encoder.py .......................                  [ 82%]
+tests\test_streaming_processor.py ...................................... [ 84%]
+.............................................                            [ 86%]
+tests\test_text_understanding.py ....................................... [ 89%]
+......................                                                   [ 90%]
+tests\test_transformer_embeddings.py ................................... [ 92%]
+................................................                         [ 95%]
+tests\test_unified_pipeline.py ......................................... [ 97%]
+....................................                                     [100%]
+
+================================== FAILURES ===================================
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticNode.__init__() got an unexpected keyword argument 'content'
+E   AttributeError: 'GlyphBufferPool' object has no attribute '_available_indices_indices'
+S:\sigmalang\tests\test_optimizations.py:97: AttributeError: 'GlyphBufferPool' object has no attribute '_available_indices_indices'
+============================== warnings summary ===============================
+tests\integration\test_generator.py:32
+  S:\sigmalang\tests\integration\test_generator.py:32: PytestCollectionWarning: cannot collect test class 'TestMethod' because it has a __init__ constructor (from: tests/integration/test_generator.py)
+    @dataclass
+
+tests\integration\test_generator.py:126
+  S:\sigmalang\tests\integration\test_generator.py:126: PytestCollectionWarning: cannot collect test class 'TestCodeGenerator' because it has a __init__ constructor (from: tests/integration/test_generator.py)
+    class TestCodeGenerator:
+
+tests/claude_integration/test_code_execution.py::test_basic_encode_decode
+  C:\Users\sgbil\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but tests/claude_integration/test_code_execution.py::test_basic_encode_decode returned <class 'dict'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/claude_integration/test_code_execution.py::test_preserve_critical_tokens
+  C:\Users\sgbil\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but tests/claude_integration/test_code_execution.py::test_preserve_critical_tokens returned <class 'dict'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+------------------------------------------------------------------------------------------------------- benchmark: 5 tests ------------------------------------------------------------------------------------------------------
+Name (time in us)                                Min                   Max                  Mean                StdDev                Median                   IQR            Outliers          OPS            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_encode_performance                      41.0001 (1.0)      1,747.6000 (5.92)       107.0217 (1.11)        77.2197 (2.55)        94.2000 (1.0)         57.2999 (1.37)        84;51   9,343.8982 (0.90)        958           1
+test_roundtrip_performance                   61.1000 (1.49)       295.3000 (1.0)         96.7532 (1.0)         30.2553 (1.0)         98.9999 (1.05)        41.8501 (1.0)        549;30  10,335.5765 (1.0)        1489           1
+test_cache_lookup_vs_linear_search           91.8000 (2.24)       583.6000 (1.98)       149.1810 (1.54)        46.9341 (1.55)       149.1001 (1.58)        80.0000 (1.91)      1874;23   6,703.2685 (0.65)       4689           1
+test_decode_performance                     101.9000 (2.49)       466.5001 (1.58)       160.5630 (1.66)        49.5341 (1.64)       146.6000 (1.56)        81.4751 (1.95)        673;9   6,228.0833 (0.60)       2005           1
+test_iterative_vs_recursive_traversal     2,722.9999 (66.41)    7,393.3001 (25.04)    3,671.7860 (37.95)    1,069.9713 (35.36)    3,229.1500 (34.28)    1,277.4000 (30.52)       41;14     272.3470 (0.03)        264           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+=========================== short test summary info ===========================
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10b
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_1kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_100kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_1mb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10mb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_100mb
+FAILED tests/test_optimizations.py::TestGlyphBufferPool::test_buffer_reuse_reduces_allocations
+====== 8 failed, 1681 passed, 3 skipped, 4 warnings in 121.15s (0:02:01) ======

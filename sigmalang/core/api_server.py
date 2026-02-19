@@ -55,13 +55,16 @@ class EncoderService:
     def __init__(self, config: Optional[SigmalangConfig] = None):
         self.config = config or get_config()
         self._encoder = None
+        self._parser = None
         self._initialized = False
     
     def initialize(self) -> None:
         """Initialize the encoder."""
         try:
             from .encoder import SigmaEncoder
+            from .parser import SemanticParser
             self._encoder = SigmaEncoder()
+            self._parser = SemanticParser()
             self._initialized = True
             logger.info("Encoder service initialized")
         except Exception as e:
@@ -75,8 +78,9 @@ class EncoderService:
         
         start = time.perf_counter()
         try:
-            # Use the encoder to process text
-            result = self._encoder.encode(text)
+            # Parse text to SemanticTree, then compute embedding
+            tree = self._parser.parse(text)
+            result = self._encoder.sigma_bank.compute_embedding(tree)
             
             # Convert to numpy array
             if hasattr(result, 'to_numpy'):
@@ -207,7 +211,7 @@ class AnalogyService:
             if self._engine:
                 # Use the full engine
                 result = self._engine.solve_analogy(a, b, c, top_k=top_k)
-                if hasattr(result, 'solutions'):
+                if hasattr(result, 'solutions') and result.solutions:
                     for sol in result.solutions[:top_k]:
                         solutions.append(AnalogySolution(
                             answer=sol.answer if hasattr(sol, 'answer') else str(sol),
@@ -215,6 +219,20 @@ class AnalogyService:
                             relation=sol.relation if hasattr(sol, 'relation') else "",
                             reasoning=sol.reasoning if hasattr(sol, 'reasoning') else ""
                         ))
+                elif hasattr(result, 'answer'):
+                    # AnalogyResult with single answer + optional candidates
+                    solutions.append(AnalogySolution(
+                        answer=result.answer,
+                        confidence=result.confidence if hasattr(result, 'confidence') else 0.5,
+                        reasoning=result.reasoning if hasattr(result, 'reasoning') else ""
+                    ))
+                    # Add additional candidates if available
+                    if hasattr(result, 'candidates') and result.candidates:
+                        for concept, sim in result.candidates[1:top_k]:
+                            solutions.append(AnalogySolution(
+                                answer=str(concept),
+                                confidence=(sim + 1.0) / 2.0
+                            ))
                 elif isinstance(result, list):
                     for item in result[:top_k]:
                         if isinstance(item, tuple):

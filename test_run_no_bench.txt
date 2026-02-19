@@ -1,0 +1,605 @@
+============================= test session starts =============================
+collected 1692 items
+
+tests\claude_integration\test_code_execution.py ..                       [  0%]
+tests\integration\test_api_services.py .........s...                     [  0%]
+tests\integration\test_cli_commands.py ...FFFFF...FFF.FFF.FFFF.s.......  [  2%]
+tests\integration\test_e2e_pipeline.py ................................. [  4%]
+.F                                                                       [  4%]
+tests\integration\test_generated_integration.py ..FFFF..F.F              [  5%]
+tests\integration\test_generated_properties.py F..                       [  5%]
+tests\integration\test_streaming_pipeline.py FFF.FF.FF..FFFFFFFF         [  6%]
+tests\test_advanced_analogy_integration.py ............................. [  8%]
+....                                                                     [  8%]
+tests\test_advanced_analogy_patterns.py ................................ [ 10%]
+....................                                                     [ 11%]
+tests\test_analytics_engine.py ......................................... [ 14%]
+........................................                                 [ 16%]
+tests\test_api_server.py ................s.............................. [ 19%]
+.                                                                        [ 19%]
+tests\test_bidirectional_codec.py ..........................             [ 20%]
+tests\test_cli.py ...................................................... [ 24%]
+.........                                                                [ 24%]
+tests\test_config.py ............................................        [ 27%]
+tests\test_cross_modal_analogies.py .................................... [ 29%]
+...............................                                          [ 31%]
+tests\test_entity_relation_extraction.py ............................... [ 33%]
+..................................                                       [ 35%]
+tests\test_feature_expansion.py .......................................  [ 37%]
+tests\test_federation.py ............................                    [ 39%]
+tests\test_hybrid_optimization.py ............                           [ 39%]
+tests\test_memory_profiling.py FFFFFFF                                   [ 40%]
+tests\test_ml_models.py ................................................ [ 43%]
+........................................................                 [ 46%]
+tests\test_monitoring.py ............................................... [ 49%]
+....                                                                     [ 49%]
+tests\test_multilingual_support.py ..................................... [ 51%]
+............................                                             [ 53%]
+tests\test_optimizations.py ....FF...............                        [ 54%]
+tests\test_parallel_processor.py ....................................... [ 56%]
+.........                                                                [ 57%]
+tests\test_pattern_evolution.py ........................................ [ 59%]
+......                                                                   [ 59%]
+tests\test_pattern_intelligence.py ...................................   [ 62%]
+tests\test_pattern_persistence.py ...................................... [ 64%]
+.                                                                        [ 64%]
+tests\test_production_hardening.py ..................................... [ 66%]
+...................................................................      [ 70%]
+tests\test_roundtrip.py ...FF.............F........................      [ 73%]
+tests\test_ryot_integration.py ..........                                [ 73%]
+tests\test_semantic_analogy_engine.py ................................   [ 75%]
+tests\test_semantic_search.py .......................................... [ 78%]
+..................                                                       [ 79%]
+tests\test_sigmalang.py ...........s...............                      [ 80%]
+tests\test_streaming_encoder.py .......................                  [ 82%]
+tests\test_streaming_processor.py ...................................... [ 84%]
+.............................................                            [ 86%]
+tests\test_text_understanding.py ....................................... [ 89%]
+......................                                                   [ 90%]
+tests\test_transformer_embeddings.py ................................... [ 92%]
+................................................                         [ 95%]
+tests\test_unified_pipeline.py ......................................... [ 97%]
+....................................                                     [100%]
+
+================================== FAILURES ===================================
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:42.752540Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:42.755342Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:42.758295Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:42.847096Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.030973Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.116595Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.116982Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.117053Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:107: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.128680Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.132513Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.136410Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.243014Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.337169Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.396562Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.396896Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.396956Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:119: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.402068Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.404917Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.408035Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.492934Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.577075Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.632327Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.632662Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.632717Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:133: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.641157Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.644081Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.646927Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.728805Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.809463Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.867759Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.868016Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.868101Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:145: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.873260Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.876237Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.879167Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:43.990710Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.120162Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.209268Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.209698Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.209824Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:155: assert 1 == 0
+E   assert 2 == 0
+     +  where 2 = <Result SystemExit(2)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:225: assert 2 == 0
+E   assert 2 == 0
+     +  where 2 = <Result SystemExit(2)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:240: assert 2 == 0
+E   assert 2 == 0
+     +  where 2 = <Result SystemExit(2)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:253: assert 2 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:276: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:287: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+S:\sigmalang\tests\integration\test_cli_commands.py:297: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.522296Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.525512Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.528357Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.615193Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.722748Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.808995Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.809234Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.809304Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:322: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.818280Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.822267Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.826163Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:44.987575Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.119286Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.216113Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.216496Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.216641Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:333: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.225258Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.230511Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.237154Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.394245Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.487398Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.547478Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.547715Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.547772Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:343: assert 1 == 0
+E   assert 1 == 0
+     +  where 1 = <Result SystemExit(1)>.exit_code
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.551197Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.554040Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.556875Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.645851Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.732153Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.790220Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.790466Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:45.790531Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_cli_commands.py:353: assert 1 == 0
+E   IndexError: index out of range
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: assert False
+     +  where False = isinstance(IndexError('index out of range'), (<class 'ValueError'>, <class 'RuntimeError'>))
+s:\sigmalang\tests\integration\test_e2e_pipeline.py:294: AssertionError: assert False
+E   TypeError: DecoderService.decode() missing 1 required positional argument: 'vector'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: DecoderService.decode() missing 1 required positional argument: 'vector'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.602281Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.605876Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.609637Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.708579Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.796357Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.854545Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.854831Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.854929Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.854975Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.857900Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.861117Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:48.966069Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.067590Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.132732Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.132971Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.133040Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:122: Failed: Method raised unexpected exception: DecoderService.decode() missing 1 required positional argument: 'vector'
+E   TypeError: DecoderService.decode_batch() missing 1 required positional argument: 'vectors'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: DecoderService.decode_batch() missing 1 required positional argument: 'vectors'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.136504Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.139565Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.142964Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.265940Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.401215Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.503327Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.503609Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.503716Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.503826Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.509693Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.514897Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.707319Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.849658Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.972368Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.972728Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.972887Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:143: Failed: Method raised unexpected exception: DecoderService.decode_batch() missing 1 required positional argument: 'vectors'
+E   AttributeError: 'str' object has no attribute 'primitives_used'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: 'str' object has no attribute 'primitives_used'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.980305Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.986493Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:49.993005Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.166979Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.333444Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.441004Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.441327Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.441575Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.441694Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.447659Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.453429Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.619749Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.740373Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.817318Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.817642Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.817758Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:183: Failed: Method raised unexpected exception: 'str' object has no attribute 'primitives_used'
+E   TypeError: EncoderService.encode_batch() missing 1 required positional argument: 'texts'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: EncoderService.encode_batch() missing 1 required positional argument: 'texts'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.823130Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.826799Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.830483Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:50.924416Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.028586Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.129487Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.129756Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.129850Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.129979Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.134176Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.140320Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.253884Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.384607Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.447832Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.448064Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:51.448120Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:204: Failed: Method raised unexpected exception: EncoderService.encode_batch() missing 1 required positional argument: 'texts'
+E   TypeError: NLPService.embed_batch() missing 1 required positional argument: 'texts'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: NLPService.embed_batch() missing 1 required positional argument: 'texts'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.572687Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.575361Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.577904Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.661122Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.745226Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.805118Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.805463Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.805617Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.805669Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.808438Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.811189Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.898832Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:52.981313Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.040274Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.040715Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.040772Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:306: Failed: Method raised unexpected exception: NLPService.embed_batch() missing 1 required positional argument: 'texts'
+E   TypeError: SearchService.search() missing 1 required positional argument: 'corpus'
+
+During handling of the above exception, another exception occurred:
+E   Failed: Method raised unexpected exception: SearchService.search() missing 1 required positional argument: 'corpus'
+----------------------------- Captured log setup ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.550165Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.552863Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.555348Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.637241Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.718156Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.780032Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.780402Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.780548Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.780614Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.784058Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.787573Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.877162Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:53.984034Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.078142Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.078549Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.078691Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_integration.py:369: Failed: Method raised unexpected exception: SearchService.search() missing 1 required positional argument: 'corpus'
+E   AttributeError: 'EncoderService' object has no attribute 'encode_tree'
+    Falsifying example: test_encode_decode_roundtrip(
+        self=<tests.integration.test_generated_properties.TestEncoderProperties object at 0x00000236D471E990>,
+        text='0',
+    )
+------------------------------ Captured log call ------------------------------
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.127045Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.135355Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.141727Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.317809Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.431309Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.490939Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.491339Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.491465Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.491553Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.496462Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.500239Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.600729Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.749333Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.853909Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.854345Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.854480Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.864339Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.870311Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:54.876825Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.035305Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.175457Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.259555Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.259947Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.260053Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.260157Z", "level": "INFO", "logger": "sigmalang.api", "message": "Initializing \u03a3LANG API"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.265900Z", "level": "INFO", "logger": "sigmalang.api", "message": "Encoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.270569Z", "level": "INFO", "logger": "sigmalang.api", "message": "Decoder service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.415333Z", "level": "INFO", "logger": "sigmalang.api", "message": "NLP service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.514470Z", "level": "INFO", "logger": "sigmalang.api", "message": "Analogy service initialized with default candidates"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.580003Z", "level": "INFO", "logger": "sigmalang.api", "message": "Search service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.580438Z", "level": "INFO", "logger": "sigmalang.api", "message": "Entity service initialized"}
+INFO     sigmalang.api:monitoring.py:538 {"timestamp": "2026-02-18T21:12:55.580509Z", "level": "INFO", "logger": "sigmalang.api", "message": "\u03a3LANG API initialized successfully"}
+S:\sigmalang\tests\integration\test_generated_properties.py:45: AttributeError: 'EncoderService' object has no attribute 'encode_tree'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:88: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:98: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:108: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:142: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:166: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:205: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:226: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:273: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:288: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:297: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:312: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: StreamBuffer.__init__() missing 1 required positional argument: 'name'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:325: TypeError: StreamBuffer.__init__() missing 1 required positional argument: 'name'
+E   TypeError: StreamBuffer.__init__() missing 1 required positional argument: 'name'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:343: TypeError: StreamBuffer.__init__() missing 1 required positional argument: 'name'
+E   TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:369: TypeError: StreamingEncoder.encode_file() missing 1 required positional argument: 'output_path'
+E   TypeError: estimate_memory_usage() missing 1 required positional argument: 'chunk_size'
+s:\sigmalang\tests\integration\test_streaming_pipeline.py:382: TypeError: estimate_memory_usage() missing 1 required positional argument: 'chunk_size'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+S:\sigmalang\tests\test_memory_profiling.py:261: TypeError: SemanticTree.__init__() missing 2 required positional arguments: 'root' and 'source_text'
+E   AssertionError: assert 0 == 256
+     +  where 0 = len(bytearray(b''))
+S:\sigmalang\tests\test_optimizations.py:85: AssertionError: assert 0 == 256
+E   AttributeError: 'GlyphBufferPool' object has no attribute '_available'
+S:\sigmalang\tests\test_optimizations.py:97: AttributeError: 'GlyphBufferPool' object has no attribute '_available'
+E   AssertionError: assert False
+     +  where False = <function TreeComparator.trees_equal at 0x00000236D30C3C10>(SemanticTree(root=SemanticNode(primitive=<ExistentialPrimitive.ACTION: 1>, value='root', children=[SemanticNode(primit...odifiers={})], modifiers={})], modifiers={})], modifiers={}), source_text='deep_test', embedding=None, sigma_hash=None), SemanticTree(root=SemanticNode(primitive=1, value='root', children=[SemanticNode(primitive=0, value='level_0', childre...odifiers={})], modifiers={})], modifiers={})], modifiers={}), source_text='[decoded]', embedding=None, sigma_hash=None))
+     +    where <function TreeComparator.trees_equal at 0x00000236D30C3C10> = TreeComparator.trees_equal
+S:\sigmalang\tests\test_roundtrip.py:123: AssertionError: assert False
+E   AssertionError: assert False
+     +  where False = <function TreeComparator.trees_equal at 0x00000236D30C3C10>(SemanticTree(root=SemanticNode(primitive=<CodePrimitive.FUNCTION: 16>, value='func', children=[SemanticNode(primitive=...value='param_19', children=[], modifiers={})], modifiers={}), source_text='wide_test', embedding=None, sigma_hash=None), SemanticTree(root=SemanticNode(primitive=16, value='func', children=[SemanticNode(primitive=23, value='param_0', child...value='param_19', children=[], modifiers={})], modifiers={}), source_text='[decoded]', embedding=None, sigma_hash=None))
+     +    where <function TreeComparator.trees_equal at 0x00000236D30C3C10> = TreeComparator.trees_equal
+S:\sigmalang\tests\test_roundtrip.py:151: AssertionError: assert False
+E   AssertionError: Failed for width 30
+    assert False
+     +  where False = <function TreeComparator.trees_equal at 0x00000236D30C3C10>(SemanticTree(root=SemanticNode(primitive=<ExistentialPrimitive.ENTITY: 0>, value='root', children=[SemanticNode(primit...BUTE: 3>, value='attr_29', children=[], modifiers={})], modifiers={}), source_text='', embedding=None, sigma_hash=None), SemanticTree(root=SemanticNode(primitive=0, value='root', children=[SemanticNode(primitive=3, value='attr_0', children... value='attr_29', children=[], modifiers={})], modifiers={}), source_text='[decoded]', embedding=None, sigma_hash=None))
+     +    where <function TreeComparator.trees_equal at 0x00000236D30C3C10> = TreeComparator.trees_equal
+    Falsifying example: test_arbitrary_tree_width(
+        self=<tests.test_roundtrip.TestPropertyBased object at 0x00000236F71C0640>,
+        width=30,
+    )
+S:\sigmalang\tests\test_roundtrip.py:426: AssertionError: Failed for width 30
+============================== warnings summary ===============================
+tests\integration\test_generated_integration.py:39
+  S:\sigmalang\tests\integration\test_generated_integration.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:63
+  S:\sigmalang\tests\integration\test_generated_integration.py:63: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:105
+  S:\sigmalang\tests\integration\test_generated_integration.py:105: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:126
+  S:\sigmalang\tests\integration\test_generated_integration.py:126: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:165
+  S:\sigmalang\tests\integration\test_generated_integration.py:165: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:187
+  S:\sigmalang\tests\integration\test_generated_integration.py:187: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:226
+  S:\sigmalang\tests\integration\test_generated_integration.py:226: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:267
+  S:\sigmalang\tests\integration\test_generated_integration.py:267: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:289
+  S:\sigmalang\tests\integration\test_generated_integration.py:289: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:310
+  S:\sigmalang\tests\integration\test_generated_integration.py:310: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_integration.py:350
+  S:\sigmalang\tests\integration\test_generated_integration.py:350: PytestUnknownMarkWarning: Unknown pytest.mark.generated - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.generated
+
+tests\integration\test_generated_properties.py:31
+  S:\sigmalang\tests\integration\test_generated_properties.py:31: PytestUnknownMarkWarning: Unknown pytest.mark.property - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.property
+
+tests\integration\test_generated_properties.py:50
+  S:\sigmalang\tests\integration\test_generated_properties.py:50: PytestUnknownMarkWarning: Unknown pytest.mark.property - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.property
+
+tests\integration\test_generated_properties.py:78
+  S:\sigmalang\tests\integration\test_generated_properties.py:78: PytestUnknownMarkWarning: Unknown pytest.mark.property - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.property
+
+tests\integration\test_generator.py:32
+  S:\sigmalang\tests\integration\test_generator.py:32: PytestCollectionWarning: cannot collect test class 'TestMethod' because it has a __init__ constructor (from: tests/integration/test_generator.py)
+    @dataclass
+
+tests\integration\test_generator.py:126
+  S:\sigmalang\tests\integration\test_generator.py:126: PytestCollectionWarning: cannot collect test class 'TestCodeGenerator' because it has a __init__ constructor (from: tests/integration/test_generator.py)
+    class TestCodeGenerator:
+
+tests\test_memory_profiling.py:354
+  S:\sigmalang\tests\test_memory_profiling.py:354: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:359
+  S:\sigmalang\tests\test_memory_profiling.py:359: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:364
+  S:\sigmalang\tests\test_memory_profiling.py:364: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:369
+  S:\sigmalang\tests\test_memory_profiling.py:369: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:374
+  S:\sigmalang\tests\test_memory_profiling.py:374: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:379
+  S:\sigmalang\tests\test_memory_profiling.py:379: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests\test_memory_profiling.py:384
+  S:\sigmalang\tests\test_memory_profiling.py:384: PytestUnknownMarkWarning: Unknown pytest.mark.memory - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.memory
+
+tests/claude_integration/test_code_execution.py::test_basic_encode_decode
+  C:\Users\sgbil\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but tests/claude_integration/test_code_execution.py::test_basic_encode_decode returned <class 'dict'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/claude_integration/test_code_execution.py::test_preserve_critical_tokens
+  C:\Users\sgbil\AppData\Roaming\Python\Python314\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but tests/claude_integration/test_code_execution.py::test_preserve_critical_tokens returned <class 'dict'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------------------------------------------------------------------------------------------------------- benchmark: 5 tests --------------------------------------------------------------------------------------------------------
+Name (time in us)                                 Min                    Max                   Mean                 StdDev                 Median                   IQR            Outliers         OPS            Rounds  Iterations
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_encode_performance                      198.3000 (1.0)       1,432.3000 (1.38)        397.3406 (1.0)         137.0504 (1.54)        387.0000 (1.0)        218.5999 (4.08)         95;1  2,516.7325 (1.0)         298           1
+test_roundtrip_performance                   368.7000 (1.86)      1,035.1000 (1.0)         428.8484 (1.08)         89.1385 (1.0)         395.6000 (1.02)        53.5999 (1.0)         16;17  2,331.8264 (0.93)        186           1
+test_cache_lookup_vs_linear_search           414.6000 (2.09)      3,685.3000 (3.56)        579.0056 (1.46)        205.7838 (2.31)        501.3000 (1.30)       152.0000 (2.84)      166;140  1,727.0989 (0.69)       1133           1
+test_decode_performance                      856.1000 (4.32)      4,591.0000 (4.44)      1,117.1057 (2.81)        394.3492 (4.42)        989.8000 (2.56)       257.5000 (4.80)        73;71    895.1704 (0.36)        631           1
+test_iterative_vs_recursive_traversal     21,203.5000 (106.93)   70,159.4000 (67.78)    30,422.2341 (76.56)    13,902.0868 (155.96)   24,593.6500 (63.55)    8,371.0499 (156.18)        6;6     32.8707 (0.01)         44           1
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+=========================== short test summary info ===========================
+FAILED tests/integration/test_cli_commands.py::TestEncodeCommand::test_encode_simple_text
+FAILED tests/integration/test_cli_commands.py::TestEncodeCommand::test_encode_from_file
+FAILED tests/integration/test_cli_commands.py::TestEncodeCommand::test_encode_with_output_file
+FAILED tests/integration/test_cli_commands.py::TestEncodeCommand::test_encode_batch_mode
+FAILED tests/integration/test_cli_commands.py::TestEncodeCommand::test_encode_json_output
+FAILED tests/integration/test_cli_commands.py::TestAnalogyCommands::test_analogy_solve_basic
+FAILED tests/integration/test_cli_commands.py::TestAnalogyCommands::test_analogy_solve_with_top_k
+FAILED tests/integration/test_cli_commands.py::TestAnalogyCommands::test_analogy_explain
+FAILED tests/integration/test_cli_commands.py::TestSearchCommand::test_search_basic_query
+FAILED tests/integration/test_cli_commands.py::TestSearchCommand::test_search_with_top_k
+FAILED tests/integration/test_cli_commands.py::TestSearchCommand::test_search_with_threshold
+FAILED tests/integration/test_cli_commands.py::TestEntitiesCommand::test_entities_extract_basic
+FAILED tests/integration/test_cli_commands.py::TestEntitiesCommand::test_entities_extract_from_file
+FAILED tests/integration/test_cli_commands.py::TestEntitiesCommand::test_entities_with_relations
+FAILED tests/integration/test_cli_commands.py::TestEntitiesCommand::test_entities_json_output
+FAILED tests/integration/test_e2e_pipeline.py::TestE2EErrorHandling::test_malformed_encoded_data_handling
+FAILED tests/integration/test_generated_integration.py::TestGeneratedDecoderService::test_decode
+FAILED tests/integration/test_generated_integration.py::TestGeneratedDecoderService::test_decode_batch
+FAILED tests/integration/test_generated_integration.py::TestGeneratedEncoderService::test_encode
+FAILED tests/integration/test_generated_integration.py::TestGeneratedEncoderService::test_encode_batch
+FAILED tests/integration/test_generated_integration.py::TestGeneratedNlpService::test_embed_batch
+FAILED tests/integration/test_generated_integration.py::TestGeneratedSearchService::test_search
+FAILED tests/integration/test_generated_properties.py::TestEncoderProperties::test_encode_decode_roundtrip
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingBasicFunctionality::test_streaming_encoder_small_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingBasicFunctionality::test_streaming_encoder_medium_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingBasicFunctionality::test_streaming_encoder_large_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingMemoryUsage::test_memory_remains_constant
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingMemoryUsage::test_memory_scaling_large_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingVsNonStreaming::test_compression_ratio_comparison
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingVsNonStreaming::test_streaming_performance
+FAILED tests/integration/test_streaming_pipeline.py::TestBoundaryHandling::test_streaming_with_random_chunk_sizes
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingErrorHandling::test_streaming_nonexistent_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingErrorHandling::test_streaming_empty_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingErrorHandling::test_streaming_binary_file
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamBuffer::test_stream_buffer_basic
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamBuffer::test_stream_buffer_backpressure
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingStatistics::test_streaming_stats_collection
+FAILED tests/integration/test_streaming_pipeline.py::TestStreamingStatistics::test_estimate_memory_usage
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10b
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_1kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_100kb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_1mb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_10mb
+FAILED tests/test_memory_profiling.py::TestMemoryProfiler::test_baseline_100mb
+FAILED tests/test_optimizations.py::TestGlyphBufferPool::test_acquire_buffer_from_pool
+FAILED tests/test_optimizations.py::TestGlyphBufferPool::test_buffer_reuse_reduces_allocations
+FAILED tests/test_roundtrip.py::TestBasicRoundTrip::test_deep_tree_round_trip
+FAILED tests/test_roundtrip.py::TestBasicRoundTrip::test_wide_tree_round_trip
+FAILED tests/test_roundtrip.py::TestPropertyBased::test_arbitrary_tree_width
+===== 50 failed, 1638 passed, 4 skipped, 25 warnings in 129.54s (0:02:09) =====

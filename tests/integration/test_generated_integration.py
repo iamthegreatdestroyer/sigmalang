@@ -11,6 +11,7 @@ DO NOT EDIT MANUALLY - Regenerate using test_generator.py
 
 import pytest
 import sys
+import numpy as np
 from pathlib import Path
 
 # Add parent to path
@@ -105,12 +106,18 @@ class TestGeneratedDecoderService:
     @pytest.mark.generated
     def test_decode(self, service):
         """Auto-generated test for decoder.decode()."""
-        # Test inputs
+        # Test inputs - encode first to get valid data for decoding
+        from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
+        encoder = SigmaEncoder()
+        parser = SemanticParser()
+        tree = parser.parse("test input")
+        vector = encoder.encode(tree)
         max_length = 42
 
         # Execute method
         try:
-            result = service.decode(max_length=max_length)
+            result = service.decode(vector, max_length=max_length)
 
             # Basic assertions
             assert result is not None, "Result should not be None"
@@ -126,12 +133,18 @@ class TestGeneratedDecoderService:
     @pytest.mark.generated
     def test_decode_batch(self, service):
         """Auto-generated test for decoder.decode_batch()."""
-        # Test inputs
+        # Test inputs - encode first to get valid data for decoding
+        from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
+        encoder = SigmaEncoder()
+        parser = SemanticParser()
+        tree = parser.parse("test input")
+        vectors = [encoder.encode(tree)]
         max_length = 42
 
         # Execute method
         try:
-            result = service.decode_batch(max_length=max_length)
+            result = service.decode_batch(vectors, max_length=max_length)
 
             # Basic assertions
             assert result is not None, "Result should not be None"
@@ -188,11 +201,12 @@ class TestGeneratedEncoderService:
     def test_encode_batch(self, service):
         """Auto-generated test for encoder.encode_batch()."""
         # Test inputs
+        texts = ["test input"]
         normalize = True
 
         # Execute method
         try:
-            result = service.encode_batch(normalize=normalize)
+            result = service.encode_batch(texts=texts, normalize=normalize)
 
             # Basic assertions
             assert result is not None, "Result should not be None"
@@ -290,11 +304,12 @@ class TestGeneratedNlpService:
     def test_embed_batch(self, service):
         """Auto-generated test for nlp.embed_batch()."""
         # Test inputs
+        texts = ["test input"]
         normalize = True
 
         # Execute method
         try:
-            result = service.embed_batch(normalize=normalize)
+            result = service.embed_batch(texts=texts, normalize=normalize)
 
             # Basic assertions
             assert result is not None, "Result should not be None"
@@ -355,9 +370,11 @@ class TestGeneratedSearchService:
         top_k = 42
         threshold = 3.14
 
+        corpus = ["test document", "another document", "third document"]
+
         # Execute method
         try:
-            result = service.search(query=query, top_k=top_k, threshold=threshold)
+            result = service.search(query=query, corpus=corpus, top_k=top_k, threshold=threshold)
 
             # Basic assertions
             assert result is not None, "Result should not be None"

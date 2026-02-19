@@ -315,7 +315,7 @@ class TreeComparator:
     @staticmethod
     def _nodes_equal(node1: SemanticNode, node2: SemanticNode) -> bool:
         """Recursively compare semantic nodes."""
-        if node1.primitive != node2.primitive:
+        if int(node1.primitive) != int(node2.primitive):
             return False
         if node1.value != node2.value:
             return False

@@ -89,4 +89,7 @@ markers = [
     "performance: Performance and benchmarking tests",
     "round_trip: Encoder/decoder round-trip validation tests",
     "slow: Slow tests that should run separately (timeout=600)",
+    "generated: Tests for generated code",
+    "property: Property-based tests",
+    "memory: Memory profiling tests",
 ]

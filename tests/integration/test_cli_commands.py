@@ -217,9 +217,7 @@ class TestAnalogyCommands:
         """Test basic analogy solving: A:B::C:?"""
         result = runner.invoke(cli, [
             "analogy", "solve",
-            "--a", "king",
-            "--b", "queen",
-            "--c", "man"
+            "king:queen::man:?"
         ])
 
         assert result.exit_code == 0
@@ -231,9 +229,7 @@ class TestAnalogyCommands:
         """Test analogy with top-k results."""
         result = runner.invoke(cli, [
             "analogy", "solve",
-            "--a", "Python",
-            "--b", "programming",
-            "--c", "SQL",
+            "Python:programming::SQL:?",
             "--top-k", "5"
         ])
 
@@ -244,10 +240,7 @@ class TestAnalogyCommands:
         """Test analogy explanation."""
         result = runner.invoke(cli, [
             "analogy", "explain",
-            "--a", "cat",
-            "--b", "meow",
-            "--c", "dog",
-            "--d", "bark"
+            "cat:meow::dog:bark"
         ])
 
         assert result.exit_code == 0
@@ -266,32 +259,35 @@ class TestSearchCommand:
     """Tests for search command."""
 
     @pytest.mark.integration
-    def test_search_basic_query(self, runner):
+    def test_search_basic_query(self, runner, sample_corpus_file):
         """Test basic search query."""
         result = runner.invoke(cli, [
             "search",
-            "machine learning algorithms"
+            "machine learning algorithms",
+            "--corpus", str(sample_corpus_file)
         ])
 
         assert result.exit_code == 0
         assert len(result.output) > 0
 
     @pytest.mark.integration
-    def test_search_with_top_k(self, runner):
+    def test_search_with_top_k(self, runner, sample_corpus_file):
         """Test search with top-k results."""
         result = runner.invoke(cli, [
             "search",
-            "neural networks"
+            "neural networks",
+            "--corpus", str(sample_corpus_file)
         ])
 
         assert result.exit_code == 0
 
     @pytest.mark.integration
-    def test_search_with_threshold(self, runner):
+    def test_search_with_threshold(self, runner, sample_corpus_file):
         """Test search with similarity threshold."""
         result = runner.invoke(cli, [
             "search",
-            "deep learning"
+            "deep learning",
+            "--corpus", str(sample_corpus_file)
         ])
 
         assert result.exit_code == 0

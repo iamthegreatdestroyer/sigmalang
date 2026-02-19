@@ -1,0 +1,35 @@
+apiVersion: v2
+name: sigmalang
+description: Sub-Linear Algorithmic Neural Glyph Language for LLM compression
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - llm
+  - compression
+  - semantic
+  - encoding
+  - nlp
+
+home: https://github.com/iamthegreatdestroyer/sigmalang
+sources:
+  - https://github.com/iamthegreatdestroyer/sigmalang
+maintainers:
+  - name: Ryot LLM Project
+    url: https://github.com/iamthegreatdestroyer
+
+dependencies:
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+    alias: redis
+  - name: prometheus
+    version: "15.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled
+  - name: grafana
+    version: "6.x.x"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: grafana.enabled

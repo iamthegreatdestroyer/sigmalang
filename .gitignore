@@ -106,12 +106,31 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.*.local
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Secrets and Credentials (NEVER commit!)
+*.key
+*.pem
+*.p8
+*.p12
+*.pfx
+secrets.json
+*-secrets.yaml
+*-secrets.yml
+secret.yaml
+secret.yml
+.secrets
+credentials.json
+token.json
+apikey.txt
+*credentials*
 
 # Spyder project settings
 .spyderproject

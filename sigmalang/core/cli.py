@@ -467,7 +467,7 @@ def entities_extract(ctx, text, input_file, types, relations):
         from .api_models import EntityExtractionRequest
         request = EntityExtractionRequest(
             text=text,
-            extract_relations=relations
+            include_relations=relations
         )
         response = api.extract_entities(request)
         
@@ -481,7 +481,7 @@ def entities_extract(ctx, text, input_file, types, relations):
                 if response.entities:
                     click.echo("\nEntities:")
                     for ent in response.entities:
-                        click.echo(f"  • {ent.text} ({ent.type})")
+                        click.echo(f"  • {ent.text} ({ent.entity_type})")
                 
                 if relations and response.relations:
                     click.echo("\nRelations:")

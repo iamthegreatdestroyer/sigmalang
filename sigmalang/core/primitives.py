@@ -452,6 +452,8 @@ class Glyph:
         
         Returns (glyph, bytes_consumed).
         """
+        if not data:
+            raise ValueError("Empty glyph data")
         first_byte = data[0]
         glyph_type = GlyphType((first_byte >> 6) & 0x03)
         has_payload = (first_byte >> 5) & 0x01

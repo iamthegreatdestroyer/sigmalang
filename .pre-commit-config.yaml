@@ -1,0 +1,92 @@
+# Pre-commit hooks for ΣLANG
+# Installation: pip install pre-commit && pre-commit install
+
+repos:
+  # Detect secrets and private keys
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.1
+    hooks:
+      - id: gitleaks
+        name: gitleaks - detect secrets
+        entry: gitleaks detect --source git --verbose
+        language: golang
+        stages: [commit]
+
+  # Code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: black - Python formatter
+        language_version: python3
+
+  # Linting
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        name: flake8 - Python linter
+        args: ['--max-line-length=100', '--extend-ignore=E203,W503']
+
+  # Type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        name: mypy - Python type checker
+        additional_dependencies: ['types-all']
+        args: ['--ignore-missing-imports']
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: bandit - Security linter
+        args: ['-r', 'sigmalang/', '-ll']
+
+  # YAML validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML
+        args: ['--unsafe']
+      - id: check-json
+        name: Check JSON
+      - id: check-toml
+        name: Check TOML
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-case-conflict
+      - id: detect-private-key
+        name: Detect private keys
+
+  # Secrets detection via python
+  - repo: local
+    hooks:
+      - id: check-secrets-python
+        name: Check for secrets in Python files
+        entry: python -c "
+import sys
+import re
+patterns = [
+    r'password\s*=\s*[\"\\'](?!changeme)',
+    r'secret\s*=\s*[\"\\'](?!change)',
+    r'api[_-]?key\s*=\s*[\"\\'](?!sk-)',
+    r'token\s*=\s*[\"\\'](?!hf_)',
+]
+for file in sys.argv[1:]:
+    with open(file) as f:
+        for i, line in enumerate(f, 1):
+            if any(re.search(p, line, re.I) for p in patterns):
+                print(f'{file}:{i}: Potential secret found')
+sys.exit(0)
+        "
+        language: system
+        types: [python]
+        pass_filenames: true
+
+# Disable by default for faster commits
+# Enable with: pre-commit run --all-files
+default_stages: [commit]

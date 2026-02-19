@@ -1,0 +1,49 @@
+[run]
+# Coverage configuration for ΣLANG
+branch = True
+parallel = True
+omit =
+    */site-packages/*
+    */distutils/*
+    */python?.?/*
+    */tests/*
+    */__pycache__/*
+    */venv/*
+    .tox/*
+    setup.py
+    */migrations/*
+
+[report]
+# Report configuration
+precision = 2
+show_missing = True
+skip_covered = False
+sort = Cover
+
+# Exclude lines from coverage
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    @abstractmethod
+    @abc.abstractmethod
+    if TYPE_CHECKING:
+    if 0:
+    if False:
+    @overload
+    @typing.overload
+
+ignore_errors = False
+
+[html]
+directory = htmlcov
+
+[paths]
+source =
+    sigmalang
+    */site-packages/sigmalang
+
+[xml]
+output = coverage.xml

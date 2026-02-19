@@ -1,0 +1,228 @@
+# ΣLANG Helm Chart Values
+# Default configuration for Kubernetes deployment
+
+# Global configuration
+global:
+  environment: production
+  imagePullSecrets: []
+
+# API Deployment
+api:
+  enabled: true
+  replicaCount: 3
+
+  image:
+    repository: ghcr.io/iamthegreatdestroyer/sigmalang
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  # Pod configuration
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+    annotations: {}
+
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/rate-limit: "100"
+      nginx.ingress.kubernetes.io/rate-limit-window: "60"
+    hosts:
+      - host: api.sigmalang.io
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: sigmalang-tls
+        hosts:
+          - api.sigmalang.io
+
+  # Resource requests and limits
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+  # Environment variables
+  env:
+    SIGMALANG_API_HOST: "0.0.0.0"
+    SIGMALANG_API_PORT: "8000"
+    SIGMALANG_DEBUG: "false"
+    SIGMALANG_LOG_LEVEL: "INFO"
+    SIGMALANG_LOG_FORMAT: "json"
+    SIGMALANG_CACHE_BACKEND: "redis"
+    SIGMALANG_METRICS_ENABLED: "true"
+    SIGMALANG_RATE_LIMIT_ENABLED: "true"
+
+  # Secrets (stored in Kubernetes Secrets)
+  secrets:
+    - name: SIGMALANG_JWT_SECRET
+      key: jwt-secret
+    - name: SIGMALANG_REDIS_URL
+      key: redis-url
+
+  # Liveness and readiness probes
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # Autoscaling
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  # Node affinity
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - sigmalang
+            topologyKey: kubernetes.io/hostname
+
+# Redis Cache
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: ""  # Set via secrets
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+  replica:
+    replicaCount: 2
+    persistence:
+      enabled: true
+      size: 10Gi
+
+# Prometheus Monitoring
+prometheus:
+  enabled: true
+  retention: 15d
+
+  alertmanager:
+    enabled: true
+
+  pushgateway:
+    enabled: false
+
+  # Grafana integration
+  grafana:
+    enabled: true
+    adminPassword: ""  # Set via secrets
+    persistence:
+      enabled: true
+      size: 10Gi
+
+  # ServiceMonitor for ΣLANG
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+
+# Logging
+logging:
+  enabled: true
+  level: INFO
+  format: json
+
+# Backup and restore
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: 30  # days
+  destination: s3://sigmalang-backups
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+    - ports:
+        - protocol: TCP
+          port: 53  # DNS
+        - protocol: UDP
+          port: 53
+
+# RBAC
+rbac:
+  enabled: true
+  create: true
+
+# Service Account
+serviceAccount:
+  create: true
+  name: sigmalang
+  annotations: {}
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9090"
+  prometheus.io/path: "/metrics"
+
+# Labels
+labels:
+  app: sigmalang
+  component: api
+  version: "1.0.0"

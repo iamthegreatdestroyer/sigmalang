@@ -42,7 +42,9 @@ class TestEncoderProperties:
         parser = SemanticParser()
         tree = parser.parse(text)
 
-        encoded = api.encoder.encode_tree(tree)
+        from sigmalang.core.encoder import SigmaEncoder
+        encoder = SigmaEncoder()
+        encoded = encoder.encode(tree)
         assert encoded is not None
         assert len(encoded) > 0
 
