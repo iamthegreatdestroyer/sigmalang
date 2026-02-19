@@ -201,12 +201,12 @@ class MemoryProfiler:
         top_allocations = [
             (str(stat), stat.size) for stat in top_stats
         ]
-        
+
         measurement = MemoryMeasurement(
             timestamp=time.time() - self.start_time,
             peak_memory_mb=peak / (1024 * 1024),
             current_memory_mb=mem_info.rss / (1024 * 1024),
-            allocation_count=len(snapshot),
+            allocation_count=len(top_stats),
             top_allocations=top_allocations
         )
         
@@ -243,8 +243,8 @@ class TestDataGenerator:
         def count_bytes(node: SemanticNode, depth: int = 0) -> int:
             size = 64  # Base node overhead
             
-            if node.content:
-                size += len(str(node.content))
+            if node.value:
+                size += len(str(node.value))
             
             if node.children:
                 size += len(node.children) * 8  # Pointers
@@ -258,8 +258,8 @@ class TestDataGenerator:
     @staticmethod
     def generate_balanced_tree(target_size_bytes: int, depth: int = 5) -> SemanticTree:
         """Generate a balanced semantic tree."""
-        tree = SemanticTree()
-        
+        placeholder = SemanticNode(primitive=CodePrimitive.BLOCK, value="ot")
+        tree = SemanticTree(root=placeholder, source_text="")
         # Estimate bytes per leaf
         bytes_per_leaf = 128
         target_leaves = max(1, target_size_bytes // bytes_per_leaf)
@@ -280,11 +280,11 @@ class TestDataGenerator:
                 
                 child = SemanticNode(
                     primitive=CodePrimitive.VARIABLE,
-                    content=f"var_{current_depth}_{i}_{i*1000}",
+                    value=f"v_{current_depth}_{i}_{i*1000}",
                 )
-                
+
                 if parent_node is not None:
-                    parent_node.add_child(child)
+                    parent_node.children.append(child)
                 else:
                     tree.root = child
                 
@@ -302,36 +302,29 @@ class TestDataGenerator:
     @staticmethod
     def generate_deep_tree(target_size_bytes: int, depth: int = 50) -> SemanticTree:
         """Generate a deep linear tree (stress test for recursion)."""
-        tree = SemanticTree()
-        
         current_node = SemanticNode(CodePrimitive.BLOCK, "root")
-        tree.root = current_node
-        size = 64
+        tree = SemanticTree(root=current_node, source_text="")
         
+        size = 0
         depth_count = 0
         while size < target_size_bytes and depth_count < depth:
             child = SemanticNode(
                 CodePrimitive.STATEMENT,
-                f"stmt_{depth_count}_{depth_count*100}_{depth_count*10000}"
+                f"statement_{depth_count}"
             )
             current_node.add_child(child)
-            current_node = child
-            size += 128
-            depth_count += 1
+            cepth_count += 1
         
         return tree
     
     @staticmethod
     def generate_wide_tree(target_size_bytes: int, width: int = 1000) -> SemanticTree:
         """Generate a wide tree (many siblings)."""
-        tree = SemanticTree()
-        
         root = SemanticNode(CodePrimitive.BLOCK, "root")
-        tree.root = root
+        tree = SemanticTree(root=root, source_text="")
         
-        size = 64
+        size = 0
         child_count = 0
-        
         while size < target_size_bytes and child_count < width:
             child = SemanticNode(
                 CodePrimitive.VARIABLE,
@@ -339,10 +332,7 @@ class TestDataGenerator:
             )
             root.add_child(child)
             size += 128
-            child_count += 1
-        
-        return tree
-
+            child_count
 
 # ============================================================================
 # TEST SUITE
@@ -443,8 +433,8 @@ class TestMemoryProfiler:
         """Save profiling results to JSON."""
         results_dir = Path(__file__).parent / "memory_profiles"
         results_dir.mkdir(exist_ok=True)
-        
-        timestamp = datetime.now().isoformat()
+
+        timestamp = datetime.now().isoformat().replace(':', '-')
         filename = results_dir / f"profile_{summary.test_name}_{timestamp}.json"
         
         with open(filename, 'w') as f:

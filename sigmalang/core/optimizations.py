@@ -65,15 +65,15 @@ class FastPrimitiveCache:
         if len(self._id_to_primitive) < self.max_cache_size:
             # Use hash of key tuple as cache key
             cache_key = hash(key) % self.max_cache_size
-            self._id_to_primitive[cache_key] = value
+            self._id_to_primitive[cache_key] = (key, value)
     
     def get(self, key: Tuple[int, Any]) -> Optional[Any]:
         """Generic cache get operation for tuple keys (primitive_id, value)."""
         cache_key = hash(key) % self.max_cache_size
-        if cache_key in self._id_to_primitive:
+        entry = self._id_to_primitive.get(cache_key)
+        if entry is not None and isinstance(entry, tuple) and len(entry) == 2 and entry[0] == key:
             self.hits += 1
-            return self._id_to_primitive[cache_key]
-        
+            return entry[1]
         self.misses += 1
         return None
     
@@ -152,16 +152,23 @@ class GlyphBufferPool:
     def release(self, buffer: bytearray) -> None:
         """
         Return buffer to the pool.
-        
+
         Time: O(1)
-        
+
         Only returns if pool not full (prevents unbounded growth).
         """
         if len(self._available_indices) < self.pool_size:
             # Find which buffer this is, or add if new
-            if buffer in self._pool:
+            # Use identity (is) not equality (==) to find correct buffer
+            idx = None
+            for i, buf in enumerate(self._pool):
+                if buf is buffer:
+                    idx = i
+                    break
+
+            if idx is not None:
                 # Already in pool, just mark available
-                idx = self._pool.index(buffer)
+                pass
             else:
                 # External buffer - add to pool if space
                 if len(self._pool) < self.pool_size:
@@ -170,7 +177,7 @@ class GlyphBufferPool:
                 else:
                     # Pool full, discard buffer (GC handles it)
                     return
-            
+
             self._available_indices.append(idx)
     
     def suggest_resize(self) -> Optional[int]:

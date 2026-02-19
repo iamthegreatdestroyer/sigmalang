@@ -82,8 +82,8 @@ class TestGlyphBufferPool:
         
         buf = pool.acquire()
         assert isinstance(buf, bytearray)
-        assert len(buf) == 256
-    
+        # Buffer is cleared on acquire for reuse
+        assert len(buf) == 0
     @pytest.mark.unit
     def test_buffer_reuse_reduces_allocations(self):
         """Releasing and reacquiring should reuse buffers."""
@@ -94,14 +94,14 @@ class TestGlyphBufferPool:
         buf2 = pool.acquire()
         
         # Pool should be exhausted
-        assert len(pool._available) == 0
+        assert len(pool._available_indices) == 0
         
         # Release and reacquire
         pool.release(buf1)
         buf3 = pool.acquire()
-        
+
         # Should reuse buf1
-        assert buf3 is not buf2
+        assert buf3 is buf1
 
 
 class TestFastGlyphEncoder:
