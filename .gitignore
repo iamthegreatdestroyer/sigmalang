@@ -192,3 +192,7 @@ tmp/
 temp/
 *.tmp
 .history/
+
+# Track shared VS Code 1.112 workspace settings
+!.vscode/
+!.vscode/settings.json
