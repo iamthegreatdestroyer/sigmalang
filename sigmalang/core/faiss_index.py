@@ -174,9 +174,9 @@ class BaseIndex(ABC):
         t0 = time.perf_counter()
         if queries.ndim == 1:
             queries = queries.reshape(1, -1)
-        D, I = self.search(queries, k)
+        D, Idx = self.search(queries, k)
         return SearchResult(
-            distances=D, indices=I,
+            distances=D, indices=Idx,
             query_count=len(queries),
             elapsed_ms=(time.perf_counter() - t0) * 1000,
         )
@@ -479,8 +479,8 @@ class HNSWIndex(BaseIndex):
                     np.full((nq, k), -1, dtype=np.int64))
 
         if self._faiss_index is not None:
-            D, I = self._faiss_index.search(queries, min(k, self.ntotal))
-            return D.astype(np.float32), I.astype(np.int64)
+            D, Idx = self._faiss_index.search(queries, min(k, self.ntotal))
+            return D.astype(np.float32), Idx.astype(np.int64)
 
         # NumPy fallback: exact search (correct, slower for large n)
         dists = self._distances(queries, self._data)
