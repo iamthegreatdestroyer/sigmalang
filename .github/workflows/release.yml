@@ -22,12 +22,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pytest
+          pip install numpy pytest pytest-asyncio pytest-timeout httpx
           pip install -e .
 
       - name: Run tests
         run: |
-          python -m pytest tests/ -v
+          python -m pytest tests/ --ignore=tests/claude_integration -v --timeout=300
 
   build:
     needs: test
