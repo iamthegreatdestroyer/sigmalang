@@ -34,6 +34,14 @@ def _has_fastapi() -> bool:
         return False
 
 
+def _has_httpx() -> bool:
+    try:
+        import httpx  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
 def _has_uvicorn() -> bool:
     try:
         import uvicorn  # noqa: F401
@@ -171,7 +179,10 @@ class TestCreateWebsocketApp:
 # WebSocket endpoint integration tests (require FastAPI + httpx or starlette)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.skipif(not _has_fastapi(), reason="FastAPI not installed")
+@pytest.mark.skipif(
+    not _has_fastapi() or not _has_httpx(),
+    reason="FastAPI or httpx not installed",
+)
 class TestWebSocketEndpoints:
     """Integration tests using FastAPI's test client."""
 
