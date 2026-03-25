@@ -4,7 +4,7 @@
 # =============================================================================
 # STAGE 1: Builder - Install dependencies with compilation tools
 # =============================================================================
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Set environment variables for Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -41,7 +41,7 @@ RUN pip install -e ".[dev]"
 # =============================================================================
 # STAGE 2: Production - Minimal runtime image
 # =============================================================================
-FROM python:3.12-slim AS production
+FROM python:3.14-slim AS production
 
 # Labels for container metadata
 LABEL org.opencontainers.image.title="ΣLANG" \
