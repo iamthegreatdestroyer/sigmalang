@@ -6,7 +6,10 @@
 .PHONY: help install install-dev test lint format build run clean \
         docker-build docker-run docker-push docker-clean \
         compose-up compose-down compose-dev compose-logs \
-        k8s-deploy k8s-delete
+        k8s-deploy k8s-delete \
+        test-fast test-strict test-watch \
+        security-scan auto-fix validate publish-check \
+        coverage-report pre-commit-install pre-commit-run
 
 # Default target
 .DEFAULT_GOAL := help
@@ -137,3 +140,71 @@ release-minor: ## Create minor release
 release-major: ## Create major release
 	bumpversion major
 	git push && git push --tags
+
+# =============================================================================
+# Automation & Quality Gates
+# =============================================================================
+test-strict: ## Run tests with coverage enforcement (fails below 85%)
+	$(PYTEST) tests/ --ignore=tests/claude_integration \
+		-v --cov=sigmalang --cov-report=term-missing \
+		--cov-fail-under=85 --timeout=300
+
+test-fast: ## Run tests without coverage (faster)
+	$(PYTEST) tests/ -v --tb=short
+
+test-watch: ## Run core tests continuously on file changes
+	$(PYTEST) tests/test_sigmalang.py tests/test_config.py -q --timeout=30 -x
+
+coverage-report: ## Generate HTML coverage report
+	$(PYTEST) tests/ --ignore=tests/claude_integration \
+		--cov=sigmalang --cov-report=html --cov-report=term-missing --timeout=300
+	@echo "Coverage report at htmlcov/index.html"
+
+auto-fix: ## Auto-fix common issues (formatting + imports + lint)
+	black sigmalang/ tests/ --line-length=120 --quiet
+	isort sigmalang/ tests/ --profile=black --line-length=120 --quiet
+	ruff check sigmalang/ --fix --ignore E501,F401 --quiet || true
+	@echo "✅ Auto-fix complete"
+
+security-scan: ## Run security audit (bandit + pip-audit)
+	bandit -r sigmalang/ -ll -q
+	pip-audit --strict --desc 2>&1 || echo "⚠️  Dependency vulnerabilities found"
+	@echo "✅ Security scan complete"
+
+validate: ## Full validation pipeline (lint + test-strict + security)
+	@echo "🔍 Running full validation..."
+	$(MAKE) lint
+	$(MAKE) test-strict
+	$(MAKE) security-scan
+	@echo "✅ Full validation passed"
+
+publish-check: ## Verify package builds and passes twine check
+	$(PYTHON) -m build
+	twine check dist/*
+	@echo "✅ Package ready for PyPI"
+
+pre-commit-install: ## Install pre-commit hooks
+	pip install pre-commit
+	pre-commit install
+	@echo "✅ Pre-commit hooks installed"
+
+pre-commit-run: ## Run all pre-commit hooks on all files
+	pre-commit run --all-files
+
+health-check: ## Run health monitor
+	$(PYTHON) scripts/health_monitor.py --quick
+
+status: ## Show project test status summary
+	@echo "=== ΣLANG Project Status ==="
+	@$(PYTHON) -c "import json; d=json.load(open('automation_state.json')); t=d['test_summary']; print(f\"Tests: {t['passed']}/{t['total_collected']} passed | {t['failed']} failed | {t['skipped']} skipped | {t['duration_s']:.0f}s\")"
+	@echo ""
+
+changelog: ## Generate changelog from git history since last tag
+	@echo "=== ΣLANG Changelog ==="
+	@PREV=$$(git tag --sort=-creatordate 2>/dev/null | head -1); \
+	if [ -z "$$PREV" ]; then \
+		git log --oneline --no-decorate HEAD | head -50; \
+	else \
+		echo "Changes since $$PREV:"; \
+		git log --oneline --no-decorate "$$PREV..HEAD" | head -50; \
+	fi

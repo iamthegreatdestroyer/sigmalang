@@ -355,13 +355,13 @@ class DatasetGenerator:
                 "avg_value_len": 50
             },
             DatasetComplexity.COMPLEX: {
-                "max_depth": 8,
-                "max_children": 8,
+                "max_depth": 4,
+                "max_children": 4,
                 "avg_value_len": 200
             },
             DatasetComplexity.EXTREME: {
-                "max_depth": 16,
-                "max_children": 16,
+                "max_depth": 5,
+                "max_children": 4,
                 "avg_value_len": 500
             }
         }
@@ -373,7 +373,9 @@ class DatasetGenerator:
             
             def gen_tree(d: int) -> Dict:
                 """Recursively generate tree."""
-                num_children = np.random.randint(1, param["max_children"] + 1)
+                # Cap children to avoid exponential blowup at high depths
+                max_ch = min(param["max_children"], max(1, 6 - d))
+                num_children = np.random.randint(1, max_ch + 1)
                 value_len = np.random.randint(
                     max(1, param["avg_value_len"] // 2),
                     param["avg_value_len"] * 2

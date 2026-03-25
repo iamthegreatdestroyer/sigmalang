@@ -30,9 +30,8 @@ sys.path.insert(0, str(sigmalang_root))
 # =============================================================================
 
 @dataclass
-class TestMethod:
+class MethodTemplate:
     """Represents a generated test method."""
-
     name: str
     service: str
     method: str
@@ -40,6 +39,9 @@ class TestMethod:
     assertions: List[str]
     description: str
     test_code: str
+
+# Mark dataclass as non-test to prevent pytest collection
+MethodTemplate.__test__ = False
 
 
 # =============================================================================
@@ -123,7 +125,7 @@ class APIIntrospector:
 # Test Code Generator
 # =============================================================================
 
-class TestCodeGenerator:
+class APITestCodeGenerator:
     """Generates test code from API analysis."""
 
     def __init__(self, introspector: APIIntrospector):
@@ -297,6 +299,8 @@ sys.path.insert(0, str(sigmalang_root))
 
 class PropertyBasedTestGenerator:
     """Generates property-based tests using hypothesis."""
+    # Mark as non-test to prevent pytest collection
+    __test__ = False
 
     def generate_encoder_properties(self) -> str:
         """Generate property-based tests for encoder."""
@@ -426,7 +430,7 @@ def generate_all_tests(output_dir: Path = None) -> Dict[str, str]:
         output_dir = Path(__file__).parent
 
     introspector = APIIntrospector()
-    code_generator = TestCodeGenerator(introspector)
+    code_generator = APITestCodeGenerator(introspector)
     property_generator = PropertyBasedTestGenerator()
 
     generated_files = {}

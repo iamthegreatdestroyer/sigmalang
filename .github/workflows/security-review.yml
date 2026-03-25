@@ -1,33 +1,94 @@
-name: Claude Code Security Review
+name: Security & Health Monitoring
 
 on:
   pull_request:
     paths:
-      - 'core/**/*.py'
+      - "sigmalang/**/*.py"
   push:
     branches: [main, develop]
     paths:
-      - 'core/crypto_*.py'
-      - 'core/key_*.py'
+      - "sigmalang/core/crypto_*.py"
+      - "sigmalang/core/key_*.py"
+      - "sigmalang/core/api_server.py"
+      - "sigmalang/core/websocket_server.py"
+  schedule:
+    - cron: "0 3 * * *" # Nightly at 3am UTC
+  workflow_dispatch: {} # Manual trigger
 
 jobs:
-  security-review:
+  security-scan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.11"
 
-      - name: Claude Security Review
+      - name: Install security tools
         run: |
-          echo "🔒 Security review would run here"
-          echo "Files: core/crypto_primitives.py, core/key_derivation.py"
+          pip install bandit[toml] pip-audit safety
+          pip install -e .
 
-      - name: Upload Report
+      - name: Bandit (static analysis)
+        run: bandit -r sigmalang/ -ll -f json -o bandit-report.json || true
+
+      - name: pip-audit (dependency CVEs)
+        run: pip-audit --strict --desc --format json --output pip-audit-report.json 2>&1 || true
+
+      - name: Safety check (known vulnerabilities)
+        run: safety check --json --output safety-report.json 2>&1 || true
+
+      - name: Summary
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f bandit-report.json ]; then
+            ISSUES=$(python -c "import json; r=json.load(open('bandit-report.json')); print(len(r.get('results',[])))")
+            echo "- **Bandit**: ${ISSUES} issues found" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f pip-audit-report.json ]; then
+            echo "- **pip-audit**: Completed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: security-report
-          path: security-report.md
+          name: security-reports
+          path: |
+            bandit-report.json
+            pip-audit-report.json
+            safety-report.json
+          retention-days: 30
+
+  nightly-health:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          pip install numpy pytest pytest-cov pytest-asyncio pytest-timeout hypothesis
+          pip install -e .
+
+      - name: Full test suite (nightly)
+        run: |
+          python -m pytest tests/ --ignore=tests/claude_integration \
+            -q --tb=short --cov=sigmalang --cov-report=term-missing \
+            --cov-fail-under=85 --timeout=300
+
+      - name: Health monitor
+        if: always()
+        run: python scripts/health_monitor.py --quick 2>&1 || echo "::warning::Health check issues detected"
+
+      - name: Auto-test-fixer (diagnose mode)
+        if: failure()
+        run: python scripts/auto_fix_tests.py --ci

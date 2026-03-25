@@ -1,0 +1,71 @@
+# =============================================================================
+# Dependabot Configuration — Automated Dependency Updates
+# =============================================================================
+# Keeps pip and GitHub Actions dependencies up to date automatically
+# PRs are auto-created for version bumps with CI validation
+
+version: 2
+updates:
+  # ── Python Dependencies ──────────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "iamthegreatdestroyer"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps):"
+    # Group minor/patch updates to reduce PR noise
+    groups:
+      testing:
+        patterns:
+          - "pytest*"
+          - "hypothesis"
+          - "coverage"
+      linting:
+        patterns:
+          - "ruff"
+          - "black"
+          - "mypy"
+          - "isort"
+      ml-stack:
+        patterns:
+          - "numpy"
+          - "scipy"
+          - "scikit-learn"
+      web:
+        patterns:
+          - "fastapi"
+          - "uvicorn"
+          - "pydantic*"
+
+  # ── GitHub Actions ───────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "ci"
+      - "automated"
+    commit-message:
+      prefix: "ci(deps):"
+
+  # ── Docker Base Images ───────────────────────────────────────────────
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "chore(docker):"
