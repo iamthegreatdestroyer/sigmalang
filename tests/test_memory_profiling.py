@@ -21,7 +21,8 @@ import sys
 import tempfile
 import time
 import tracemalloc
-import psutil
+
+psutil = pytest.importorskip("psutil")
 import numpy as np
 from pathlib import Path
 from dataclasses import dataclass, field

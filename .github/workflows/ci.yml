@@ -142,19 +142,19 @@ jobs:
         run: |
           echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
           python -c "
-import json, glob, sys
-files = sorted(glob.glob('benchmark_results/ci_*.json'))
-if not files:
-    print('No benchmark results found'); sys.exit(0)
-with open(files[-1]) as f:
-    data = json.load(f)
-benchmarks = data.get('benchmarks', [])
-print(f'Ran {len(benchmarks)} benchmarks')
-for b in benchmarks:
-    name = b.get('name', 'unknown')
-    mean = b.get('stats', {}).get('mean', 0)
-    print(f'  {name}: {mean*1000:.1f}ms')
-"
+          import json, glob, sys
+          files = sorted(glob.glob('benchmark_results/ci_*.json'))
+          if not files:
+              print('No benchmark results found'); sys.exit(0)
+          with open(files[-1]) as f:
+              data = json.load(f)
+          benchmarks = data.get('benchmarks', [])
+          print(f'Ran {len(benchmarks)} benchmarks')
+          for b in benchmarks:
+              name = b.get('name', 'unknown')
+              mean = b.get('stats', {}).get('mean', 0)
+              print(f'  {name}: {mean*1000:.1f}ms')
+          "
 
       - name: Store benchmark results
         uses: actions/upload-artifact@v4
