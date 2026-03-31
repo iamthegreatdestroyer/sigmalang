@@ -2,7 +2,7 @@
 Semantic Analogy Engine for ΣLANG.
 
 This module implements semantic analogy resolution using hyperdimensional vectors.
-The engine solves problems of the form: A:B::C:? 
+The engine solves problems of the form: A:B::C:?
 
 Where ? is the unknown fourth element that completes the analogy.
 
@@ -28,14 +28,15 @@ License: AGPLv3 / Commercial Dual License
 Copyright (c) 2025
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Set
-import numpy as np
-from pathlib import Path
+import hashlib
 import json
 import logging
-import hashlib
 import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
+
+import numpy as np
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -105,15 +106,15 @@ class AnalogyBenchmark:
 class HDVectorSpace:
     """
     Hyperdimensional vector space for semantic analogy.
-    
+
     Uses simple projections to convert strings to high-dimensional vectors
     that preserve semantic relationships through vector arithmetic.
     """
-    
+
     def __init__(self, dimensionality: int = 10000, seed: int = 42):
         """
         Initialize the HD vector space.
-        
+
         Args:
             dimensionality: Dimension of HD vectors
             seed: Random seed for reproducibility
@@ -121,65 +122,65 @@ class HDVectorSpace:
         self.dimensionality = dimensionality
         self.seed = seed
         np.random.seed(seed)
-        
+
         # Initialize projection matrix for consistent hashing
         self.projection_matrix = np.random.randn(256, dimensionality)
         self.projection_matrix = (
             self.projection_matrix / np.linalg.norm(self.projection_matrix, axis=1, keepdims=True)
         )
-    
+
     def encode(self, text: str) -> np.ndarray:
         """
         Encode a text string as an HD vector.
-        
+
         Uses character-based hashing and projection to create stable,
         semantically meaningful vectors.
-        
+
         Args:
             text: Input string
-            
+
         Returns:
             HD vector (1D numpy array of shape (dimensionality,))
         """
         text = text.lower().strip()
-        
+
         # Create initial character vector
-        char_hash = hashlib.md5(text.encode()).digest()
+        char_hash = hashlib.md5(text.encode(), usedforsecurity=False).digest()
         char_vector = np.frombuffer(char_hash, dtype=np.uint8)
-        
+
         # Pad or truncate to 256 dimensions
         if len(char_vector) < 256:
             char_vector = np.pad(char_vector, (0, 256 - len(char_vector)))
         else:
             char_vector = char_vector[:256]
-        
+
         # Project to HD space
         hd_vector = np.dot(char_vector, self.projection_matrix)
-        
+
         # Normalize
         norm = np.linalg.norm(hd_vector)
         if norm > 0:
             hd_vector = hd_vector / norm
-        
+
         return hd_vector.astype(np.float32)
-    
+
     def similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
         """
         Compute cosine similarity between two HD vectors.
-        
+
         Args:
             vec1: First HD vector
             vec2: Second HD vector
-            
+
         Returns:
             Similarity score in [-1, 1]
         """
         norm1 = np.linalg.norm(vec1)
         norm2 = np.linalg.norm(vec2)
-        
+
         if norm1 == 0 or norm2 == 0:
             return 0.0
-        
+
         return float(np.dot(vec1, vec2) / (norm1 * norm2))
 
 

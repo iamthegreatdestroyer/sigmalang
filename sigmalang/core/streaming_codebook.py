@@ -50,12 +50,12 @@ Usage:
             print(f"New patterns learned: {codebook.stats['promotions']}")
 """
 
-import time
 import hashlib
 import logging
-from typing import Dict, List, Tuple, Optional, Any, Set
-from dataclasses import dataclass, field
+import time
 from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -180,7 +180,7 @@ class FrequencyAccumulator:
         self._chunk_count += 1
 
         for pattern, count in patterns.items():
-            hash_id = hashlib.md5(pattern.encode()).hexdigest()[:8]
+            hash_id = hashlib.md5(pattern.encode(), usedforsecurity=False).hexdigest()[:8]
 
             if hash_id in self._candidates:
                 candidate = self._candidates[hash_id]
@@ -553,7 +553,7 @@ class StreamingCodebook:
     def _generate_embedding(self, pattern: str) -> np.ndarray:
         """Generate a deterministic embedding for a pattern."""
         # Hash-based deterministic embedding
-        seed = int(hashlib.md5(pattern.encode()).hexdigest()[:8], 16)
+        seed = int(hashlib.md5(pattern.encode(), usedforsecurity=False).hexdigest()[:8], 16)
         rng = np.random.RandomState(seed)
         vec = rng.randn(self.config.embedding_dim).astype(np.float32)
         vec /= np.linalg.norm(vec) + 1e-8
@@ -576,7 +576,6 @@ class StreamingCodebook:
             reverse=True
         )
 
-        encoded = text
         for entry in entries_by_length:
             if entry.pattern.lower() in text_lower:
                 # Track substitution

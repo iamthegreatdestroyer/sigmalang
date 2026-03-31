@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MIN_COVERAGE: 60
+  MIN_COVERAGE: 85
   PYTHON_PRIMARY: "3.11"
 
 jobs:
@@ -38,19 +38,16 @@ jobs:
       - name: Ruff lint (strict)
         run: ruff check sigmalang/ --ignore E501,F401,W291,W293,I001,E741,F841,F821,F541,E722,E702,F811,E402
 
-      - name: Type check (advisory)
+      - name: Type check
         run: mypy sigmalang/ --ignore-missing-imports --no-error-summary --warn-return-any --check-untyped-defs
-        continue-on-error: true # pre-existing type issues; track but don't block
 
       - name: Security scan (bandit)
         run: bandit -r sigmalang/ -ll -q
-        continue-on-error: true # pre-existing MD5-for-caching (B324) and 0.0.0.0-bind (B104) warnings
 
       - name: Dependency audit (pip-audit)
         run: |
           pip install -e .
-          pip-audit --desc 2>&1 || echo "::warning::Dependency vulnerabilities found"
-        continue-on-error: true # warn but don't block on upstream CVEs (they fix on their schedule)
+          pip-audit --desc
 
   # ════════════════════════════════════════════════════════════════════════
   # GATE 2: Test Matrix + Coverage Enforcement
@@ -93,7 +90,6 @@ jobs:
 
       - name: Run integration tests
         run: python -m pytest tests/integration/ -v --timeout=600
-        continue-on-error: true  # integration tests may need services not in CI
 
       - name: Upload coverage (primary version only)
         uses: codecov/codecov-action@v4

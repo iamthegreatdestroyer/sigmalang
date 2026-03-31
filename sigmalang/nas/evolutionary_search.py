@@ -26,16 +26,16 @@ Usage:
     print(f"Best architecture: {best.to_dict()}")
 """
 
-import time
 import hashlib
 import logging
-from typing import Dict, List, Any, Optional, Tuple, Callable
+import time
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from sigmalang.nas.search_space import SearchSpace, ArchitectureConfig
 from sigmalang.nas.evaluator import ArchitectureEvaluator, EvaluationResult
+from sigmalang.nas.search_space import ArchitectureConfig, SearchSpace
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ class EvolutionarySearch:
         """Generate a unique ID for an architecture."""
         d = config.to_dict()
         key = str(sorted(d.items()))
-        return hashlib.md5(key.encode()).hexdigest()[:10]
+        return hashlib.md5(key.encode(), usedforsecurity=False).hexdigest()[:10]
 
     def _init_population(self) -> None:
         """Initialize random population."""

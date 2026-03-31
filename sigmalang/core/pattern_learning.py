@@ -16,8 +16,8 @@ For asynchronous background learning, see:
 
 import hashlib
 import logging
-from typing import Dict, List, Any, Optional
 from collections import Counter
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +165,7 @@ class PatternLearner:
 
     def _pattern_key(self, text: str) -> str:
         """Generate a stable key for a pattern."""
-        return hashlib.md5(text.encode()).hexdigest()[:12]
+        return hashlib.md5(text.encode(), usedforsecurity=False).hexdigest()[:12]
 
     def _classify_pattern(self, text: str) -> str:
         """Classify the dominant pattern type in text."""

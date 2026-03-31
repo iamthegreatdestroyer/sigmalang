@@ -323,7 +323,7 @@ app = get_websocket_app()
 # Entry-point
 # =============================================================================
 
-def run(host: str = "0.0.0.0", port: int = 26090) -> None:  # pragma: no cover
+def run(host: str = "0.0.0.0", port: int = 26090) -> None:  # nosec B104  # pragma: no cover
     """Launch the WebSocket server with uvicorn."""
     try:
         import uvicorn

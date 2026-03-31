@@ -5,15 +5,15 @@ Environment-based configuration with validation, secrets management,
 and feature flags for production deployment.
 """
 
-import os
+import base64
+import hashlib
 import json
+import logging
+import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Union
 from enum import Enum
 from pathlib import Path
-import hashlib
-import base64
-import logging
+from typing import Any, Dict, List, Optional, Set, Union
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class Environment(Enum):
     TESTING = "testing"
     STAGING = "staging"
     PRODUCTION = "production"
-    
+
     @classmethod
     def from_string(cls, value: str) -> 'Environment':
         """Parse environment from string."""
@@ -46,7 +46,7 @@ class Environment(Enum):
 @dataclass
 class ServerConfig:
     """Server configuration."""
-    host: str = "0.0.0.0"
+    host: str = "0.0.0.0"  # nosec B104
     port: int = 8000
     workers: int = 4
     reload: bool = False
@@ -56,12 +56,12 @@ class ServerConfig:
     max_request_size: int = 10 * 1024 * 1024  # 10MB
     request_timeout: float = 30.0
     keepalive_timeout: int = 65
-    
+
     @classmethod
     def from_env(cls) -> 'ServerConfig':
         """Create from environment variables."""
         return cls(
-            host=os.getenv("SIGMALANG_HOST", "0.0.0.0"),
+            host=os.getenv("SIGMALANG_HOST", "0.0.0.0"),  # nosec B104
             port=int(os.getenv("SIGMALANG_PORT", "8000")),
             workers=int(os.getenv("SIGMALANG_WORKERS", "4")),
             reload=os.getenv("SIGMALANG_RELOAD", "false").lower() == "true",
@@ -83,7 +83,7 @@ class RateLimitConfig:
     by_ip: bool = True
     by_api_key: bool = True
     whitelist_ips: List[str] = field(default_factory=list)
-    
+
     @classmethod
     def from_env(cls) -> 'RateLimitConfig':
         """Create from environment variables."""
@@ -108,13 +108,13 @@ class AuthConfig:
     jwt_algorithm: str = "HS256"
     jwt_expiry_hours: int = 24
     api_keys: Set[str] = field(default_factory=set)
-    
+
     @classmethod
     def from_env(cls) -> 'AuthConfig':
         """Create from environment variables."""
         api_keys_str = os.getenv("SIGMALANG_API_KEYS", "")
         api_keys = set(k.strip() for k in api_keys_str.split(",") if k.strip())
-        
+
         return cls(
             enabled=os.getenv("SIGMALANG_AUTH_ENABLED", "false").lower() == "true",
             api_key_header=os.getenv("SIGMALANG_API_KEY_HEADER", "X-API-Key"),
@@ -124,7 +124,7 @@ class AuthConfig:
             jwt_expiry_hours=int(os.getenv("SIGMALANG_JWT_EXPIRY_HOURS", "24")),
             api_keys=api_keys,
         )
-    
+
     def validate_api_key(self, key: str) -> bool:
         """Validate an API key."""
         if not self.enabled:
@@ -140,7 +140,7 @@ class CacheConfig:
     redis_url: str = "redis://localhost:6379/0"
     default_ttl: int = 3600  # 1 hour
     max_size: int = 10000
-    
+
     @classmethod
     def from_env(cls) -> 'CacheConfig':
         """Create from environment variables."""
@@ -162,7 +162,7 @@ class EncoderConfig:
     enable_parallel: bool = True
     max_workers: int = 4
     batch_size: int = 100
-    
+
     @classmethod
     def from_env(cls) -> 'EncoderConfig':
         """Create from environment variables."""
@@ -188,7 +188,7 @@ class MonitoringConfig:
     log_format: str = "json"  # json, text
     log_requests: bool = True
     log_responses: bool = False
-    
+
     @classmethod
     def from_env(cls) -> 'MonitoringConfig':
         """Create from environment variables."""
@@ -217,7 +217,7 @@ class FeatureFlags:
     enable_batch: bool = True
     enable_admin: bool = False
     experimental_features: Set[str] = field(default_factory=set)
-    
+
     @classmethod
     def from_env(cls) -> 'FeatureFlags':
         """Create from environment variables."""
@@ -233,7 +233,7 @@ class FeatureFlags:
             enable_admin=os.getenv("SIGMALANG_FEATURE_ADMIN", "false").lower() == "true",
             experimental_features=set(f.strip() for f in experimental.split(",") if f.strip()),
         )
-    
+
     def is_enabled(self, feature: str) -> bool:
         """Check if a feature is enabled."""
         feature_map = {
@@ -260,18 +260,18 @@ class SecretsManager:
     Secure secrets management with encryption support.
     Supports environment variables, files, and external secret stores.
     """
-    
+
     def __init__(self, encryption_key: Optional[str] = None):
         """
         Initialize secrets manager.
-        
+
         Args:
             encryption_key: Optional key for encrypting/decrypting secrets
         """
         self._secrets: Dict[str, str] = {}
         self._encryption_key = encryption_key or os.getenv("SIGMALANG_SECRETS_KEY")
         self._load_from_env()
-    
+
     def _load_from_env(self) -> None:
         """Load secrets from environment variables."""
         prefix = "SIGMALANG_SECRET_"
@@ -279,19 +279,19 @@ class SecretsManager:
             if key.startswith(prefix):
                 secret_name = key[len(prefix):].lower()
                 self._secrets[secret_name] = value
-    
+
     def get(self, name: str, default: Optional[str] = None) -> Optional[str]:
         """Get a secret by name."""
         return self._secrets.get(name.lower(), default)
-    
+
     def set(self, name: str, value: str) -> None:
         """Set a secret value."""
         self._secrets[name.lower()] = value
-    
+
     def has(self, name: str) -> bool:
         """Check if a secret exists."""
         return name.lower() in self._secrets
-    
+
     def load_from_file(self, path: Union[str, Path]) -> None:
         """Load secrets from a JSON file."""
         path = Path(path)
@@ -300,12 +300,12 @@ class SecretsManager:
                 data = json.load(f)
                 for key, value in data.items():
                     self._secrets[key.lower()] = value
-    
+
     @staticmethod
     def hash_secret(value: str) -> str:
         """Create a hash of a secret for comparison."""
         return hashlib.sha256(value.encode()).hexdigest()
-    
+
     @staticmethod
     def generate_key() -> str:
         """Generate a random API key."""
@@ -329,13 +329,13 @@ class SigmalangConfig:
     encoder: EncoderConfig = field(default_factory=EncoderConfig)
     monitoring: MonitoringConfig = field(default_factory=MonitoringConfig)
     features: FeatureFlags = field(default_factory=FeatureFlags)
-    
+
     @classmethod
     def from_env(cls) -> 'SigmalangConfig':
         """Create complete configuration from environment variables."""
         env_str = os.getenv("SIGMALANG_ENV", "development")
         environment = Environment.from_string(env_str)
-        
+
         config = cls(
             environment=environment,
             server=ServerConfig.from_env(),
@@ -346,12 +346,12 @@ class SigmalangConfig:
             monitoring=MonitoringConfig.from_env(),
             features=FeatureFlags.from_env(),
         )
-        
+
         # Apply environment-specific defaults
         config._apply_environment_defaults()
-        
+
         return config
-    
+
     def _apply_environment_defaults(self) -> None:
         """Apply environment-specific default overrides."""
         if self.environment == Environment.DEVELOPMENT:
@@ -359,35 +359,35 @@ class SigmalangConfig:
             self.server.reload = True
             self.auth.enabled = False
             self.monitoring.log_format = "text"
-            
+
         elif self.environment == Environment.TESTING:
             self.server.debug = True
             self.cache.enabled = False
             self.auth.enabled = False
             self.rate_limit.enabled = False
-            
+
         elif self.environment == Environment.PRODUCTION:
             self.server.debug = False
             self.server.reload = False
             self.monitoring.log_format = "json"
-    
+
     def is_production(self) -> bool:
         """Check if running in production."""
         return self.environment == Environment.PRODUCTION
-    
+
     def is_development(self) -> bool:
         """Check if running in development."""
         return self.environment == Environment.DEVELOPMENT
-    
+
     def validate(self) -> List[str]:
         """
         Validate configuration and return list of errors.
-        
+
         Returns:
             List of validation error messages (empty if valid)
         """
         errors = []
-        
+
         # Production-specific validations
         if self.is_production():
             if self.auth.enabled and not self.auth.api_keys:
@@ -396,7 +396,7 @@ class SigmalangConfig:
                 errors.append("JWT secret is required when JWT is enabled")
             if self.server.debug:
                 errors.append("Debug mode should be disabled in production")
-        
+
         # General validations
         if self.server.port < 1 or self.server.port > 65535:
             errors.append(f"Invalid port number: {self.server.port}")
@@ -404,9 +404,9 @@ class SigmalangConfig:
             errors.append(f"Workers must be at least 1: {self.server.workers}")
         if self.rate_limit.requests_per_minute < 1:
             errors.append("Rate limit must be at least 1 request per minute")
-        
+
         return errors
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary (excluding secrets)."""
         return {
@@ -498,7 +498,7 @@ def load_config_file(path: Union[str, Path]) -> Dict[str, Any]:
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Config file not found: {path}")
-    
+
     with open(path, 'r') as f:
         if path.suffix == '.json':
             return json.load(f)
@@ -569,53 +569,53 @@ def env_list(key: str, default: Optional[List[str]] = None, separator: str = ","
 def configure_from_file(path: str) -> Dict[str, Any]:
     """
     Load configuration from a file and apply it to global config.
-    
+
     Args:
         path: Path to configuration file (YAML, JSON, or TOML)
-        
+
     Returns:
         The loaded configuration dictionary
-        
+
     Raises:
         FileNotFoundError: If configuration file doesn't exist
         ValueError: If file format is unsupported
     """
     config = load_config_file(path)
-    
+
     # Merge with existing config
     current = get_config()
     merged = merge_configs(current, config)
-    
+
     # Apply merged config
     for key, value in merged.items():
         set_config(key, value)
-    
+
     return merged
 
 
 def configure_from_env(prefix: str = "SIGMALANG") -> Dict[str, Any]:
     """
     Load configuration from environment variables with given prefix.
-    
+
     Environment variables should be named like:
     - SIGMALANG_DEBUG -> config["debug"]
     - SIGMALANG_LOG_LEVEL -> config["log_level"]
     - SIGMALANG_API_HOST -> config["api_host"]
-    
+
     Args:
         prefix: Environment variable prefix (default: "SIGMALANG")
-        
+
     Returns:
         Dictionary of configuration values loaded from environment
     """
     config = {}
     prefix_upper = prefix.upper() + "_"
-    
+
     for key, value in os.environ.items():
         if key.startswith(prefix_upper):
             # Convert SIGMALANG_LOG_LEVEL to log_level
             config_key = key[len(prefix_upper):].lower()
-            
+
             # Type coercion based on value content
             if value.lower() in ("true", "false"):
                 config[config_key] = value.lower() == "true"
@@ -625,11 +625,11 @@ def configure_from_env(prefix: str = "SIGMALANG") -> Dict[str, Any]:
                 config[config_key] = float(value)
             else:
                 config[config_key] = value
-    
+
     # Apply to global config
     for key, value in config.items():
         set_config(key, value)
-    
+
     return config
 
 

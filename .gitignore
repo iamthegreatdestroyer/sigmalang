@@ -193,6 +193,16 @@ temp/
 *.tmp
 .history/
 
+# Build/commit artifacts (automation temp files)
+_*.txt
+_*.py
+_*.ps1
+*.lnk
+automation_state.json
+
+# Ruff cache
+.ruff_cache/
+
 # Track shared VS Code 1.112 workspace settings
 !.vscode/
 !.vscode/settings.json

@@ -19,55 +19,37 @@ Training Components:
 Copyright 2025 - Ryot LLM Project
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "Ryot LLM Project"
 
+from .core.encoder import ContextStack, SigmaDecoder, SigmaEncoder, SigmaHashBank
+from .core.parser import IntentType, SemanticParser, SemanticTreePrinter
 from .core.primitives import (
-    SemanticNode,
-    SemanticTree,
+    PRIMITIVE_REGISTRY,
+    ActionPrimitive,
+    CodePrimitive,
+    CommunicationPrimitive,
+    EntityPrimitive,
+    ExistentialPrimitive,
     Glyph,
     GlyphStream,
     GlyphType,
-    ExistentialPrimitive,
-    CodePrimitive,
-    MathPrimitive,
-    LogicPrimitive,
-    EntityPrimitive,
-    ActionPrimitive,
-    CommunicationPrimitive,
-    StructurePrimitive,
     LearnedPrimitive,
-    PRIMITIVE_REGISTRY
+    LogicPrimitive,
+    MathPrimitive,
+    SemanticNode,
+    SemanticTree,
+    StructurePrimitive,
 )
-
-from .core.parser import (
-    SemanticParser,
-    SemanticTreePrinter,
-    IntentType
-)
-
-from .core.encoder import (
-    SigmaEncoder,
-    SigmaDecoder,
-    SigmaHashBank,
-    ContextStack
-)
-
-from .training.codebook import (
-    LearnedCodebook,
-    CodebookTrainer,
-    TrainingConfig,
-    TrainingCorpusBuilder,
-    PatternSignature
-)
+from .training.codebook import CodebookTrainer, LearnedCodebook, PatternSignature, TrainingConfig, TrainingCorpusBuilder
 
 # Phase 2A: Adapter imports for Ryot LLM integration
 try:
     from .adapters import (
+        RyotSigmaEncodedContext,
+        RyotTokenSequence,
         SigmaCompressionAdapter,
         create_ryot_compression_adapter,
-        RyotTokenSequence,
-        RyotSigmaEncodedContext,
     )
 except ImportError:
     # Adapters may not be available in all contexts
@@ -80,7 +62,7 @@ __all__ = [
     'Glyph',
     'GlyphStream',
     'GlyphType',
-    
+
     # Primitives
     'ExistentialPrimitive',
     'CodePrimitive',
@@ -92,25 +74,25 @@ __all__ = [
     'StructurePrimitive',
     'LearnedPrimitive',
     'PRIMITIVE_REGISTRY',
-    
+
     # Parser
     'SemanticParser',
     'SemanticTreePrinter',
     'IntentType',
-    
+
     # Encoder/Decoder
     'SigmaEncoder',
     'SigmaDecoder',
     'SigmaHashBank',
     'ContextStack',
-    
+
     # Training
     'LearnedCodebook',
     'CodebookTrainer',
     'TrainingConfig',
     'TrainingCorpusBuilder',
     'PatternSignature',
-    
+
     # Adapters (Phase 2A: Ryot Integration)
     'SigmaCompressionAdapter',
     'create_ryot_compression_adapter',
