@@ -38,17 +38,17 @@ Usage:
     python scripts/sigma_daemon.py --dry-run      # Show what would run
 """
 
-import sys
-import time
 import json
-import signal
 import logging
+import signal
+import sys
 import threading
-from pathlib import Path
-from typing import Dict, Any, Optional, List, Callable
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 # Setup logging
 logging.basicConfig(
@@ -327,7 +327,7 @@ class SelfHealer:
         # Try to trigger adaptive pruning to clean up bad primitives
         try:
             from sigmalang.training.adaptive_pruner import initialize_adaptive_pruning
-            pruner = initialize_adaptive_pruning(auto_start=False)
+            initialize_adaptive_pruning(auto_start=False)
             logger.info("  -> Triggered emergency pruning cycle")
             return {'action': 'emergency_pruning', 'success': True}
         except Exception as e:
@@ -354,7 +354,7 @@ class SelfHealer:
 
         try:
             from sigmalang.training.adaptive_pruner import initialize_adaptive_pruning
-            pruner = initialize_adaptive_pruning(auto_start=False)
+            initialize_adaptive_pruning(auto_start=False)
             logger.info("  -> Triggered pruning to free codebook slots")
             return {'action': 'codebook_pruning', 'success': True}
         except Exception as e:
@@ -477,7 +477,7 @@ class SigmaDaemon:
         """Analyze current compression ratios."""
         try:
             from sigmalang.core.entropy_estimator import get_entropy_analyzer
-            analyzer = get_entropy_analyzer()
+            get_entropy_analyzer()
             # Return analyzer availability
             return {'status': 'ok', 'analyzer_ready': True}
         except ImportError:
@@ -727,7 +727,7 @@ def show_status() -> None:
     if active > 0:
         print(f"  [!!] Active anomalies: {active}")
     else:
-        print(f"  [OK] No active anomalies")
+        print("  [OK] No active anomalies")
 
     print("=" * 60)
 

@@ -32,12 +32,12 @@ Usage:
     print(f"SigmaLang efficiency: {report.efficiency_pct:.1f}%")
 """
 
-import math
 import logging
-from typing import Dict, Any, Optional, List, Tuple
-from dataclasses import dataclass, field
+import math
 from collections import Counter
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

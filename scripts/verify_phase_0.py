@@ -64,14 +64,14 @@ import_status = 'PASS'
 try:
     from sigmalang.api import CompressionEngine, RSUManager
     from sigmalang.stubs import MockCompressionEngine, MockRSUManager
-    
+
     # Verify protocol implementation
     engine = MockCompressionEngine()
     assert isinstance(engine, CompressionEngine)
-    
+
     mgr = MockRSUManager()
     assert isinstance(mgr, RSUManager)
-    
+
 except Exception as e:
     import_status = f'FAIL - {str(e)}'
 
@@ -85,7 +85,7 @@ print("=" * 80)
 print()
 
 print(f"PROJECT: {project_name}")
-print(f"STATUS: COMPLETE")
+print("STATUS: COMPLETE")
 print()
 
 print("FILES:")

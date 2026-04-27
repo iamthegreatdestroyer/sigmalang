@@ -19,26 +19,26 @@ Scenarios:
 """
 
 import argparse
-import random
-import string
-import time
-import signal
-import sys
-import os
-import threading
 import logging
-from pathlib import Path
-from typing import List, Dict, Any, Optional
+import os
+import random
+import signal
+import string
+import sys
+import threading
+import time
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.api_server import create_api
-from sigmalang.core.parser import SemanticParser
-from sigmalang.core.encoder import SigmaEncoder
+from sigmalang.core.api_server import create_api  # noqa: E402
+from sigmalang.core.encoder import SigmaEncoder  # noqa: E402
+from sigmalang.core.parser import SemanticParser  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -190,7 +190,7 @@ class InputFuzzingChaos:
                 passed += 1
                 logger.debug(f"Correctly rejected input {i}: {str(e)[:50]}")
 
-            except UnicodeDecodeError as e:
+            except UnicodeDecodeError:
                 # Unicode errors are acceptable for binary data
                 passed += 1
                 logger.debug(f"Correctly rejected binary data {i}")
@@ -255,7 +255,7 @@ class CircuitBreakerChaos:
                     failed += 1
                     errors.append(f"Encode {i} returned None")
 
-            except ConnectionError as e:
+            except ConnectionError:
                 # Circuit breaker should handle this gracefully
                 # For now, count as expected failure
                 passed += 1
@@ -357,7 +357,7 @@ class GracefulShutdownChaos:
                 self.active_requests += 1
                 text = f"Background request {self.completed_requests}"
                 tree = self.parser.parse(text)
-                encoded = self.encoder.encode(tree, original_text=text)
+                self.encoder.encode(tree, original_text=text)
                 self.completed_requests += 1
                 self.active_requests -= 1
                 time.sleep(0.1)
@@ -448,7 +448,7 @@ class MemoryPressureChaos:
                     failed += 1
                     errors.append(f"Large input {i} failed to encode")
 
-            except MemoryError as e:
+            except MemoryError:
                 # MemoryError is expected under pressure
                 passed += 1
                 logger.debug(f"Correctly handled memory pressure at iteration {i}")

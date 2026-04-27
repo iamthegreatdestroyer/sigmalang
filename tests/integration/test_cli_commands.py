@@ -17,10 +17,10 @@ Test Coverage:
 - Error handling and exit codes
 """
 
-import sys
 import json
-import tempfile
 import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -30,7 +30,7 @@ from click.testing import CliRunner
 sigmalang_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.cli import cli, main
+from sigmalang.core.cli import cli, main  # noqa: E402
 
 
 @pytest.fixture

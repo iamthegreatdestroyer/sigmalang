@@ -24,14 +24,14 @@ Example:
     ...     AnalyticsDashboard,
     ...     create_analytics_engine
     ... )
-    >>> 
+    >>>
     >>> # Create analytics engine
     >>> engine = create_analytics_engine()
-    >>> 
+    >>>
     >>> # Record metrics
     >>> engine.record_latency("process_query", 15.5)
     >>> engine.record_throughput("queries_per_second", 100)
-    >>> 
+    >>>
     >>> # Get dashboard
     >>> dashboard = engine.get_dashboard()
     >>> print(dashboard.summary())
@@ -39,20 +39,17 @@ Example:
 
 from __future__ import annotations
 
-import time
 import json
-import threading
-import statistics
 import logging
-from dataclasses import dataclass, field
-from typing import (
-    Dict, List, Any, Optional, Union, 
-    Callable, Tuple, TypeVar, Generic
-)
-from enum import Enum, auto
+import statistics
+import threading
+import time
 from collections import defaultdict, deque
-from pathlib import Path
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from enum import Enum, auto
+from pathlib import Path
+from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar, Union
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +107,7 @@ class MetricPoint:
     timestamp: float = field(default_factory=time.time)
     labels: Dict[str, str] = field(default_factory=dict)
     metric_type: MetricType = MetricType.GAUGE
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -120,7 +117,7 @@ class MetricPoint:
             'labels': self.labels,
             'type': self.metric_type.name
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'MetricPoint':
         """Create from dictionary."""
@@ -150,7 +147,7 @@ class AggregatedMetric:
     start_time: float
     end_time: float
     labels: Dict[str, str] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -180,7 +177,7 @@ class Alert:
     value: float
     threshold: float
     timestamp: float = field(default_factory=time.time)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -202,7 +199,7 @@ class AlertRule:
     severity: AlertSeverity
     message_template: str
     cooldown_seconds: float = 60.0
-    
+
     def check(self, value: float) -> bool:
         """Check if value triggers alert."""
         if self.condition == 'gt':
@@ -227,7 +224,7 @@ class ResourceUsage:
     memory_bytes: int = 0
     active_threads: int = 0
     open_files: int = 0
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -258,28 +255,28 @@ class DashboardConfig:
 class TimeSeriesStore:
     """
     In-memory time series storage for metrics.
-    
+
     Features:
     - Configurable retention period
     - Automatic cleanup of old data
     - Thread-safe operations
     - Efficient range queries
-    
+
     Example:
         >>> store = TimeSeriesStore(retention_hours=24)
         >>> store.add("latency", 15.5)
         >>> store.add("latency", 20.3)
         >>> points = store.get_range("latency", time.time() - 3600, time.time())
     """
-    
+
     def __init__(
-        self, 
+        self,
         retention_hours: float = 24.0,
         max_points_per_metric: int = 100000
     ):
         """
         Initialize time series store.
-        
+
         Args:
             retention_hours: How long to keep data
             max_points_per_metric: Maximum points per metric (prevents memory bloat)
@@ -292,18 +289,18 @@ class TimeSeriesStore:
         self._lock = threading.Lock()
         self._last_cleanup = time.time()
         self._cleanup_interval = 300  # 5 minutes
-    
+
     def add(
-        self, 
-        name: str, 
-        value: float, 
+        self,
+        name: str,
+        value: float,
         timestamp: Optional[float] = None,
         labels: Optional[Dict[str, str]] = None,
         metric_type: MetricType = MetricType.GAUGE
     ) -> None:
         """
         Add a metric point.
-        
+
         Args:
             name: Metric name
             value: Metric value
@@ -318,88 +315,88 @@ class TimeSeriesStore:
             labels=labels or {},
             metric_type=metric_type
         )
-        
+
         with self._lock:
             self._data[name].append(point)
-            
+
             # Periodic cleanup
             if time.time() - self._last_cleanup > self._cleanup_interval:
                 self._cleanup_expired()
-    
+
     def get_range(
-        self, 
-        name: str, 
-        start_time: float, 
+        self,
+        name: str,
+        start_time: float,
         end_time: float
     ) -> List[MetricPoint]:
         """
         Get metric points in time range.
-        
+
         Args:
             name: Metric name
             start_time: Range start
             end_time: Range end
-            
+
         Returns:
             List of MetricPoint in range
         """
         with self._lock:
             if name not in self._data:
                 return []
-            
+
             return [
                 p for p in self._data[name]
                 if start_time <= p.timestamp <= end_time
             ]
-    
+
     def get_latest(self, name: str, count: int = 1) -> List[MetricPoint]:
         """
         Get latest metric points.
-        
+
         Args:
             name: Metric name
             count: Number of points to get
-            
+
         Returns:
             List of latest MetricPoint
         """
         with self._lock:
             if name not in self._data:
                 return []
-            
+
             data = list(self._data[name])
             return data[-count:] if len(data) >= count else data
-    
+
     def get_all_metrics(self) -> List[str]:
         """Get all metric names."""
         with self._lock:
             return list(self._data.keys())
-    
+
     def get_count(self, name: str) -> int:
         """Get count of points for metric."""
         with self._lock:
             return len(self._data.get(name, []))
-    
+
     def _cleanup_expired(self) -> int:
         """Remove expired data points."""
         cutoff = time.time() - (self.retention_hours * 3600)
         removed = 0
-        
+
         for name in list(self._data.keys()):
-            original_len = len(self._data[name])
-            
+            len(self._data[name])
+
             # Remove old points from the front
             while self._data[name] and self._data[name][0].timestamp < cutoff:
                 self._data[name].popleft()
                 removed += 1
-            
+
             # Remove empty series
             if not self._data[name]:
                 del self._data[name]
-        
+
         self._last_cleanup = time.time()
         return removed
-    
+
     def clear(self) -> None:
         """Clear all data."""
         with self._lock:
@@ -413,56 +410,56 @@ class TimeSeriesStore:
 class MetricsCollector:
     """
     Collects and stores performance metrics.
-    
+
     Features:
     - Multiple metric types (counter, gauge, histogram, timer)
     - Automatic aggregation
     - Thread-safe collection
     - Built-in resource monitoring
-    
+
     Example:
         >>> collector = MetricsCollector()
         >>> collector.record_counter("requests_total", 1)
         >>> collector.record_gauge("active_connections", 50)
         >>> collector.record_timer("request_latency_ms", 15.5)
     """
-    
+
     def __init__(
-        self, 
+        self,
         store: Optional[TimeSeriesStore] = None,
         enable_resource_monitoring: bool = True
     ):
         """
         Initialize metrics collector.
-        
+
         Args:
             store: Optional time series store
             enable_resource_monitoring: Enable resource monitoring
         """
         self.store = store or TimeSeriesStore()
         self.enable_resource_monitoring = enable_resource_monitoring
-        
+
         # Counters (monotonically increasing)
         self._counters: Dict[str, float] = defaultdict(float)
         self._counter_lock = threading.Lock()
-        
+
         # Resource monitoring
         self._resource_history: deque = deque(maxlen=1000)
         self._last_resource_check = 0.0
         self._resource_check_interval = 1.0
-        
+
         # Histogram buckets
         self._histogram_buckets: Dict[str, List[float]] = defaultdict(list)
-    
+
     def record_counter(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float = 1.0,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """
         Record counter metric (monotonically increasing).
-        
+
         Args:
             name: Counter name
             value: Value to add (default 1)
@@ -471,101 +468,101 @@ class MetricsCollector:
         with self._counter_lock:
             self._counters[name] += value
             current_value = self._counters[name]
-        
+
         self.store.add(name, current_value, labels=labels, metric_type=MetricType.COUNTER)
-    
+
     def record_gauge(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """
         Record gauge metric (can go up or down).
-        
+
         Args:
             name: Gauge name
             value: Current value
             labels: Optional labels
         """
         self.store.add(name, value, labels=labels, metric_type=MetricType.GAUGE)
-    
+
     def record_histogram(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """
         Record histogram metric (distribution of values).
-        
+
         Args:
             name: Histogram name
             value: Observed value
             labels: Optional labels
         """
         self.store.add(name, value, labels=labels, metric_type=MetricType.HISTOGRAM)
-        
+
         # Also track in histogram buckets for percentile calculations
         self._histogram_buckets[name].append(value)
-        
+
         # Limit bucket size
         if len(self._histogram_buckets[name]) > 10000:
             self._histogram_buckets[name] = self._histogram_buckets[name][-10000:]
-    
+
     def record_timer(
-        self, 
-        name: str, 
+        self,
+        name: str,
         duration_ms: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """
         Record timer metric (duration measurement).
-        
+
         Args:
             name: Timer name
             duration_ms: Duration in milliseconds
             labels: Optional labels
         """
         self.store.add(name, duration_ms, labels=labels, metric_type=MetricType.TIMER)
-    
+
     def record_rate(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """
         Record rate metric (events per time unit).
-        
+
         Args:
             name: Rate name
             value: Rate value
             labels: Optional labels
         """
         self.store.add(name, value, labels=labels, metric_type=MetricType.RATE)
-    
+
     def time_operation(self, name: str) -> 'TimerContext':
         """
         Context manager for timing operations.
-        
+
         Args:
             name: Timer name
-            
+
         Returns:
             TimerContext that records duration on exit
         """
         return TimerContext(self, name)
-    
+
     def get_counter_value(self, name: str) -> float:
         """Get current counter value."""
         with self._counter_lock:
             return self._counters.get(name, 0.0)
-    
+
     def collect_resource_usage(self) -> ResourceUsage:
         """
         Collect current resource usage.
-        
+
         Returns:
             ResourceUsage snapshot
         """
@@ -573,7 +570,7 @@ class MetricsCollector:
             timestamp=time.time(),
             active_threads=threading.active_count()
         )
-        
+
         # Try to get memory info if psutil is available
         try:
             import psutil
@@ -587,20 +584,20 @@ class MetricsCollector:
             pass  # psutil not available
         except Exception as e:
             logger.debug(f"Resource collection error: {e}")
-        
+
         self._resource_history.append(usage)
         return usage
-    
+
     def get_resource_history(
-        self, 
+        self,
         last_n: Optional[int] = None
     ) -> List[ResourceUsage]:
         """
         Get resource usage history.
-        
+
         Args:
             last_n: Number of entries to return (None for all)
-            
+
         Returns:
             List of ResourceUsage
         """
@@ -608,25 +605,25 @@ class MetricsCollector:
         if last_n is not None:
             return history[-last_n:]
         return history
-    
+
     def get_histogram_percentile(
-        self, 
-        name: str, 
+        self,
+        name: str,
         percentile: float
     ) -> Optional[float]:
         """
         Get percentile from histogram.
-        
+
         Args:
             name: Histogram name
             percentile: Percentile (0-100)
-            
+
         Returns:
             Percentile value or None
         """
         if name not in self._histogram_buckets or not self._histogram_buckets[name]:
             return None
-        
+
         data = sorted(self._histogram_buckets[name])
         index = int(len(data) * percentile / 100)
         index = min(index, len(data) - 1)
@@ -635,16 +632,16 @@ class MetricsCollector:
 
 class TimerContext:
     """Context manager for timing operations."""
-    
+
     def __init__(self, collector: MetricsCollector, name: str):
         self.collector = collector
         self.name = name
         self.start_time = 0.0
-    
+
     def __enter__(self) -> 'TimerContext':
         self.start_time = time.time()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         duration_ms = (time.time() - self.start_time) * 1000
         self.collector.record_timer(self.name, duration_ms)
@@ -657,55 +654,55 @@ class TimerContext:
 class MetricsAggregator:
     """
     Aggregates metrics over time windows.
-    
+
     Features:
     - Configurable aggregation windows
     - Multiple aggregation types
     - Statistical calculations
     - Trend detection
-    
+
     Example:
         >>> aggregator = MetricsAggregator(store)
         >>> agg = aggregator.aggregate("latency", window_seconds=60)
         >>> print(f"Mean latency: {agg.mean_value}ms")
     """
-    
+
     def __init__(self, store: TimeSeriesStore):
         """
         Initialize aggregator.
-        
+
         Args:
             store: Time series store to aggregate from
         """
         self.store = store
-    
+
     def aggregate(
-        self, 
-        name: str, 
+        self,
+        name: str,
         window_seconds: float = 60.0,
         end_time: Optional[float] = None
     ) -> Optional[AggregatedMetric]:
         """
         Aggregate metric over time window.
-        
+
         Args:
             name: Metric name
             window_seconds: Aggregation window
             end_time: End of window (defaults to now)
-            
+
         Returns:
             AggregatedMetric or None if no data
         """
         end_time = end_time or time.time()
         start_time = end_time - window_seconds
-        
+
         points = self.store.get_range(name, start_time, end_time)
-        
+
         if not points:
             return None
-        
+
         values = [p.value for p in points]
-        
+
         return AggregatedMetric(
             name=name,
             count=len(values),
@@ -721,19 +718,19 @@ class MetricsAggregator:
             start_time=start_time,
             end_time=end_time
         )
-    
+
     def aggregate_multiple(
-        self, 
-        names: List[str], 
+        self,
+        names: List[str],
         window_seconds: float = 60.0
     ) -> Dict[str, Optional[AggregatedMetric]]:
         """
         Aggregate multiple metrics.
-        
+
         Args:
             names: Metric names
             window_seconds: Aggregation window
-            
+
         Returns:
             Dict mapping name to AggregatedMetric
         """
@@ -741,71 +738,71 @@ class MetricsAggregator:
             name: self.aggregate(name, window_seconds)
             for name in names
         }
-    
+
     def calculate_rate_of_change(
-        self, 
-        name: str, 
+        self,
+        name: str,
         window_seconds: float = 60.0
     ) -> Optional[float]:
         """
         Calculate rate of change over window.
-        
+
         Args:
             name: Metric name
             window_seconds: Window for calculation
-            
+
         Returns:
             Rate of change per second
         """
         end_time = time.time()
         start_time = end_time - window_seconds
-        
+
         points = self.store.get_range(name, start_time, end_time)
-        
+
         if len(points) < 2:
             return None
-        
+
         first = points[0]
         last = points[-1]
-        
+
         time_diff = last.timestamp - first.timestamp
         if time_diff <= 0:
             return None
-        
+
         value_diff = last.value - first.value
         return value_diff / time_diff
-    
+
     def detect_anomaly(
-        self, 
-        name: str, 
+        self,
+        name: str,
         threshold_stddev: float = 2.0,
         window_seconds: float = 300.0
     ) -> Optional[Tuple[bool, float, float]]:
         """
         Detect anomaly in latest value.
-        
+
         Args:
             name: Metric name
             threshold_stddev: Number of std devs for anomaly
             window_seconds: Historical window
-            
+
         Returns:
             Tuple of (is_anomaly, latest_value, z_score) or None
         """
         agg = self.aggregate(name, window_seconds)
         if agg is None or agg.stddev_value == 0:
             return None
-        
+
         latest = self.store.get_latest(name, 1)
         if not latest:
             return None
-        
+
         latest_value = latest[0].value
         z_score = (latest_value - agg.mean_value) / agg.stddev_value
-        
+
         is_anomaly = abs(z_score) > threshold_stddev
         return (is_anomaly, latest_value, z_score)
-    
+
     def _percentile(self, values: List[float], percentile: float) -> float:
         """Calculate percentile of values."""
         if not values:
@@ -823,28 +820,28 @@ class MetricsAggregator:
 class AnalyticsDashboard:
     """
     Analytics dashboard for performance visualization.
-    
+
     Features:
     - Real-time metrics display
     - Alert management
     - Export capabilities
     - Summary generation
-    
+
     Example:
         >>> dashboard = AnalyticsDashboard(collector, aggregator, config)
         >>> print(dashboard.summary())
         >>> alerts = dashboard.check_alerts()
     """
-    
+
     def __init__(
-        self, 
+        self,
         collector: MetricsCollector,
         aggregator: MetricsAggregator,
         config: Optional[DashboardConfig] = None
     ):
         """
         Initialize dashboard.
-        
+
         Args:
             collector: Metrics collector
             aggregator: Metrics aggregator
@@ -853,22 +850,22 @@ class AnalyticsDashboard:
         self.collector = collector
         self.aggregator = aggregator
         self.config = config or DashboardConfig()
-        
+
         # Alert state
         self._alerts: List[Alert] = []
         self._last_alert_time: Dict[str, float] = {}
         self._lock = threading.Lock()
-    
+
     def summary(self) -> Dict[str, Any]:
         """
         Generate dashboard summary.
-        
+
         Returns:
             Summary dictionary
         """
         metrics = self.collector.store.get_all_metrics()
         window = self.config.aggregation_window_seconds
-        
+
         summary = {
             'dashboard_name': self.config.name,
             'timestamp': time.time(),
@@ -876,116 +873,116 @@ class AnalyticsDashboard:
             'active_alerts': len(self._alerts),
             'aggregations': {}
         }
-        
+
         for metric_name in metrics:
             agg = self.aggregator.aggregate(metric_name, window)
             if agg:
                 summary['aggregations'][metric_name] = agg.to_dict()
-        
+
         return summary
-    
+
     def check_alerts(self) -> List[Alert]:
         """
         Check all alert rules and return triggered alerts.
-        
+
         Returns:
             List of triggered alerts
         """
         triggered = []
         current_time = time.time()
-        
+
         for rule in self.config.alert_rules:
             # Check cooldown
             last_alert = self._last_alert_time.get(rule.metric_name, 0)
             if current_time - last_alert < rule.cooldown_seconds:
                 continue
-            
+
             # Get latest value
             latest = self.collector.store.get_latest(rule.metric_name, 1)
             if not latest:
                 continue
-            
+
             value = latest[0].value
-            
+
             if rule.check(value):
                 alert = Alert(
                     metric_name=rule.metric_name,
                     severity=rule.severity,
                     message=rule.message_template.format(
-                        value=value, 
+                        value=value,
                         threshold=rule.threshold
                     ),
                     value=value,
                     threshold=rule.threshold
                 )
-                
+
                 triggered.append(alert)
                 self._last_alert_time[rule.metric_name] = current_time
-                
+
                 with self._lock:
                     self._alerts.append(alert)
-        
+
         return triggered
-    
+
     def get_alerts(
-        self, 
+        self,
         severity: Optional[AlertSeverity] = None,
         since: Optional[float] = None
     ) -> List[Alert]:
         """
         Get alerts, optionally filtered.
-        
+
         Args:
             severity: Filter by severity
             since: Only alerts after this timestamp
-            
+
         Returns:
             List of alerts
         """
         with self._lock:
             alerts = list(self._alerts)
-        
+
         if severity is not None:
             alerts = [a for a in alerts if a.severity == severity]
-        
+
         if since is not None:
             alerts = [a for a in alerts if a.timestamp >= since]
-        
+
         return alerts
-    
+
     def clear_alerts(self) -> int:
         """Clear all alerts and return count cleared."""
         with self._lock:
             count = len(self._alerts)
             self._alerts.clear()
             return count
-    
+
     def add_alert_rule(self, rule: AlertRule) -> None:
         """Add an alert rule."""
         self.config.alert_rules.append(rule)
-    
+
     def export(
-        self, 
+        self,
         format: ExportFormat = ExportFormat.JSON,
         metrics: Optional[List[str]] = None,
         window_seconds: float = 3600.0
     ) -> str:
         """
         Export metrics data.
-        
+
         Args:
             format: Export format
             metrics: Specific metrics to export (None for all)
             window_seconds: Time window for export
-            
+
         Returns:
             Exported data as string
         """
         end_time = time.time()
         start_time = end_time - window_seconds
-        
+
         all_metrics = metrics or self.collector.store.get_all_metrics()
-        
+
         if format == ExportFormat.JSON:
             return self._export_json(all_metrics, start_time, end_time)
         elif format == ExportFormat.CSV:
@@ -994,11 +991,11 @@ class AnalyticsDashboard:
             return self._export_prometheus(all_metrics)
         else:
             raise ValueError(f"Unsupported export format: {format}")
-    
+
     def _export_json(
-        self, 
-        metrics: List[str], 
-        start_time: float, 
+        self,
+        metrics: List[str],
+        start_time: float,
         end_time: float
     ) -> str:
         """Export as JSON."""
@@ -1008,41 +1005,41 @@ class AnalyticsDashboard:
             'end_time': end_time,
             'metrics': {}
         }
-        
+
         for name in metrics:
             points = self.collector.store.get_range(name, start_time, end_time)
             data['metrics'][name] = [p.to_dict() for p in points]
-        
+
         return json.dumps(data, indent=2)
-    
+
     def _export_csv(
-        self, 
-        metrics: List[str], 
-        start_time: float, 
+        self,
+        metrics: List[str],
+        start_time: float,
         end_time: float
     ) -> str:
         """Export as CSV."""
         lines = ["timestamp,metric_name,value,type"]
-        
+
         for name in metrics:
             points = self.collector.store.get_range(name, start_time, end_time)
             for p in points:
                 lines.append(
                     f"{p.timestamp},{p.name},{p.value},{p.metric_type.name}"
                 )
-        
+
         return "\n".join(lines)
-    
+
     def _export_prometheus(self, metrics: List[str]) -> str:
         """Export in Prometheus format."""
         lines = []
-        
+
         for name in metrics:
             latest = self.collector.store.get_latest(name, 1)
             if latest:
                 point = latest[0]
                 metric_name = name.replace('.', '_').replace('-', '_')
-                
+
                 # Format labels
                 labels_str = ""
                 if point.labels:
@@ -1050,38 +1047,38 @@ class AnalyticsDashboard:
                         f'{k}="{v}"' for k, v in point.labels.items()
                     ]
                     labels_str = "{" + ",".join(label_pairs) + "}"
-                
+
                 lines.append(
                     f"# TYPE {metric_name} {point.metric_type.name.lower()}"
                 )
                 lines.append(f"{metric_name}{labels_str} {point.value}")
-        
+
         return "\n".join(lines)
-    
+
     def get_health_status(self) -> Dict[str, Any]:
         """
         Get overall health status.
-        
+
         Returns:
             Health status dictionary
         """
         critical_alerts = len([
-            a for a in self._alerts 
+            a for a in self._alerts
             if a.severity == AlertSeverity.CRITICAL
         ])
-        
+
         warning_alerts = len([
-            a for a in self._alerts 
+            a for a in self._alerts
             if a.severity == AlertSeverity.WARNING
         ])
-        
+
         if critical_alerts > 0:
             status = "critical"
         elif warning_alerts > 0:
             status = "warning"
         else:
             status = "healthy"
-        
+
         return {
             'status': status,
             'critical_alerts': critical_alerts,
@@ -1098,24 +1095,24 @@ class AnalyticsDashboard:
 class AnalyticsEngine:
     """
     Unified analytics engine combining all components.
-    
+
     This is the main entry point for analytics functionality.
-    
+
     Example:
         >>> engine = AnalyticsEngine()
         >>> engine.record_latency("query_processing", 15.5)
         >>> engine.record_throughput("queries_per_second", 100)
         >>> summary = engine.get_summary()
     """
-    
+
     def __init__(
-        self, 
+        self,
         config: Optional[DashboardConfig] = None,
         retention_hours: float = 24.0
     ):
         """
         Initialize analytics engine.
-        
+
         Args:
             config: Dashboard configuration
             retention_hours: Data retention period
@@ -1128,75 +1125,75 @@ class AnalyticsEngine:
             aggregator=self.aggregator,
             config=config
         )
-    
+
     def record_latency(
-        self, 
-        name: str, 
+        self,
+        name: str,
         latency_ms: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Record latency metric."""
         self.collector.record_timer(name, latency_ms, labels)
-    
+
     def record_throughput(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Record throughput metric."""
         self.collector.record_rate(name, value, labels)
-    
+
     def record_counter(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float = 1.0,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Record counter metric."""
         self.collector.record_counter(name, value, labels)
-    
+
     def record_gauge(
-        self, 
-        name: str, 
+        self,
+        name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Record gauge metric."""
         self.collector.record_gauge(name, value, labels)
-    
+
     def time_operation(self, name: str) -> TimerContext:
         """Get context manager for timing operations."""
         return self.collector.time_operation(name)
-    
+
     def get_summary(self) -> Dict[str, Any]:
         """Get dashboard summary."""
         return self.dashboard.summary()
-    
+
     def get_aggregation(
-        self, 
-        name: str, 
+        self,
+        name: str,
         window_seconds: float = 60.0
     ) -> Optional[AggregatedMetric]:
         """Get aggregated metric."""
         return self.aggregator.aggregate(name, window_seconds)
-    
+
     def check_alerts(self) -> List[Alert]:
         """Check and return triggered alerts."""
         return self.dashboard.check_alerts()
-    
+
     def export(
-        self, 
+        self,
         format: ExportFormat = ExportFormat.JSON,
         window_seconds: float = 3600.0
     ) -> str:
         """Export metrics data."""
         return self.dashboard.export(format, window_seconds=window_seconds)
-    
+
     def get_health(self) -> Dict[str, Any]:
         """Get health status."""
         return self.dashboard.get_health_status()
-    
+
     def add_alert_rule(
         self,
         metric_name: str,
@@ -1226,11 +1223,11 @@ def create_analytics_engine(
 ) -> AnalyticsEngine:
     """
     Create a configured analytics engine.
-    
+
     Args:
         retention_hours: Data retention period
         aggregation_window: Default aggregation window
-        
+
     Returns:
         Configured AnalyticsEngine
     """
@@ -1243,7 +1240,7 @@ def create_analytics_engine(
 def create_default_alert_rules() -> List[AlertRule]:
     """
     Create default alert rules for common metrics.
-    
+
     Returns:
         List of default AlertRule
     """
@@ -1286,7 +1283,7 @@ __all__ = [
     'AggregationType',
     'AlertSeverity',
     'ExportFormat',
-    
+
     # Data classes
     'MetricPoint',
     'AggregatedMetric',
@@ -1294,7 +1291,7 @@ __all__ = [
     'AlertRule',
     'ResourceUsage',
     'DashboardConfig',
-    
+
     # Core classes
     'TimeSeriesStore',
     'MetricsCollector',
@@ -1302,7 +1299,7 @@ __all__ = [
     'MetricsAggregator',
     'AnalyticsDashboard',
     'AnalyticsEngine',
-    
+
     # Convenience functions
     'create_analytics_engine',
     'create_default_alert_rules'

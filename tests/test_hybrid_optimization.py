@@ -3,18 +3,18 @@ Tests for hybrid optimization pipeline — combining multiple Phase 7
 optimization strategies (entropy, PQ, prompt compression, NAS evaluation).
 """
 
-import pytest
 import numpy as np
+import pytest
 
 from sigmalang.core.entropy_estimator import (
-    zeroth_order_entropy,
-    first_order_entropy,
     EntropyAnalyzer,
+    first_order_entropy,
+    zeroth_order_entropy,
 )
-from sigmalang.core.pq_codebook import ProductQuantizer, PQConfig
-from sigmalang.core.prompt_compressor import PromptCompressor, CompressorConfig
+from sigmalang.core.pq_codebook import PQConfig, ProductQuantizer
+from sigmalang.core.prompt_compressor import CompressorConfig, PromptCompressor
 from sigmalang.nas.evaluator import ArchitectureEvaluator
-from sigmalang.nas.search_space import SearchSpace, ArchitectureConfig
+from sigmalang.nas.search_space import ArchitectureConfig, SearchSpace
 
 
 class TestEntropyPQPipeline:

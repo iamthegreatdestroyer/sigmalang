@@ -6,8 +6,9 @@ Unified billing system integration for multiple providers.
 """
 
 import abc
-from typing import Dict, Any, Optional
 import json
+from typing import Any, Dict, Optional
+
 
 class BillingProvider(abc.ABC):
     """Abstract billing provider interface"""

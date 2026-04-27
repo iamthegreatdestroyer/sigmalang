@@ -6,15 +6,16 @@ Focuses on service integration and functionality.
 """
 
 import sys
-import pytest
 from pathlib import Path
+
+import pytest
 
 sigmalang_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.api_server import create_api
-from sigmalang.core.api_models import EncodeRequest, AnalogyRequest
-from sigmalang.core.config import reset_config
+from sigmalang.core.api_models import AnalogyRequest, EncodeRequest  # noqa: E402
+from sigmalang.core.api_server import create_api  # noqa: E402
+from sigmalang.core.config import reset_config  # noqa: E402
 
 
 @pytest.fixture(scope="module")

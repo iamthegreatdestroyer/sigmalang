@@ -49,7 +49,7 @@ if not logger.handlers:
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
     logger.addHandler(console_handler)
-    
+
     file_handler = logging.FileHandler("automation_log.txt", encoding='utf-8')
     file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
     logger.addHandler(file_handler)
@@ -112,25 +112,25 @@ class Phase:
 
 class AutomationState:
     """Persistent state management for automation."""
-    
+
     STATE_FILE = Path("automation_state.json")
-    
+
     def __init__(self):
         self.phases: Dict[int, Phase] = {}
         self.tasks: Dict[str, Task] = {}
         self.load()
-    
+
     def load(self) -> None:
         """Load state from disk."""
         if self.STATE_FILE.exists():
             try:
                 with open(self.STATE_FILE, "r") as f:
-                    data = json.load(f)
+                    json.load(f)
                     # Reconstruct state from JSON
                     logger.info(f"Loaded automation state from {self.STATE_FILE}")
             except Exception as e:
                 logger.warning(f"Could not load state: {e}")
-    
+
     def save(self) -> None:
         """Save state to disk."""
         try:
@@ -163,17 +163,17 @@ class AutomationState:
 
 class MasterAutomation:
     """Master automation orchestrator."""
-    
+
     def __init__(self, dry_run: bool = False, autonomous: bool = False):
         self.dry_run = dry_run
         self.autonomous = autonomous
         self.state = AutomationState()
         self.phases = self._initialize_phases()
-        
+
     def _initialize_phases(self) -> Dict[int, Phase]:
         """Initialize all automation phases and tasks."""
         phases = {}
-        
+
         # Phase 1: Immediate Fixes
         phase1 = Phase(
             id=1,
@@ -213,7 +213,7 @@ class MasterAutomation:
             ),
         ]
         phases[1] = phase1
-        
+
         # Phase 2: E2E Testing
         phase2 = Phase(
             id=2,
@@ -250,7 +250,7 @@ class MasterAutomation:
             ),
         ]
         phases[2] = phase2
-        
+
         # Phase 3: Production Deployment
         phase3 = Phase(
             id=3,
@@ -283,7 +283,7 @@ class MasterAutomation:
             ),
         ]
         phases[3] = phase3
-        
+
         # Phase 4: SDK Development
         phase4 = Phase(
             id=4,
@@ -322,7 +322,7 @@ class MasterAutomation:
             ),
         ]
         phases[4] = phase4
-        
+
         # Phase 5: Marketplace Integration
         phase5 = Phase(
             id=5,
@@ -353,7 +353,7 @@ class MasterAutomation:
             ),
         ]
         phases[5] = phase5
-        
+
         # Phase 6: Observability
         phase6 = Phase(
             id=6,
@@ -378,7 +378,7 @@ class MasterAutomation:
             ),
         ]
         phases[6] = phase6
-        
+
         # Phase 7: Continuous Automation
         phase7 = Phase(
             id=7,
@@ -411,22 +411,22 @@ class MasterAutomation:
             ),
         ]
         phases[7] = phase7
-        
+
         return phases
-    
+
     async def execute_task(self, task: Task) -> bool:
         """Execute a single task."""
         logger.info(f"▶ Executing task {task.id}: {task.name}")
         task.status = TaskStatus.RUNNING
         task.start_time = datetime.now()
         self.state.save()
-        
+
         if self.dry_run:
             logger.info(f"  [DRY-RUN] Would execute: {task.command}")
             task.status = TaskStatus.SUCCESS
             task.end_time = datetime.now()
             return True
-        
+
         try:
             # Execute the command
             process = await asyncio.create_subprocess_shell(
@@ -434,7 +434,7 @@ class MasterAutomation:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            
+
             try:
                 stdout, stderr = await asyncio.wait_for(
                     process.communicate(),
@@ -442,7 +442,7 @@ class MasterAutomation:
                 )
                 task.output = stdout.decode() if stdout else ""
                 task.error = stderr.decode() if stderr else ""
-                
+
                 if process.returncode == 0:
                     task.status = TaskStatus.SUCCESS
                     logger.info(f"  ✅ Task {task.id} completed successfully")
@@ -452,13 +452,13 @@ class MasterAutomation:
                     task.status = TaskStatus.FAILED
                     logger.error(f"  ❌ Task {task.id} failed with code {process.returncode}")
                     logger.error(f"     Error: {task.error[:500] if task.error else 'No error output'}")
-                    
+
             except asyncio.TimeoutError:
                 process.kill()
                 task.status = TaskStatus.FAILED
                 task.error = f"Task timed out after {task.timeout} seconds"
                 logger.error(f"  ❌ Task {task.id} timed out")
-                
+
         except FileNotFoundError:
             # Script doesn't exist yet - mark as skipped for now
             task.status = TaskStatus.SKIPPED
@@ -466,39 +466,39 @@ class MasterAutomation:
             logger.warning(f"  ⚠ Task {task.id} skipped (script not found)")
             task.end_time = datetime.now()
             return True  # Don't block on missing scripts
-            
+
         except Exception as e:
             task.status = TaskStatus.FAILED
             task.error = str(e)
             logger.error(f"  ❌ Task {task.id} failed with exception: {e}")
-        
+
         task.end_time = datetime.now()
         self.state.save()
-        
+
         # Retry logic
         if task.status == TaskStatus.FAILED and task.retries < task.max_retries:
             task.retries += 1
             task.status = TaskStatus.RETRYING
             logger.info(f"  🔄 Retrying task {task.id} (attempt {task.retries}/{task.max_retries})")
             return await self.execute_task(task)
-        
+
         return task.status == TaskStatus.SUCCESS
-    
+
     async def execute_phase(self, phase: Phase) -> bool:
         """Execute all tasks in a phase respecting dependencies."""
         logger.info(f"\n{'='*60}")
         logger.info(f"📋 PHASE {phase.id}: {phase.name}")
         logger.info(f"   {phase.description}")
         logger.info(f"{'='*60}\n")
-        
+
         phase.status = PhaseStatus.IN_PROGRESS
         phase.start_time = datetime.now()
         self.state.save()
-        
+
         # Build dependency graph
         completed_tasks = set()
         failed_tasks = set()
-        
+
         while len(completed_tasks) + len(failed_tasks) < len(phase.tasks):
             # Find tasks that can be executed
             executable = []
@@ -507,18 +507,18 @@ class MasterAutomation:
                     continue
                 if all(dep in completed_tasks for dep in task.dependencies):
                     executable.append(task)
-            
+
             if not executable:
                 # Deadlock or all remaining tasks have failed dependencies
                 logger.error("No executable tasks remaining - possible dependency deadlock")
                 break
-            
+
             # Execute tasks in parallel where possible
             results = await asyncio.gather(
                 *[self.execute_task(task) for task in executable],
                 return_exceptions=True,
             )
-            
+
             for task, result in zip(executable, results):
                 if result is True:
                     completed_tasks.add(task.id)
@@ -527,9 +527,9 @@ class MasterAutomation:
                         failed_tasks.add(task.id)
                     else:
                         completed_tasks.add(task.id)  # Non-critical can continue
-        
+
         phase.end_time = datetime.now()
-        
+
         # Determine phase status
         if len(failed_tasks) == 0:
             phase.status = PhaseStatus.COMPLETED
@@ -543,7 +543,7 @@ class MasterAutomation:
             phase.status = PhaseStatus.FAILED
             logger.error(f"\n❌ Phase {phase.id} failed")
             return False
-    
+
     async def run(self, phases_to_run: Optional[List[int]] = None) -> bool:
         """Run automation for specified phases."""
         logger.info("\n" + "="*60)
@@ -551,18 +551,18 @@ class MasterAutomation:
         logger.info(f"   Mode: {'DRY-RUN' if self.dry_run else 'LIVE'}")
         logger.info(f"   Autonomous: {self.autonomous}")
         logger.info("="*60 + "\n")
-        
+
         phases_to_execute = phases_to_run or list(self.phases.keys())
         overall_success = True
-        
+
         for phase_id in sorted(phases_to_execute):
             if phase_id not in self.phases:
                 logger.warning(f"Phase {phase_id} not found, skipping")
                 continue
-            
+
             phase = self.phases[phase_id]
             success = await self.execute_phase(phase)
-            
+
             if not success and not self.autonomous:
                 # In non-autonomous mode, ask for confirmation to continue
                 logger.warning("Phase did not complete successfully.")
@@ -573,19 +573,19 @@ class MasterAutomation:
                     break
             elif not success:
                 overall_success = False
-        
+
         # Generate summary
         self._generate_summary()
         self.state.save()
-        
+
         return overall_success
-    
+
     def _generate_summary(self) -> None:
         """Generate execution summary."""
         logger.info("\n" + "="*60)
         logger.info("📊 EXECUTION SUMMARY")
         logger.info("="*60)
-        
+
         for phase_id, phase in sorted(self.phases.items()):
             status_emoji = {
                 PhaseStatus.COMPLETED: "✅",
@@ -594,9 +594,9 @@ class MasterAutomation:
                 PhaseStatus.IN_PROGRESS: "🔄",
                 PhaseStatus.NOT_STARTED: "⏸",
             }.get(phase.status, "?")
-            
+
             logger.info(f"\n{status_emoji} Phase {phase.id}: {phase.name}")
-            
+
             for task in phase.tasks:
                 task_emoji = {
                     TaskStatus.SUCCESS: "  ✅",
@@ -606,30 +606,30 @@ class MasterAutomation:
                     TaskStatus.PENDING: "  ⏸",
                     TaskStatus.RETRYING: "  🔁",
                 }.get(task.status, "  ?")
-                
+
                 duration = ""
                 if task.start_time and task.end_time:
                     delta = task.end_time - task.start_time
                     duration = f" ({delta.total_seconds():.1f}s)"
-                
+
                 logger.info(f"{task_emoji} {task.id}: {task.name}{duration}")
-        
+
         logger.info("\n" + "="*60)
-    
+
     def show_status(self) -> None:
         """Show current automation status."""
         logger.info("\n📋 AUTOMATION STATUS\n")
-        
+
         for phase_id, phase in sorted(self.phases.items()):
             status = phase.status.value.upper()
             logger.info(f"Phase {phase.id}: {phase.name} [{status}]")
-            
+
             for task in phase.tasks:
                 status_str = task.status.value
                 if task.status == TaskStatus.FAILED:
                     status_str += f" (retries: {task.retries})"
                 logger.info(f"  - {task.id}: {task.name} [{status_str}]")
-        
+
         logger.info("")
 
 
@@ -646,7 +646,7 @@ Examples:
     python master_automation.py --phase=2,3 --retry-failed
         """,
     )
-    
+
     parser.add_argument(
         "--phase",
         type=str,
@@ -673,9 +673,9 @@ Examples:
         action="store_true",
         help="Retry only failed tasks",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Parse phases
     phases_to_run = None
     if args.phase != "all":
@@ -684,19 +684,19 @@ Examples:
         except ValueError:
             logger.error(f"Invalid phase specification: {args.phase}")
             sys.exit(1)
-    
+
     automation = MasterAutomation(
         dry_run=args.dry_run,
         autonomous=args.autonomous,
     )
-    
+
     if args.status:
         automation.show_status()
         return
-    
+
     # Run automation
     success = asyncio.run(automation.run(phases_to_run))
-    
+
     sys.exit(0 if success else 1)
 
 

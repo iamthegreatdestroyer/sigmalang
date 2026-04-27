@@ -9,10 +9,12 @@ robustness.
 DO NOT EDIT MANUALLY - Regenerate using test_generator.py
 """
 
-import pytest
 import sys
 from pathlib import Path
-from hypothesis import given, strategies as st, settings, HealthCheck
+
+import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent.parent
@@ -59,8 +61,8 @@ class TestEncoderProperties:
         api.initialize()
 
         # This should never fail or return empty
-        from sigmalang.core.parser import SemanticParser
         from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
 
         parser = SemanticParser()
         encoder = SigmaEncoder()

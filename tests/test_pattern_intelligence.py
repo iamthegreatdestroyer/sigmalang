@@ -13,19 +13,20 @@ Test Coverage:
 - Total: 35 comprehensive tests
 """
 
-import pytest
-import numpy as np
-from typing import List, Dict, Tuple
-from sigmalang.core.pattern_intelligence import (
-    MethodPredictor,
-    ThresholdLearner,
-    WeightLearner,
-    MethodPrediction,
-    ThresholdOptimization,
-    PatternWeight,
-    compute_pattern_features
-)
+from typing import Dict, List, Tuple
 
+import numpy as np
+import pytest
+
+from sigmalang.core.pattern_intelligence import (
+    MethodPrediction,
+    MethodPredictor,
+    PatternWeight,
+    ThresholdLearner,
+    ThresholdOptimization,
+    WeightLearner,
+    compute_pattern_features,
+)
 
 # ============================================================================
 # Fixtures
@@ -392,7 +393,7 @@ class TestIntegrationLearners:
 
         # Train all
         method_pred.train(training_features, training_labels)
-        result = threshold_learner.learn(sample_patterns, performance_data)
+        threshold_learner.learn(sample_patterns, performance_data)
         weight_learner.calibrate(sample_patterns, performance_data)
 
         # Predictions + optimization

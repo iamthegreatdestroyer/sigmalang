@@ -2,19 +2,20 @@
 Tests for FAISS-compatible vector index (faiss_index.py)
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from sigmalang.core.faiss_index import (
     BaseIndex,
     FlatIndex,
     HNSWIndex,
+    IndexType,
     IVFIndex,
     LSHIndex,
-    IndexType,
     SearchResult,
     VectorIndex,
-    _l2_distances,
     _cosine_distances,
+    _l2_distances,
 )
 
 
@@ -63,9 +64,9 @@ class TestDistanceFunctions:
 class TestFlatIndex:
     def test_empty_search_returns_inf(self):
         idx = FlatIndex(dim=DIM)
-        D, I = idx.search(_rng_vecs(1, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=5)
         assert np.all(np.isinf(D))
-        assert np.all(I == -1)
+        assert np.all(indices == -1)
 
     def test_add_increases_ntotal(self):
         idx = FlatIndex(dim=DIM)
@@ -77,26 +78,26 @@ class TestFlatIndex:
     def test_search_returns_correct_shape(self):
         idx = FlatIndex(dim=DIM)
         idx.add(_rng_vecs(50, DIM))
-        D, I = idx.search(_rng_vecs(3, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(3, DIM), k=5)
         assert D.shape == (3, 5)
-        assert I.shape == (3, 5)
+        assert indices.shape == (3, 5)
 
     def test_nearest_neighbor_exact(self):
         """The nearest neighbor of a vector to itself should be itself."""
         idx = FlatIndex(dim=DIM)
         vecs = _rng_vecs(20, DIM)
         idx.add(vecs)
-        D, I = idx.search(vecs[:3], k=1)
+        D, indices = idx.search(vecs[:3], k=1)
         for i in range(3):
-            assert I[i, 0] == i, f"NN of vector {i} should be {i}, got {I[i,0]}"
+            assert indices[i, 0] == i, f"NN of vector {i} should be {i}, got {indices[i,0]}"
 
     def test_k_larger_than_database(self):
         """k larger than n should return at most n results."""
         idx = FlatIndex(dim=DIM)
         idx.add(_rng_vecs(5, DIM))
-        D, I = idx.search(_rng_vecs(1, DIM), k=20)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=20)
         # Valid results should be 5
-        valid = (I[0] >= 0).sum()
+        valid = (indices[0] >= 0).sum()
         assert valid == 5
 
     def test_add_1d_vector(self):
@@ -109,7 +110,7 @@ class TestFlatIndex:
         idx.add(_rng_vecs(10, DIM))
         idx.reset()
         assert idx.ntotal == 0
-        D, I = idx.search(_rng_vecs(1, DIM), k=3)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=3)
         assert np.all(np.isinf(D))
 
     def test_is_trained(self):
@@ -120,9 +121,9 @@ class TestFlatIndex:
         idx = FlatIndex(dim=DIM, metric="cosine")
         vecs = _rng_vecs(20, DIM)
         idx.add(vecs)
-        D, I = idx.search(vecs[:3], k=1)
+        D, indices = idx.search(vecs[:3], k=1)
         for i in range(3):
-            assert I[i, 0] == i
+            assert indices[i, 0] == i
 
     def test_repr(self):
         idx = FlatIndex(dim=DIM)
@@ -153,15 +154,15 @@ class TestIVFIndex:
     def test_search_shape(self):
         idx = IVFIndex(dim=DIM, nlist=4, nprobe=2)
         idx.add(_rng_vecs(40, DIM))
-        D, I = idx.search(_rng_vecs(5, DIM), k=3)
+        D, indices = idx.search(_rng_vecs(5, DIM), k=3)
         assert D.shape == (5, 3)
-        assert I.shape == (5, 3)
+        assert indices.shape == (5, 3)
 
     def test_empty_search(self):
         idx = IVFIndex(dim=DIM, nlist=4)
-        D, I = idx.search(_rng_vecs(1, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=5)
         assert np.all(np.isinf(D))
-        assert np.all(I == -1)
+        assert np.all(indices == -1)
 
     def test_recall_reasonable(self):
         """IVF should have decent recall against exact search."""
@@ -204,23 +205,23 @@ class TestHNSWIndex:
     def test_search_shape(self):
         idx = HNSWIndex(dim=DIM, M=8)
         idx.add(_rng_vecs(50, DIM))
-        D, I = idx.search(_rng_vecs(3, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(3, DIM), k=5)
         assert D.shape == (3, 5)
-        assert I.shape == (3, 5)
+        assert indices.shape == (3, 5)
 
     def test_nearest_to_self(self):
         idx = HNSWIndex(dim=DIM, M=8)
         vecs = _rng_vecs(30, DIM)
         idx.add(vecs)
-        D, I = idx.search(vecs[:5], k=1)
+        D, indices = idx.search(vecs[:5], k=1)
         for i in range(5):
-            assert I[i, 0] == i, f"HNSW NN of vector {i} should be self, got {I[i,0]}"
+            assert indices[i, 0] == i, f"HNSW NN of vector {i} should be self, got {indices[i,0]}"
 
     def test_empty_search(self):
         idx = HNSWIndex(dim=DIM)
-        D, I = idx.search(_rng_vecs(1, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=5)
         assert np.all(np.isinf(D))
-        assert np.all(I == -1)
+        assert np.all(indices == -1)
 
     def test_is_trained(self):
         idx = HNSWIndex(dim=DIM)
@@ -263,15 +264,15 @@ class TestLSHIndex:
     def test_search_shape(self):
         idx = LSHIndex(dim=DIM, n_bits=16, n_tables=4)
         idx.add(_rng_vecs(50, DIM))
-        D, I = idx.search(_rng_vecs(3, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(3, DIM), k=5)
         assert D.shape == (3, 5)
-        assert I.shape == (3, 5)
+        assert indices.shape == (3, 5)
 
     def test_empty_search(self):
         idx = LSHIndex(dim=DIM, n_bits=16, n_tables=4)
-        D, I = idx.search(_rng_vecs(1, DIM), k=5)
+        D, indices = idx.search(_rng_vecs(1, DIM), k=5)
         assert np.all(np.isinf(D))
-        assert np.all(I == -1)
+        assert np.all(indices == -1)
 
     def test_nearest_to_self(self):
         """With multiple tables, self should be retrievable."""
@@ -279,12 +280,12 @@ class TestLSHIndex:
         idx = LSHIndex(dim=DIM, n_bits=32, n_tables=8)
         vecs = _rng_vecs(n, DIM)
         idx.add(vecs)
-        D, I = idx.search(vecs[:5], k=1)
+        D, indices = idx.search(vecs[:5], k=1)
         # Self should appear in results (either as NN or in top-k)
         for i in range(5):
             # With multiple tables self should hash to same bucket
             # (not guaranteed but very likely)
-            assert i in I[i], f"Vector {i} not found in its own search results"
+            assert i in indices[i], f"Vector {i} not found in its own search results"
 
     def test_reset(self):
         idx = LSHIndex(dim=DIM, n_bits=16, n_tables=4)

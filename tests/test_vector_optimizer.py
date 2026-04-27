@@ -2,15 +2,15 @@
 Tests for VectorOptimizer and DocumentVectorizer
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from sigmalang.core.vector_optimizer import (
+    DocumentVector,
+    DocumentVectorizer,
     VectorOptimizer,
     VectorOptimizerConfig,
-    DocumentVectorizer,
-    DocumentVector,
 )
-
 
 # ---------------------------------------------------------------------------
 # VectorOptimizer

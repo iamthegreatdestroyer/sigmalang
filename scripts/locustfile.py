@@ -13,9 +13,10 @@ Performance Targets:
 """
 
 import json
-import random
-from locust import HttpUser, task, between, events
 import logging
+import random
+
+from locust import HttpUser, between, events, task
 
 logger = logging.getLogger(__name__)
 

@@ -34,11 +34,11 @@ Usage:
     assert original == encoded_bytes  # Guaranteed
 """
 
-import struct
 import hashlib
-from typing import List, Tuple, Optional, Dict, Any
-from dataclasses import dataclass, field
 import logging
+import struct
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

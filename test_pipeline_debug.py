@@ -2,9 +2,10 @@
 """Debug script to identify Bug 5A in full SigmaEncoder/SigmaDecoder pipeline."""
 
 import sys
+
 sys.path.insert(0, '.')
 
-from core.encoder import SigmaEncoder, SigmaDecoder
+from core.encoder import SigmaDecoder, SigmaEncoder
 from core.parser import SemanticParser
 
 print('=== Full Pipeline Debug: Special Characters ===')
@@ -48,7 +49,7 @@ for orig_key, orig_val in test_data.items():
         print(f'  Decoded:   {repr(dec_val)}')
         print(f'  Match:     {match}')
         if not match:
-            print(f'  MISMATCH DETECTED!')
+            print('  MISMATCH DETECTED!')
     else:
         print(f'Key {repr(orig_key)}: NOT FOUND in decoded!')
         print(f'  Available keys: {[repr(k) for k in decoded.keys()]}')

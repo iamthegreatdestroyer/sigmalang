@@ -28,16 +28,16 @@ Usage:
     python scripts/health_monitor.py --interval 60   # Custom check interval
 """
 
-import sys
 import json
-import time
 import logging
 import subprocess
-from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+import sys
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # Setup logging
 logging.basicConfig(
@@ -145,8 +145,8 @@ def http_check(url: str, timeout: int = 10) -> Tuple[bool, float, str]:
 def _python_http_check(url: str, timeout: int = 10) -> Tuple[bool, float, str]:
     """Fallback HTTP check using Python urllib."""
     try:
-        import urllib.request
         import urllib.error
+        import urllib.request
 
         start = time.time()
         req = urllib.request.Request(url, method='GET')

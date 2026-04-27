@@ -18,12 +18,13 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
-import shutil
+from typing import Any, Dict, List
+
 
 class MarketplacePackager:
     """AI-powered marketplace packaging bot"""
@@ -424,7 +425,7 @@ def main():
     with open(results_file, 'w') as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n📦 Marketplace Packaging Complete")
+    print("\n📦 Marketplace Packaging Complete")
     print(f"📂 Results: {results_file}")
 
     # Summary

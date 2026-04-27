@@ -48,13 +48,13 @@ Usage:
     print(f"Compression: {result['ratio']:.0f}x")
 """
 
-import struct
 import hashlib
 import logging
 import math
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+import struct
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

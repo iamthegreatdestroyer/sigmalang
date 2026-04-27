@@ -4,6 +4,7 @@
 import subprocess
 import sys
 
+
 def run_tests():
     """Run the test suite and capture results."""
     cmd = [
@@ -12,13 +13,13 @@ def run_tests():
         "tests/test_sigmalang.py",
         "-v", "--tb=short", "-q"
     ]
-    
+
     result = subprocess.run(cmd, capture_output=True, text=True)
-    
+
     print(result.stdout)
     if result.stderr:
         print("STDERR:", result.stderr)
-    
+
     return result.returncode
 
 if __name__ == "__main__":

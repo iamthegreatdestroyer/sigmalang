@@ -26,9 +26,9 @@ from typing import (
     Tuple,
     Union,
 )
+
 import numpy as np
 from numpy.typing import NDArray
-
 
 # =============================================================================
 # ENUMERATIONS
@@ -81,22 +81,22 @@ class CompressionQuality(Enum):
 class SemanticGlyph:
     """
     A single semantic primitive in ΣLANG.
-    
+
     Glyphs are the atomic units of meaning in ΣLANG encoding.
     Each glyph represents a semantic concept that can be combined
     with modifiers to express complex meanings.
     """
     glyph_id: int              # 0-255 for base glyphs
     tier: GlyphTier
-    
+
     # Semantic properties
     semantic_category: str     # e.g., "entity", "action", "relation"
     base_meaning: str          # Human-readable meaning
-    
+
     # Encoding properties
     binary_code: bytes         # Binary representation
     embedding: Optional[NDArray[np.float32]] = None  # Semantic embedding
-    
+
     def __hash__(self) -> int:
         return hash((self.glyph_id, self.tier))
 
@@ -105,13 +105,13 @@ class SemanticGlyph:
 class GlyphModifier:
     """
     Modifier that adjusts glyph meaning.
-    
+
     Modifiers allow a small glyph vocabulary to express
     nuanced meanings through composition.
     """
     modifier_id: int           # 0-63 for modifiers
     modifier_type: str         # e.g., "intensity", "negation", "temporal"
-    
+
     # Effect on meaning
     semantic_shift: str        # Description of modification
     weight: float = 1.0        # Strength of modification
@@ -124,13 +124,13 @@ class EncodedGlyph:
     """
     base_glyph: SemanticGlyph
     modifiers: Tuple[GlyphModifier, ...] = ()
-    
+
     # Position in sequence
     position: int = 0
-    
+
     # Link to original tokens
     source_token_span: Tuple[int, int] = (0, 0)  # (start, end) in original
-    
+
     def to_bytes(self) -> bytes:
         """Serialize to binary representation."""
         result = bytes([self.base_glyph.glyph_id, len(self.modifiers)])
@@ -149,22 +149,22 @@ class GlyphSequence:
     A sequence of encoded glyphs representing compressed content.
     """
     glyphs: Tuple[EncodedGlyph, ...]
-    
+
     # Compression metadata
     original_token_count: int
     compressed_size_bytes: int
-    
+
     # For reconstruction
     semantic_hash: int
     codebook_version: str
-    
+
     @property
     def compression_ratio(self) -> float:
         if self.compressed_size_bytes == 0:
             return 0.0
         original_bytes = self.original_token_count * 4
         return original_bytes / self.compressed_size_bytes
-    
+
     def to_bytes(self) -> bytes:
         result = b''
         for glyph in self.glyphs:
@@ -176,7 +176,7 @@ class GlyphSequence:
 class SigmaEncodedContext:
     """
     Complete ΣLANG-encoded context ready for Ryot LLM.
-    
+
     This is the bridge structure between ΣLANG and Ryot LLM.
     """
     glyph_sequence: GlyphSequence
@@ -190,7 +190,7 @@ class SigmaEncodedContext:
     is_delta_encoded: bool = False
     parent_rsu_id: Optional[str] = None
     _cached_tokens: Optional[List[int]] = field(default=None, repr=False)
-    
+
     @property
     def glyph_count(self) -> int:
         return len(self.glyph_sequence.glyphs)
@@ -246,7 +246,7 @@ class RSUReference:
     storage_tier: StorageTier
     compression_ratio: float
     has_kv_cache: bool
-    
+
     def __hash__(self) -> int:
         return hash(self.rsu_id)
 
@@ -258,7 +258,7 @@ class RSUChain:
     entries: List[RSUReference]
     total_tokens: int
     total_compressed_bytes: int
-    
+
     @property
     def chain_compression_ratio(self) -> float:
         if self.total_compressed_bytes == 0:

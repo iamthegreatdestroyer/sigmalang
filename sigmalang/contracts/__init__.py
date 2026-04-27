@@ -10,9 +10,9 @@ Usage:
 """
 
 from sigmalang.api.interfaces import (
+    CodebookProtocol,
     CompressionEngine,
     RSUManager,
-    CodebookProtocol,
     StorageBackend,
 )
 

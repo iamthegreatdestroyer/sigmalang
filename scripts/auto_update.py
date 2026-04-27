@@ -23,15 +23,15 @@ Usage:
     python scripts/auto_update.py --rollback   # Rollback to previous version
 """
 
+import json
+import logging
 import subprocess
 import sys
-import json
 import time
-import logging
-from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
 
 # Setup logging
 logging.basicConfig(

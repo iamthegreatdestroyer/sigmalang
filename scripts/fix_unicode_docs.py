@@ -4,11 +4,11 @@
 Automatic Unicode character replacement and documentation regeneration
 """
 
-import os
-import sys
 import io
 import json
+import os
 import re
+import sys
 from pathlib import Path
 
 # Fix Windows console Unicode encoding
@@ -20,7 +20,8 @@ if sys.platform == 'win32':
     except Exception:
         pass
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 
 class UnicodeDocumentationFixer:
     def __init__(self):
@@ -262,7 +263,7 @@ class UnicodeDocumentationFixer:
         fixes_applied = self.fix_unicode_characters(unicode_issues)
 
         # Step 3: Regenerate documentation
-        regeneration_success = self.regenerate_documentation()
+        self.regenerate_documentation()
 
         # Step 4: Validate fixes
         validation_results = self.validate_fixes(unicode_issues)

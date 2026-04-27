@@ -27,12 +27,12 @@ Usage:
         print(f"[{a['severity']}] {a['message']}")
 """
 
+import logging
 import math
 import time
-import logging
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, field
 from collections import deque
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

@@ -4,12 +4,11 @@
 Pydantic models for API request/response validation.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Union
-from enum import Enum
-from dataclasses import dataclass, field
 import hashlib
-
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
 # =============================================================================
 # Enums
@@ -60,13 +59,13 @@ class BaseRequest:
     """Base class for all API requests."""
     request_id: Optional[str] = None
     timestamp: Optional[datetime] = None
-    
+
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now(timezone.utc)
         if self.request_id is None:
             self.request_id = self._generate_id()
-    
+
     def _generate_id(self) -> str:
         """Generate unique request ID."""
         content = f"{self.timestamp.isoformat()}-{id(self)}"

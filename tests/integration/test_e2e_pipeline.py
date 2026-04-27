@@ -14,18 +14,19 @@ Test Coverage:
 """
 
 import sys
-import pytest
 from pathlib import Path
 from typing import List
+
+import pytest
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.parser import SemanticParser
-from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
-from sigmalang.core.primitives import SemanticTree
-from tests.conftest import TreeComparator, CompressionAnalyzer, TestDatasets
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder  # noqa: E402
+from sigmalang.core.parser import SemanticParser  # noqa: E402
+from sigmalang.core.primitives import SemanticTree  # noqa: E402
+from tests.conftest import CompressionAnalyzer, TestDatasets, TreeComparator  # noqa: E402
 
 
 class TestE2EBasicPipeline:
@@ -226,7 +227,7 @@ class TestE2EPerformance:
         # Full pipeline
         tree = parser.parse(input_text)
         encoded = encoder.encode(tree)
-        decoded = decoder.decode(encoded)
+        decoder.decode(encoded)
 
         end = time.perf_counter()
         latency_ms = (end - start) * 1000
@@ -252,7 +253,7 @@ class TestE2EPerformance:
         for text in texts:
             tree = parser.parse(text)
             encoded = encoder.encode(tree)
-            decoded = decoder.decode(encoded)
+            decoder.decode(encoded)
 
         end = time.perf_counter()
         duration = end - start
@@ -287,7 +288,7 @@ class TestE2EErrorHandling:
         malformed_data = b'\x00\x01\x02\x03\x04'
 
         try:
-            decoded = decoder.decode(malformed_data)
+            decoder.decode(malformed_data)
             # If it doesn't raise, that's also acceptable
         except Exception as e:
             # Should raise a specific exception, not crash

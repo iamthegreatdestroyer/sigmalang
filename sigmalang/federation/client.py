@@ -20,9 +20,9 @@ Usage:
     client.apply_global_update(global_update)
 """
 
-import logging
 import hashlib
-from typing import Dict, Any, Optional, List
+import logging
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 

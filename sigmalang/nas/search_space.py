@@ -20,10 +20,10 @@ Usage:
     restored = ArchitectureConfig.from_dict(config_dict)
 """
 
-import math
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+import math
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

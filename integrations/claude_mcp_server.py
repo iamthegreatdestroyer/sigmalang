@@ -35,13 +35,13 @@ Setup:
 Protocol: MCP over stdio (JSON-RPC 2.0)
 """
 
-import sys
+import hashlib
 import json
 import logging
-import hashlib
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent
@@ -88,8 +88,8 @@ class SigmaLangEngine:
             return
 
         try:
+            from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder
             from sigmalang.core.parser import SemanticParser
-            from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
 
             self._parser = SemanticParser()
             self._encoder = SigmaEncoder()

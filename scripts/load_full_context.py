@@ -1,6 +1,7 @@
 """Load entire ΣLANG codebase into Claude 1M context."""
-from pathlib import Path
 import json
+from pathlib import Path
+
 
 def collect_source_files(root_dir, extensions=['.py', '.md']):
     """Collect all source files."""
@@ -51,7 +52,7 @@ def generate_snapshot(root_dir='S:/sigmalang'):
         'estimated_tokens': total_chars // 4
     }
 
-    print(f"\n[OK] Snapshot Complete:")
+    print("\n[OK] Snapshot Complete:")
     print(f"   Files: {snapshot['stats']['total_files']}")
     print(f"   Lines: {snapshot['stats']['total_lines']:,}")
     print(f"   Est. Tokens: {snapshot['stats']['estimated_tokens']:,}")

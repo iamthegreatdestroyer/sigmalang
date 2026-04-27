@@ -4,12 +4,12 @@
 Intelligent import resolution and profiling completion
 """
 
-import os
-import sys
+import importlib
 import io
 import json
-import importlib
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 # Fix Windows console Unicode encoding
@@ -21,7 +21,8 @@ if sys.platform == 'win32':
     except Exception:
         pass
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 
 class PerformanceProfilingFixer:
     def __init__(self):

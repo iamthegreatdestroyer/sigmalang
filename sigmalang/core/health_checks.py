@@ -9,16 +9,16 @@ Comprehensive health checks for ΣLANG services including:
 - System uptime
 """
 
-import time
 import os
-import psutil
-from pathlib import Path
-from typing import Dict, Any, Optional
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import psutil
 
 from .monitoring import HealthCheckResult, get_health_checker
-
 
 # =============================================================================
 # Enhanced Health Check Data Classes

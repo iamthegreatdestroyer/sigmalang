@@ -11,10 +11,9 @@ from pathlib import Path
 sigmalang_root = Path(__file__).parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
-from sigmalang.core.primitives import SemanticNode, SemanticTree, ExistentialPrimitive
-from sigmalang.core.parser import SemanticParser
-
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder  # noqa: E402
+from sigmalang.core.parser import SemanticParser  # noqa: E402
+from sigmalang.core.primitives import ExistentialPrimitive, SemanticNode, SemanticTree  # noqa: E402
 
 # Test code snippets that fail compression ratio
 FAILING_SNIPPETS = [
@@ -35,21 +34,21 @@ def analyze_compression(text: str) -> dict:
     parser = SemanticParser()
     encoder = SigmaEncoder()
     decoder = SigmaDecoder(encoder)
-    
+
     # Parse the text
     tree = parser.parse(text)
-    
+
     # Encode
     encoded = encoder.encode(tree, text)
-    
+
     # Get sizes
     original_size = len(text.encode('utf-8'))
     encoded_size = len(encoded)
     ratio = encoded_size / original_size if original_size > 0 else 0
-    
+
     # Decode to verify correctness
     decoded_tree = decoder.decode(encoded)
-    
+
     return {
         "text": text,
         "original_size": original_size,
@@ -65,11 +64,11 @@ def main():
     print("=" * 80)
     print("COMPRESSION RATIO ANALYSIS")
     print("=" * 80)
-    
+
     print("\n" + "=" * 80)
     print("FAILING SNIPPETS (ratio > 0.9)")
     print("=" * 80)
-    
+
     for snippet in FAILING_SNIPPETS:
         result = analyze_compression(snippet)
         print(f"\n📊 {snippet}")
@@ -78,11 +77,11 @@ def main():
         print(f"   Ratio:     {result['ratio']:.4f}")
         print(f"   Expansion: +{result['expansion']:,} bytes ({(result['expansion']/result['original_size']*100):.1f}%)")
         print(f"   Correct:   {result['is_roundtrip_correct']}")
-    
+
     print("\n" + "=" * 80)
     print("PASSING SNIPPETS (ratio <= 0.9)")
     print("=" * 80)
-    
+
     for snippet in PASSING_SNIPPETS:
         result = analyze_compression(snippet)
         print(f"\n📊 {snippet}")
@@ -94,7 +93,7 @@ def main():
         else:
             print(f"   Expansion: +{result['expansion']:,} bytes ({(result['expansion']/result['original_size']*100):.1f}%)")
         print(f"   Correct:   {result['is_roundtrip_correct']}")
-    
+
     # Analysis
     print("\n" + "=" * 80)
     print("ANALYSIS")
@@ -117,7 +116,7 @@ KEY OBSERVATIONS:
    - Glyph headers: ~2-3 bytes per primitive + payload length encoding
    - CRC-16 checksum: 2 bytes
    - Payload: UTF-8 encoded text
-   
+
 4. COMPRESSION EFFECTIVENESS:
    - Text < ~100 bytes: Typically expands (overhead > content benefit)
    - Text > ~200 bytes: Can compress well with pattern sharing

@@ -18,13 +18,13 @@ Features:
 
 import argparse
 import json
-import sys
 import os
 import subprocess
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+import sys
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -88,7 +88,7 @@ class BenchmarkRunner:
         if pytest_args:
             cmd.extend(pytest_args)
 
-        print(f"Running benchmarks...")
+        print("Running benchmarks...")
         print(f"Command: {' '.join(cmd)}")
         print()
 
@@ -335,14 +335,14 @@ def main():
 
             # Exit with error if regressions found
             if any(r.is_regression for r in regressions):
-                print(f"\n[FAIL] Performance regressions detected!")
+                print("\n[FAIL] Performance regressions detected!")
                 return 1
             else:
-                print(f"\n[PASS] No performance regressions")
+                print("\n[PASS] No performance regressions")
                 return 0
         else:
-            print(f"\n[INFO]  No baseline found for comparison")
-            print(f"   This will be used as the new baseline")
+            print("\n[INFO]  No baseline found for comparison")
+            print("   This will be used as the new baseline")
             return 0
 
     # Compare against specific baseline
@@ -360,7 +360,7 @@ def main():
             print(f"[FAIL] No current results found in {args.output_dir}")
             return 1
 
-        print(f"[REPORT] Comparing:")
+        print("[REPORT] Comparing:")
         print(f"  Baseline: {baseline_file}")
         print(f"  Current:  {current_file}")
 

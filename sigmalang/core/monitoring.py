@@ -4,17 +4,17 @@
 Prometheus metrics, health checks, structured logging, and OpenTelemetry tracing.
 """
 
-import time
-import threading
-import logging
 import json
+import logging
 import sys
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
-from functools import wraps
+import threading
+import time
 from contextlib import contextmanager
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 
 logger = logging.getLogger(__name__)
 
@@ -49,14 +49,14 @@ class MetricValue:
 
 class Counter:
     """A counter that only goes up."""
-    
+
     def __init__(self, name: str, description: str = "", labels: Optional[List[str]] = None):
         self.name = name
         self.description = description
         self.label_names = labels or []
         self._values: Dict[tuple, float] = {}
         self._lock = threading.Lock()
-    
+
     def inc(self, value: float = 1.0, **labels) -> None:
         """Increment the counter."""
         if value < 0:
@@ -64,17 +64,17 @@ class Counter:
         label_key = self._label_key(labels)
         with self._lock:
             self._values[label_key] = self._values.get(label_key, 0.0) + value
-    
+
     def get(self, **labels) -> float:
         """Get current counter value."""
         label_key = self._label_key(labels)
         with self._lock:
             return self._values.get(label_key, 0.0)
-    
+
     def _label_key(self, labels: Dict[str, str]) -> tuple:
         """Create a hashable key from labels."""
         return tuple(sorted(labels.items()))
-    
+
     def collect(self) -> List[MetricValue]:
         """Collect all metric values."""
         with self._lock:
@@ -95,42 +95,42 @@ class Counter:
 
 class Gauge:
     """A gauge that can go up and down."""
-    
+
     def __init__(self, name: str, description: str = "", labels: Optional[List[str]] = None):
         self.name = name
         self.description = description
         self.label_names = labels or []
         self._values: Dict[tuple, float] = {}
         self._lock = threading.Lock()
-    
+
     def set(self, value: float, **labels) -> None:
         """Set the gauge value."""
         label_key = self._label_key(labels)
         with self._lock:
             self._values[label_key] = value
-    
+
     def inc(self, value: float = 1.0, **labels) -> None:
         """Increment the gauge."""
         label_key = self._label_key(labels)
         with self._lock:
             self._values[label_key] = self._values.get(label_key, 0.0) + value
-    
+
     def dec(self, value: float = 1.0, **labels) -> None:
         """Decrement the gauge."""
         label_key = self._label_key(labels)
         with self._lock:
             self._values[label_key] = self._values.get(label_key, 0.0) - value
-    
+
     def get(self, **labels) -> float:
         """Get current gauge value."""
         label_key = self._label_key(labels)
         with self._lock:
             return self._values.get(label_key, 0.0)
-    
+
     def _label_key(self, labels: Dict[str, str]) -> tuple:
         """Create a hashable key from labels."""
         return tuple(sorted(labels.items()))
-    
+
     def collect(self) -> List[MetricValue]:
         """Collect all metric values."""
         with self._lock:
@@ -143,7 +143,7 @@ class Gauge:
                 )
                 for labels, value in self._values.items()
             ]
-    
+
     @contextmanager
     def track_inprogress(self, **labels):
         """Context manager to track in-progress operations."""
@@ -160,15 +160,15 @@ class Gauge:
 
 class Histogram:
     """A histogram for measuring distributions."""
-    
+
     DEFAULT_BUCKETS = (
         0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0
     )
-    
+
     def __init__(
-        self, 
-        name: str, 
-        description: str = "", 
+        self,
+        name: str,
+        description: str = "",
         labels: Optional[List[str]] = None,
         buckets: Optional[tuple] = None
     ):
@@ -180,7 +180,7 @@ class Histogram:
         self._sums: Dict[tuple, float] = {}
         self._totals: Dict[tuple, int] = {}
         self._lock = threading.Lock()
-    
+
     def observe(self, value: float, **labels) -> None:
         """Observe a value."""
         label_key = self._label_key(labels)
@@ -189,18 +189,18 @@ class Histogram:
                 self._counts[label_key] = {b: 0 for b in self.buckets}
                 self._sums[label_key] = 0.0
                 self._totals[label_key] = 0
-            
+
             self._sums[label_key] += value
             self._totals[label_key] += 1
-            
+
             for bucket in self.buckets:
                 if value <= bucket:
                     self._counts[label_key][bucket] += 1
-    
+
     def _label_key(self, labels: Dict[str, str]) -> tuple:
         """Create a hashable key from labels."""
         return tuple(sorted(labels.items()))
-    
+
     def collect(self) -> List[MetricValue]:
         """Collect all metric values."""
         metrics = []
@@ -230,7 +230,7 @@ class Histogram:
                     metric_type=MetricType.HISTOGRAM
                 ))
         return metrics
-    
+
     @contextmanager
     def time(self, **labels):
         """Context manager to time an operation."""
@@ -248,30 +248,30 @@ class Histogram:
 
 class MetricsRegistry:
     """Central registry for all metrics."""
-    
+
     def __init__(self):
         self._metrics: Dict[str, Union[Counter, Gauge, Histogram]] = {}
         self._lock = threading.Lock()
         self._start_time = time.time()
-    
+
     def counter(self, name: str, description: str = "", labels: Optional[List[str]] = None) -> Counter:
         """Get or create a counter."""
         with self._lock:
             if name not in self._metrics:
                 self._metrics[name] = Counter(name, description, labels)
             return self._metrics[name]
-    
+
     def gauge(self, name: str, description: str = "", labels: Optional[List[str]] = None) -> Gauge:
         """Get or create a gauge."""
         with self._lock:
             if name not in self._metrics:
                 self._metrics[name] = Gauge(name, description, labels)
             return self._metrics[name]
-    
+
     def histogram(
-        self, 
-        name: str, 
-        description: str = "", 
+        self,
+        name: str,
+        description: str = "",
         labels: Optional[List[str]] = None,
         buckets: Optional[tuple] = None
     ) -> Histogram:
@@ -280,7 +280,7 @@ class MetricsRegistry:
             if name not in self._metrics:
                 self._metrics[name] = Histogram(name, description, labels, buckets)
             return self._metrics[name]
-    
+
     def collect_all(self) -> List[MetricValue]:
         """Collect all metrics."""
         all_metrics = []
@@ -288,7 +288,7 @@ class MetricsRegistry:
             for metric in self._metrics.values():
                 all_metrics.extend(metric.collect())
         return all_metrics
-    
+
     def to_prometheus(self) -> str:
         """Export metrics in Prometheus format."""
         lines = []
@@ -299,7 +299,7 @@ class MetricsRegistry:
             else:
                 lines.append(f'{metric.name} {metric.value}')
         return "\n".join(lines)
-    
+
     def get_uptime(self) -> float:
         """Get server uptime in seconds."""
         return time.time() - self._start_time
@@ -413,29 +413,29 @@ class HealthCheckResult:
 
 class HealthChecker:
     """Manages health checks for all components."""
-    
+
     def __init__(self):
         self._checks: Dict[str, Callable[[], HealthCheckResult]] = {}
         self._lock = threading.Lock()
-    
+
     def register(self, name: str, check_fn: Callable[[], HealthCheckResult]) -> None:
         """Register a health check."""
         with self._lock:
             self._checks[name] = check_fn
-    
+
     def unregister(self, name: str) -> None:
         """Unregister a health check."""
         with self._lock:
             self._checks.pop(name, None)
-    
+
     def check(self, name: str) -> HealthCheckResult:
         """Run a specific health check."""
         with self._lock:
             check_fn = self._checks.get(name)
-        
+
         if check_fn is None:
             return HealthCheckResult(name=name, healthy=False, message="Check not found")
-        
+
         start = time.perf_counter()
         try:
             result = check_fn()
@@ -448,17 +448,17 @@ class HealthChecker:
                 latency_ms=(time.perf_counter() - start) * 1000,
                 message=str(e)
             )
-    
+
     def check_all(self) -> List[HealthCheckResult]:
         """Run all health checks."""
         with self._lock:
             names = list(self._checks.keys())
         return [self.check(name) for name in names]
-    
+
     def is_healthy(self) -> bool:
         """Check if all components are healthy."""
         return all(r.healthy for r in self.check_all())
-    
+
     def is_ready(self) -> bool:
         """Check if service is ready to accept requests."""
         return self.is_healthy()
@@ -488,14 +488,14 @@ _health_checker.register("self", _check_self)
 
 class StructuredLogger:
     """Structured JSON logging with context."""
-    
+
     def __init__(self, name: str, level: int = logging.INFO):
         self.name = name
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
         self._context: Dict[str, Any] = {}
         self._local = threading.local()
-    
+
     def _format_message(self, level: str, message: str, **kwargs) -> str:
         """Format log message as JSON."""
         log_data = {
@@ -508,15 +508,15 @@ class StructuredLogger:
             **kwargs
         }
         return json.dumps(log_data, default=str)
-    
+
     def set_context(self, **kwargs) -> None:
         """Set persistent context for all log messages."""
         self._context.update(kwargs)
-    
+
     def clear_context(self) -> None:
         """Clear persistent context."""
         self._context.clear()
-    
+
     @contextmanager
     def with_context(self, **kwargs):
         """Temporary context for a block of code."""
@@ -528,27 +528,27 @@ class StructuredLogger:
             yield
         finally:
             self._local.context = old_context
-    
+
     def debug(self, message: str, **kwargs) -> None:
         """Log debug message."""
         self.logger.debug(self._format_message("DEBUG", message, **kwargs))
-    
+
     def info(self, message: str, **kwargs) -> None:
         """Log info message."""
         self.logger.info(self._format_message("INFO", message, **kwargs))
-    
+
     def warning(self, message: str, **kwargs) -> None:
         """Log warning message."""
         self.logger.warning(self._format_message("WARNING", message, **kwargs))
-    
+
     def error(self, message: str, **kwargs) -> None:
         """Log error message."""
         self.logger.error(self._format_message("ERROR", message, **kwargs))
-    
+
     def critical(self, message: str, **kwargs) -> None:
         """Log critical message."""
         self.logger.critical(self._format_message("CRITICAL", message, **kwargs))
-    
+
     def exception(self, message: str, **kwargs) -> None:
         """Log exception with traceback."""
         import traceback
@@ -563,22 +563,22 @@ def configure_logging(
 ) -> None:
     """Configure logging for the application."""
     log_level = getattr(logging, level.upper(), logging.INFO)
-    
+
     if format_type == "json":
         formatter = logging.Formatter('%(message)s')
     else:
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
-    
+
     if output == "stdout":
         handler = logging.StreamHandler(sys.stdout)
     else:
         handler = logging.FileHandler(output)
-    
+
     handler.setFormatter(formatter)
     handler.setLevel(log_level)
-    
+
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
     root_logger.addHandler(handler)
@@ -600,15 +600,15 @@ class Span:
     attributes: Dict[str, Any] = field(default_factory=dict)
     events: List[Dict[str, Any]] = field(default_factory=list)
     status: str = "OK"
-    
+
     def end(self) -> None:
         """End the span."""
         self.end_time = time.time()
-    
+
     def set_attribute(self, key: str, value: Any) -> None:
         """Set a span attribute."""
         self.attributes[key] = value
-    
+
     def add_event(self, name: str, attributes: Optional[Dict[str, Any]] = None) -> None:
         """Add an event to the span."""
         self.events.append({
@@ -616,13 +616,13 @@ class Span:
             "timestamp": time.time(),
             "attributes": attributes or {}
         })
-    
+
     def set_error(self, error: Exception) -> None:
         """Mark span as error."""
         self.status = "ERROR"
         self.set_attribute("error.type", type(error).__name__)
         self.set_attribute("error.message", str(error))
-    
+
     def duration_ms(self) -> float:
         """Get span duration in milliseconds."""
         if self.end_time is None:
@@ -632,33 +632,33 @@ class Span:
 
 class Tracer:
     """Simple tracer for distributed tracing."""
-    
+
     def __init__(self, service_name: str = "sigmalang"):
         self.service_name = service_name
         self._local = threading.local()
         self._spans: List[Span] = []
         self._lock = threading.Lock()
         self._enabled = True
-    
+
     def _generate_id(self) -> str:
         """Generate a random trace/span ID."""
         import os
         return os.urandom(8).hex()
-    
+
     @property
     def current_span(self) -> Optional[Span]:
         """Get the current span."""
         stack = getattr(self._local, 'span_stack', [])
         return stack[-1] if stack else None
-    
+
     def start_span(self, name: str, parent: Optional[Span] = None) -> Span:
         """Start a new span."""
         if not hasattr(self._local, 'span_stack'):
             self._local.span_stack = []
-        
+
         parent = parent or self.current_span
         trace_id = parent.trace_id if parent else self._generate_id()
-        
+
         span = Span(
             trace_id=trace_id,
             span_id=self._generate_id(),
@@ -666,21 +666,21 @@ class Tracer:
             name=name,
             start_time=time.time()
         )
-        
+
         self._local.span_stack.append(span)
         return span
-    
+
     def end_span(self, span: Span) -> None:
         """End a span."""
         span.end()
-        
+
         if hasattr(self._local, 'span_stack') and self._local.span_stack:
             if self._local.span_stack[-1] is span:
                 self._local.span_stack.pop()
-        
+
         with self._lock:
             self._spans.append(span)
-    
+
     @contextmanager
     def span(self, name: str, attributes: Optional[Dict[str, Any]] = None):
         """Context manager for creating spans."""
@@ -695,12 +695,12 @@ class Tracer:
             raise
         finally:
             self.end_span(s)
-    
+
     def get_spans(self) -> List[Span]:
         """Get all recorded spans."""
         with self._lock:
             return list(self._spans)
-    
+
     def clear_spans(self) -> None:
         """Clear all recorded spans."""
         with self._lock:

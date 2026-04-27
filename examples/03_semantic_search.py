@@ -7,6 +7,7 @@ Demonstrates semantic search capabilities.
 """
 
 import sys
+
 sys.path.insert(0, '..')
 
 
@@ -15,7 +16,7 @@ def main():
     print("=" * 60)
     print("ΣLANG Semantic Search Example")
     print("=" * 60)
-    
+
     # Sample corpus
     corpus = [
         "Machine learning is a subset of artificial intelligence",
@@ -34,13 +35,13 @@ def main():
         "Recurrent networks process sequential data",
         "Transformers use attention mechanisms for sequences",
     ]
-    
+
     print(f"\n1. Corpus: {len(corpus)} documents")
     print("-" * 50)
     for i, doc in enumerate(corpus[:5]):
         print(f"   {i+1}. {doc[:55]}...")
     print(f"   ... and {len(corpus)-5} more documents")
-    
+
     # Initialize search engine
     print("\n2. Initializing search engine...")
     try:
@@ -53,7 +54,7 @@ def main():
         print(f"   ⚠ SemanticSearchEngine not available: {e}")
         print("   Using fallback keyword search...")
         engine_available = False
-    
+
     # Search queries
     queries = [
         "AI systems that understand human language",
@@ -61,13 +62,13 @@ def main():
         "Image recognition with neural networks",
         "Learning without labeled data",
     ]
-    
+
     print("\n3. Semantic search results:")
     print("-" * 50)
-    
+
     for query in queries:
         print(f"\n   Query: '{query}'")
-        
+
         if engine_available:
             try:
                 results = search_engine.search(query, top_k=3)
@@ -89,25 +90,25 @@ def main():
                 doc_words = set(doc.lower().split())
                 overlap = len(query_words & doc_words)
                 scored.append((doc, overlap / len(query_words)))
-            
+
             scored.sort(key=lambda x: x[1], reverse=True)
             for i, (doc, score) in enumerate(scored[:3]):
                 print(f"      {i+1}. [{score:.3f}] {doc[:50]}...")
-    
+
     # Search modes
     print("\n4. Available search modes:")
     print("-" * 50)
-    
+
     modes = [
         ("exact", "Exact keyword matching"),
         ("semantic", "Meaning-based search (default)"),
         ("hybrid", "Combined keyword + semantic"),
         ("fuzzy", "Approximate string matching"),
     ]
-    
+
     for mode, desc in modes:
         print(f"   {mode:10} | {desc}")
-    
+
     # Advanced features
     print("\n5. Advanced search features:")
     print("-" * 50)
@@ -116,7 +117,7 @@ def main():
     print("   • Query expansion for better recall")
     print("   • Cross-lingual search (multilingual models)")
     print("   • Batch search for multiple queries")
-    
+
     print("\n" + "=" * 60)
     print("Example complete!")
     print("=" * 60)

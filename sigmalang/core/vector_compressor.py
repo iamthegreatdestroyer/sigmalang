@@ -43,14 +43,14 @@ Usage:
     results = index.search(query_vec, top_k=5)
 """
 
-import math
-import struct
 import hashlib
 import logging
+import math
+import struct
 import time
-from typing import Dict, List, Tuple, Optional, Any
-from dataclasses import dataclass, field
 from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -402,17 +402,25 @@ def deserialize_compressed(data: bytes) -> Tuple[np.ndarray, int, bytes, Dict[st
         raise ValueError("Invalid vector-compressed format")
 
     pos = 4
-    version = data[pos]; pos += 1
-    original_length = struct.unpack('>I', data[pos:pos + 4])[0]; pos += 4
-    dim = struct.unpack('>H', data[pos:pos + 2])[0]; pos += 2
-    original_hash = data[pos:pos + 16]; pos += 16
+    version = data[pos]
+    pos += 1
+    original_length = struct.unpack('>I', data[pos:pos + 4])[0]
+    pos += 4
+    dim = struct.unpack('>H', data[pos:pos + 2])[0]
+    pos += 2
+    original_hash = data[pos:pos + 16]
+    pos += 16
 
-    is_quantized = data[pos]; pos += 1
+    is_quantized = data[pos]
+    pos += 1
 
     if is_quantized:
-        bits = data[pos]; pos += 1
-        scale = struct.unpack('>f', data[pos:pos + 4])[0]; pos += 4
-        offset = struct.unpack('>f', data[pos:pos + 4])[0]; pos += 4
+        bits = data[pos]
+        pos += 1
+        scale = struct.unpack('>f', data[pos:pos + 4])[0]
+        pos += 4
+        offset = struct.unpack('>f', data[pos:pos + 4])[0]
+        pos += 4
         byte_count = dim * (1 if bits <= 8 else 2)
         qdata = data[pos:pos + byte_count]
         vector = VectorQuantizer.dequantize(qdata, dim, scale, offset, bits)

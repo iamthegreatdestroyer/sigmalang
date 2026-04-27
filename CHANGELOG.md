@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2026-03-31
 
 ### Added — Phase 7: Advanced Features (12 Tracks)
+
 - **Multi-Modal Encoding** — Image & audio semantic encoders with unified VQ codebook
 - **Federated Codebook Learning** — Distributed primitive aggregation with ε-differential privacy
 - **Neural Architecture Search** — Evolutionary search for optimal encoder/decoder architectures
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optimization Daemon** — Unified background service with anomaly detection and self-healing
 
 ### Added — Phase 4–6
+
 - **Learned Codebook Pattern Learning** — Automatic pattern observation and promotion
 - **Advanced Analogy Engine** — Semantic vector space with word analogy solving
 - **Semantic Search (LSH)** — O(1) approximate nearest neighbor search
@@ -34,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Context Extender** — 200K → 5M+ effective token context window
 
 ### Added — Infrastructure
+
 - **CI/CD Pipeline** — 5-gate CI (lint → test matrix → benchmark → build → SDK check)
 - **Release Workflow** — Auto-changelog, PyPI publish, Docker build on tag push
 - **Security Workflow** — Nightly bandit + pip-audit + safety scans
@@ -45,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **35+ Automation Scripts** — SDK gen, security, publishing, chaos testing, compliance
 
 ### Added — Testing & Quality
+
 - **1,865 tests** (1,862 passing, 3 skipped, 0 failures)
 - **95%+ code coverage** across all modules
 - **Python 3.9–3.12 matrix** testing in CI
@@ -53,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **JavaScript SDK** with TypeScript definitions
 
 ### Fixed
+
 - 50 legacy test failures resolved (Phase 2)
 - 3 WebSocket server failures fixed (parse text→SemanticTree, codec.compress())
 - Benchmarking tree blowup (max_depth 16→5, max_children 16→4)
@@ -61,12 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows UTF-8 encoding in automation scripts
 
 ### Changed
+
 - Version bumped from 1.0.0 → 2.0.0
 - Development Status classifier: Beta → **Production/Stable**
 - Coverage enforcement: 60% CI gate, 85% pyproject.toml
 - conftest.py enriched with 10+ reusable fixtures and isolation hooks
 
 ### Performance
+
 - Text compression: **15–100x** (with meta-token layer)
 - Archival compression: **100–500x** (sequence-to-vector mode)
 - KV-cache reduction: **2–8x** with <2% quality impact
@@ -79,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-01-01
 
 ### Added
+
 - Core 256 Sigma-Primitive system (Tiers 0–2)
 - Semantic parser with intent classification
 - Multi-strategy encoder (pattern, reference, delta, full)
@@ -93,5 +101,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Links
+
 - [GitHub Repository](https://github.com/iamthegreatdestroyer/sigmalang)
 - [Issue Tracker](https://github.com/iamthegreatdestroyer/sigmalang/issues)

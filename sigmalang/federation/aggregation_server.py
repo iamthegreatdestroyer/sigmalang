@@ -23,10 +23,10 @@ Usage:
     global_update = server.aggregate_round()
 """
 
-import time
 import logging
-from typing import Dict, Any, Optional, List, Tuple
+import time
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

@@ -18,11 +18,11 @@ Usage:
     print(f"Pareto score: {score.pareto_score:.4f}")
 """
 
-import time
-import math
 import logging
-from typing import Dict, List, Any, Optional, Tuple
+import math
+import time
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

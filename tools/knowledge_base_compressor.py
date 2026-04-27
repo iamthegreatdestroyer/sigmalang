@@ -23,16 +23,16 @@ Architecture:
 Expected Impact: 25x average compression on knowledge base
 """
 
+import hashlib
+import json
+import logging
 import os
 import sys
-import json
 import time
-import hashlib
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent
@@ -318,8 +318,8 @@ class KnowledgeBaseCompressor:
 
         # Initialize encoder
         try:
-            from sigmalang.core.parser import SemanticParser
             from sigmalang.core.encoder import SigmaEncoder
+            from sigmalang.core.parser import SemanticParser
 
             parser = SemanticParser()
             encoder = SigmaEncoder()
@@ -354,7 +354,7 @@ class KnowledgeBaseCompressor:
         )
 
         print(f"\n{'=' * 60}")
-        print(f"Compression Complete")
+        print("Compression Complete")
         print(f"{'=' * 60}")
         print(f"Files processed:    {self.stats['files_processed']}")
         print(f"Files skipped:      {self.stats['files_skipped']}")

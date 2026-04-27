@@ -14,11 +14,11 @@ Test Coverage:
 - Error recovery during streaming
 """
 
-import sys
 import os
+import random
+import sys
 import tempfile
 import time
-import random
 from pathlib import Path
 
 import pytest
@@ -27,17 +27,17 @@ import pytest
 sigmalang_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.streaming_encoder import (
-    StreamingEncoder,
-    ChunkedReader,
-    StreamBuffer,
+from sigmalang.core.encoder import SigmaEncoder  # noqa: E402
+from sigmalang.core.parser import SemanticParser  # noqa: E402
+from sigmalang.core.streaming_encoder import (  # noqa: E402
     BoundaryHandler,
     Chunk,
+    ChunkedReader,
+    StreamBuffer,
+    StreamingEncoder,
+    estimate_memory_usage,
     get_optimal_chunk_size,
-    estimate_memory_usage
 )
-from sigmalang.core.encoder import SigmaEncoder
-from sigmalang.core.parser import SemanticParser
 
 
 @pytest.fixture
@@ -143,7 +143,7 @@ class TestStreamingMemoryUsage:
         initial_memory = tracemalloc.get_traced_memory()[0]
 
         # Encode file in streaming mode
-        result = encoder.encode_file(str(medium_test_file), output_path)
+        encoder.encode_file(str(medium_test_file), output_path)
 
         # Check memory after encoding
         peak_memory = tracemalloc.get_traced_memory()[1]
@@ -168,7 +168,7 @@ class TestStreamingMemoryUsage:
         tracemalloc.start()
         initial_memory = tracemalloc.get_traced_memory()[0]
 
-        result = encoder.encode_file(str(large_test_file), output_path)
+        encoder.encode_file(str(large_test_file), output_path)
 
         peak_memory = tracemalloc.get_traced_memory()[1]
         tracemalloc.stop()
@@ -230,7 +230,7 @@ class TestStreamingVsNonStreaming:
         output_path = str(temp_dir / "perf_output.sigma")
 
         start_time = time.perf_counter()
-        result = encoder.encode_file(str(medium_test_file), output_path)
+        encoder.encode_file(str(medium_test_file), output_path)
         end_time = time.perf_counter()
 
         duration = end_time - start_time
@@ -348,8 +348,8 @@ class TestStreamBuffer:
     @pytest.mark.integration
     def test_stream_buffer_backpressure(self):
         """Test StreamBuffer backpressure handling."""
-        import threading
         import queue
+        import threading
 
         buffer = StreamBuffer(name="test_backpressure", max_size=2)
 

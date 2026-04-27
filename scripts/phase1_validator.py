@@ -4,12 +4,13 @@
 Simulates the Phase 1 deployment steps for Windows environment
 """
 
+import json
 import os
 import sys
-import json
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 
 class Phase1Validator:
     def __init__(self):
@@ -207,7 +208,7 @@ class Phase1Validator:
         results["load_test"] = self.run_load_test_simulation()
 
         # Generate report
-        report = self.generate_report(results)
+        self.generate_report(results)
 
         # Final status
         print()

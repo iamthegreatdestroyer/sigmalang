@@ -19,11 +19,12 @@ Configuration:
     Run time: Configurable
 """
 
-from locust import HttpUser, task, between, events
 import json
 import random
 import time
 from statistics import mean, stdev
+
+from locust import HttpUser, between, events, task
 
 # Sample test data
 SAMPLE_TEXTS = [
@@ -144,7 +145,7 @@ class SigmaLangUser(HttpUser):
             json={"texts": texts, "optimization": "low"},
             catch_response=True
         ) as response:
-            elapsed = (time.time() - start) * 1000
+            (time.time() - start) * 1000
 
             if response.status_code == 200:
                 metrics["successes"] += 1

@@ -5,16 +5,13 @@ Tests privacy mechanisms, client training, server aggregation,
 and consensus protocol.
 """
 
-import pytest
 import numpy as np
+import pytest
 
-from sigmalang.federation.privacy import (
-    DifferentialPrivacy, PrivacyConfig, SecureAggregator
-)
-from sigmalang.federation.client import FederationClient, LocalCodebook
 from sigmalang.federation.aggregation_server import AggregationServer
+from sigmalang.federation.client import FederationClient, LocalCodebook
 from sigmalang.federation.consensus import ConsensusProtocol
-
+from sigmalang.federation.privacy import DifferentialPrivacy, PrivacyConfig, SecureAggregator
 
 # =============================================================================
 # Privacy Tests

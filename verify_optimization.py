@@ -2,7 +2,7 @@
 """Quick verification that optimizations are in place."""
 
 from sigmalang.core.encoder import SigmaEncoder
-from sigmalang.core.primitives import SemanticTree, SemanticNode
+from sigmalang.core.primitives import SemanticNode, SemanticTree
 
 # Create simple test tree
 root = SemanticNode(primitive=0, value='test')

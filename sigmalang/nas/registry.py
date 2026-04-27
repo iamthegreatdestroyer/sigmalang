@@ -12,13 +12,13 @@ Usage:
 """
 
 import json
-import time
 import logging
+import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
-from sigmalang.nas.search_space import ArchitectureConfig
 from sigmalang.nas.evaluator import EvaluationResult
+from sigmalang.nas.search_space import ArchitectureConfig
 
 logger = logging.getLogger(__name__)
 

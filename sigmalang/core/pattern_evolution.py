@@ -9,13 +9,14 @@ Key Components:
 - EmergentPatternDiscoverer: KL divergence-based novelty detection
 """
 
-import numpy as np
-from typing import List, Dict, Set, Tuple, Optional, Any
-from dataclasses import dataclass, field
-from collections import Counter
 import logging
+from collections import Counter
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+import numpy as np
+from scipy.cluster.hierarchy import dendrogram, fcluster, linkage
 from scipy.spatial.distance import pdist, squareform
-from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class ClusterResult:
 class PatternClusterer:
     """
     Clusters patterns using agglomerative (hierarchical) clustering.
-    
+
     Features:
     - Configurable distance metrics
     - Automatic optimal cluster detection via silhouette scoring
@@ -338,7 +339,7 @@ class PatternClusterer:
 class PatternAbstractor:
     """
     Extracts abstract patterns using longest common subsequence (LCS).
-    
+
     Features:
     - LCS extraction for finding common patterns
     - Parameterizable subroutine identification
@@ -387,7 +388,7 @@ class PatternAbstractor:
             Longest common subsequence
         """
         m, n = len(s1), len(s2)
-        
+
         # Build DP table
         dp = [[0] * (n + 1) for _ in range(m + 1)]
 
@@ -474,7 +475,7 @@ class EmergentPattern:
 class EmergentPatternDiscoverer:
     """
     Discovers emergent patterns using novelty and utility metrics.
-    
+
     Features:
     - KL divergence-based novelty detection
     - Utility scoring based on application frequency

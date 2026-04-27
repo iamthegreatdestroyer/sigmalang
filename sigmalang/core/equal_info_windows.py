@@ -18,14 +18,14 @@ Benefits:
 - Minimal semantic loss
 """
 
-from typing import List, Tuple, Optional, Dict, Any, Callable
+import math
+from collections import deque
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-from collections import deque
-import math
-
 
 # =============================================================================
 # Information Density Estimation

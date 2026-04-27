@@ -1,148 +1,131 @@
 """ΣLANG Core Module - Primitives, Parser, Encoder, and API Services"""
 
-from .primitives import (
-    SemanticNode,
-    SemanticTree,
-    Glyph,
-    GlyphStream,
-    GlyphType,
-    PrimitiveTier,
-    ExistentialPrimitive,
-    CodePrimitive,
-    MathPrimitive,
-    LogicPrimitive,
-    EntityPrimitive,
-    ActionPrimitive,
-    CommunicationPrimitive,
-    StructurePrimitive,
-    LearnedPrimitive,
-    PRIMITIVE_REGISTRY,
-    LEARNED_PRIMITIVE_START,
-    LEARNED_PRIMITIVE_END
-)
-
-from .parser import (
-    SemanticParser,
-    SemanticTreePrinter,
-    IntentType,
-    ParsedEntity,
-    ParsedRelation
-)
-
-from .encoder import (
-    SigmaEncoder,
-    SigmaDecoder,
-    SigmaHashBank,
-    ContextStack,
-    ContextDelta,
-    LSHIndex,
-    LRUCache
-)
-
-# Phase 3: Configuration Management
-from .config import (
-    Environment,
-    ServerConfig,
-    RateLimitConfig,
-    AuthConfig,
-    CacheConfig,
-    EncoderConfig,
-    MonitoringConfig,
-    FeatureFlags,
-    SecretsManager,
-    SigmalangConfig,
-    get_config,
-    reset_config,
-    configure_from_file,
-    configure_from_env
-)
-
 # Phase 3: API Data Models
 from .api_models import (
+    AnalogyExplainRequest,
+    AnalogyExplainResponse,
+    AnalogyRequest,
+    AnalogyResponse,
+    AnalogySolution,
     # Enums
     AnalogyType,
-    SearchMode,
-    EntityType,
-    OutputFormat,
     # Base Classes
     BaseRequest,
     BaseResponse,
-    # Core Request/Response Models
-    EncodeRequest,
-    EncodeResponse,
+    # Batch Processing
+    BatchRequest,
+    BatchResponse,
+    BatchResult,
     DecodeRequest,
     DecodeResponse,
-    AnalogyRequest,
-    AnalogySolution,
-    AnalogyResponse,
-    AnalogyExplainRequest,
-    AnalogyExplainResponse,
-    SearchRequest,
-    SearchResult,
-    SearchResponse,
-    # Entity Extraction
-    EntityExtractionRequest,
-    ExtractedEntity,
-    ExtractedRelation,
-    EntityExtractionResponse,
     # Embeddings & Similarity
     EmbeddingRequest,
     EmbeddingResponse,
-    SimilarityRequest,
-    SimilarityResponse,
-    # Translation
-    TranslationRequest,
-    TranslationResponse,
-    # Health & Info
-    HealthStatus,
-    HealthResponse,
-    InfoResponse,
-    # Batch Processing
-    BatchRequest,
-    BatchResult,
-    BatchResponse,
+    # Core Request/Response Models
+    EncodeRequest,
+    EncodeResponse,
+    # Entity Extraction
+    EntityExtractionRequest,
+    EntityExtractionResponse,
+    EntityType,
     # Errors
     ErrorDetail,
     ErrorResponse,
+    ExtractedEntity,
+    ExtractedRelation,
+    HealthResponse,
+    # Health & Info
+    HealthStatus,
+    InfoResponse,
+    OutputFormat,
+    SearchMode,
+    SearchRequest,
+    SearchResponse,
+    SearchResult,
+    SimilarityRequest,
+    SimilarityResponse,
     # Streaming
     StreamChunk,
     StreamRequest,
+    # Translation
+    TranslationRequest,
+    TranslationResponse,
     # Utilities
     create_error_response,
-    validate_request
-)
-
-# Phase 3: Monitoring and Observability
-from .monitoring import (
-    MetricsRegistry,
-    HealthChecker,
-    StructuredLogger,
-    Tracer,
-    timed,
-    counted,
-    traced,
-    get_registry,
-    get_health_checker,
-    get_tracer,
-    configure_logging,
-    MetricType,
-    MetricValue,
-    Counter,
-    Gauge,
-    Histogram,
-    HealthCheckResult,
-    Span
+    validate_request,
 )
 
 # Phase 3: API Server
 from .api_server import (
-    EncoderService,
-    DecoderService,
     AnalogyService,
-    SearchService,
+    DecoderService,
+    EncoderService,
     EntityService,
     NLPService,
+    SearchService,
     SigmalangAPI,
+    create_api,
     get_api,
-    create_api
+)
+
+# Phase 3: Configuration Management
+from .config import (
+    AuthConfig,
+    CacheConfig,
+    EncoderConfig,
+    Environment,
+    FeatureFlags,
+    MonitoringConfig,
+    RateLimitConfig,
+    SecretsManager,
+    ServerConfig,
+    SigmalangConfig,
+    configure_from_env,
+    configure_from_file,
+    get_config,
+    reset_config,
+)
+from .encoder import ContextDelta, ContextStack, LRUCache, LSHIndex, SigmaDecoder, SigmaEncoder, SigmaHashBank
+
+# Phase 3: Monitoring and Observability
+from .monitoring import (
+    Counter,
+    Gauge,
+    HealthChecker,
+    HealthCheckResult,
+    Histogram,
+    MetricsRegistry,
+    MetricType,
+    MetricValue,
+    Span,
+    StructuredLogger,
+    Tracer,
+    configure_logging,
+    counted,
+    get_health_checker,
+    get_registry,
+    get_tracer,
+    timed,
+    traced,
+)
+from .parser import IntentType, ParsedEntity, ParsedRelation, SemanticParser, SemanticTreePrinter
+from .primitives import (
+    LEARNED_PRIMITIVE_END,
+    LEARNED_PRIMITIVE_START,
+    PRIMITIVE_REGISTRY,
+    ActionPrimitive,
+    CodePrimitive,
+    CommunicationPrimitive,
+    EntityPrimitive,
+    ExistentialPrimitive,
+    Glyph,
+    GlyphStream,
+    GlyphType,
+    LearnedPrimitive,
+    LogicPrimitive,
+    MathPrimitive,
+    PrimitiveTier,
+    SemanticNode,
+    SemanticTree,
+    StructurePrimitive,
 )

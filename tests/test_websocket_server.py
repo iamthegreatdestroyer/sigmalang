@@ -6,13 +6,12 @@ without needing a live server. They fall back to unit-testing the connection
 manager and helpers when FastAPI is not installed.
 """
 
+import importlib
 import json
 import sys
-import importlib
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Helpers

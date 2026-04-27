@@ -206,3 +206,14 @@ automation_state.json
 # Track shared VS Code 1.112 workspace settings
 !.vscode/
 !.vscode/settings.json
+
+# Transient test output artifacts
+ws_test_*.txt
+test_results_*.txt
+test_run_*.txt
+test_current.txt
+test_summary.txt
+test_final_report.txt
+test_fix_check*.txt
+stream_test_errors.txt
+streaming_results_*.txt

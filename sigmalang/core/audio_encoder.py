@@ -43,13 +43,13 @@ Usage:
     print(f"Compression: {result['ratio']:.0f}x")
 """
 
-import struct
 import hashlib
 import logging
 import math
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+import struct
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -142,7 +142,7 @@ def read_wav_basic(path: Path) -> Tuple[np.ndarray, int]:
 
             if chunk_id == b'fmt ':
                 fmt_data = f.read(chunk_size)
-                audio_format = struct.unpack('<H', fmt_data[0:2])[0]
+                struct.unpack('<H', fmt_data[0:2])[0]
                 channels = struct.unpack('<H', fmt_data[2:4])[0]
                 sample_rate = struct.unpack('<I', fmt_data[4:8])[0]
                 bits_per_sample = struct.unpack('<H', fmt_data[14:16])[0]

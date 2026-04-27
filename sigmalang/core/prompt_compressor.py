@@ -30,10 +30,10 @@ Usage:
     # compressed has ~50% of original tokens
 """
 
-import math
 import logging
-from typing import Dict, List, Tuple, Optional, Any
+import math
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

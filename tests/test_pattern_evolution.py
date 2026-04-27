@@ -7,18 +7,18 @@ Tests cover:
 - EmergentPatternDiscoverer: Novelty and utility-based pattern discovery
 """
 
-import pytest
+from typing import Any, Dict, List
+
 import numpy as np
-from typing import List, Dict, Any
+import pytest
 
 from sigmalang.core.pattern_evolution import (
-    PatternClusterer,
-    PatternAbstractor,
-    EmergentPatternDiscoverer,
     ClusterResult,
     EmergentPattern,
+    EmergentPatternDiscoverer,
+    PatternAbstractor,
+    PatternClusterer,
 )
-
 
 # ============================================================================
 # TEST FIXTURES
@@ -100,7 +100,7 @@ class TestPatternClusterer:
         clusterer = PatternClusterer()
         single = {"p1": sample_patterns["logic_001"]}
         results = clusterer.cluster_patterns(single)
-        
+
         assert len(results) == 1
         assert results[0].size == 1
         assert results[0].silhouette_score == 1.0
@@ -113,7 +113,7 @@ class TestPatternClusterer:
             "p2": sample_patterns["logic_002"],
         }
         results = clusterer.cluster_patterns(two)
-        
+
         assert len(results) <= 2
         assert sum(c.size for c in results) == 2
 
@@ -121,7 +121,7 @@ class TestPatternClusterer:
         """Test clustering with multiple patterns."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         assert len(results) == 3
         assert sum(c.size for c in results) == len(sample_patterns)
 
@@ -129,7 +129,7 @@ class TestPatternClusterer:
         """Test that cluster results have correct properties."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         for cluster in results:
             assert cluster.cluster_id >= 0
             assert len(cluster.patterns) > 0
@@ -140,7 +140,7 @@ class TestPatternClusterer:
         """Test that silhouette scores are valid."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=2)
-        
+
         for cluster in results:
             # Silhouette scores should be between -1 and 1
             assert -1.0 <= cluster.silhouette_score <= 1.0
@@ -148,10 +148,10 @@ class TestPatternClusterer:
     def test_cluster_consistency(self, sample_patterns):
         """Test that clustering is deterministic."""
         clusterer = PatternClusterer()
-        
+
         results1 = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
         results2 = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         # Should get same clustering
         assert len(results1) == len(results2)
         for c1, c2 in zip(results1, results2):
@@ -161,7 +161,7 @@ class TestPatternClusterer:
         """Test that cohesion scores are in valid range."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=2)
-        
+
         for cluster in results:
             assert 0.0 <= cluster.cohesion <= 1.0
 
@@ -169,7 +169,7 @@ class TestPatternClusterer:
         """Test that separation scores are in valid range."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=2)
-        
+
         for cluster in results:
             assert 0.0 <= cluster.separation <= 1.0
 
@@ -177,7 +177,7 @@ class TestPatternClusterer:
         """Test that clusters are ordered by size."""
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(sample_patterns, num_clusters=2)
-        
+
         # Results should be sorted by size descending
         for i in range(len(results) - 1):
             assert results[i].size >= results[i + 1].size
@@ -244,7 +244,7 @@ class TestPatternAbstractor:
         patterns = ["A implies B"]
         template = "A implies B"
         params = PatternAbstractor.extract_parameters(patterns, template)
-        
+
         assert len(params) == 1
         assert params[0] == {}
 
@@ -257,7 +257,7 @@ class TestPatternAbstractor:
         ]
         template = "X implies Y"
         params = PatternAbstractor.extract_parameters(patterns, template)
-        
+
         assert len(params) == 3
 
     def test_extract_common_pattern_similarity(self):
@@ -296,7 +296,7 @@ class TestEmergentPatternDiscoverer:
         p1 = "A implies B"
         p2 = "C implies D"
         patterns = [p1, p2]
-        
+
         novelty = discoverer._compute_cluster_novelty(patterns)
         assert 0.0 <= novelty <= 1.0
 
@@ -305,7 +305,7 @@ class TestEmergentPatternDiscoverer:
         discoverer = EmergentPatternDiscoverer()
         p = "A implies B"
         patterns = [p, p, p]
-        
+
         novelty = discoverer._compute_cluster_novelty(patterns)
         assert novelty < 0.5  # Identical patterns should have low novelty
 
@@ -315,7 +315,7 @@ class TestEmergentPatternDiscoverer:
         pattern_ids = ["p1", "p2"]
         frequency = {"p1": 50, "p2": 60}
         discoverer.pattern_frequency = frequency
-        
+
         utility = discoverer._compute_cluster_utility(pattern_ids, 0.3)
         assert 0.0 <= utility <= 1.0
 
@@ -323,7 +323,7 @@ class TestEmergentPatternDiscoverer:
         """Test utility calculation without frequency data."""
         discoverer = EmergentPatternDiscoverer()
         pattern_ids = ["p1", "p2"]
-        
+
         utility = discoverer._compute_cluster_utility(pattern_ids, 0.3)
         assert 0.0 <= utility <= 1.0
 
@@ -332,7 +332,7 @@ class TestEmergentPatternDiscoverer:
         discoverer = EmergentPatternDiscoverer()
         patterns = {}
         clusters = []
-        
+
         results = discoverer.discover_patterns(patterns, clusters)
         assert results == []
 
@@ -343,7 +343,7 @@ class TestEmergentPatternDiscoverer:
             ClusterResult(cluster_id=0, patterns=["logic_001"]),
             ClusterResult(cluster_id=1, patterns=["logic_002"]),
         ]
-        
+
         results = discoverer.discover_patterns(sample_patterns, clusters)
         # Single-pattern clusters typically don't produce emergent patterns
         assert isinstance(results, list)
@@ -358,13 +358,13 @@ class TestEmergentPatternDiscoverer:
                 silhouette_score=0.8
             ),
         ]
-        
+
         results = discoverer.discover_patterns(
             sample_patterns,
             clusters,
             frequency_data
         )
-        
+
         assert isinstance(results, list)
 
     def test_emergent_pattern_properties(self, sample_patterns, frequency_data):
@@ -377,13 +377,13 @@ class TestEmergentPatternDiscoverer:
                 silhouette_score=0.7
             ),
         ]
-        
+
         results = discoverer.discover_patterns(
             sample_patterns,
             clusters,
             frequency_data
         )
-        
+
         for pattern in results:
             assert isinstance(pattern, EmergentPattern)
             assert 0.0 <= pattern.novelty_score <= 1.0
@@ -393,13 +393,13 @@ class TestEmergentPatternDiscoverer:
     def test_emergence_reason_generation(self):
         """Test emergence reason generation."""
         discoverer = EmergentPatternDiscoverer()
-        
+
         reason1 = discoverer._get_emergence_reason(0.9, 0.3)
         assert "High novelty" in reason1
-        
+
         reason2 = discoverer._get_emergence_reason(0.3, 0.9)
         assert "High utility" in reason2
-        
+
         reason3 = discoverer._get_emergence_reason(0.75, 0.75)
         assert "Balanced" in reason3 or reason3 != ""
 
@@ -418,13 +418,13 @@ class TestEmergentPatternDiscoverer:
                 silhouette_score=0.8
             ),
         ]
-        
+
         results = discoverer.discover_patterns(
             sample_patterns,
             clusters,
             frequency_data
         )
-        
+
         # Should be sorted by emergence score
         if len(results) > 1:
             for i in range(len(results) - 1):
@@ -443,10 +443,10 @@ class TestPatternEvolutionIntegration:
         # Step 1: Cluster patterns
         clusterer = PatternClusterer()
         clusters = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         assert len(clusters) > 0
         assert sum(c.size for c in clusters) == len(sample_patterns)
-        
+
         # Step 2: Discover emergent patterns
         discoverer = EmergentPatternDiscoverer(novelty_threshold=0.5)
         emergent = discoverer.discover_patterns(
@@ -454,7 +454,7 @@ class TestPatternEvolutionIntegration:
             clusters,
             frequency_data
         )
-        
+
         assert isinstance(emergent, list)
         for pattern in emergent:
             assert isinstance(pattern, EmergentPattern)
@@ -468,10 +468,10 @@ class TestPatternEvolutionIntegration:
                 "type": "type" + str(i % 5),
                 "content": f"pattern content {i} with some similarity"
             }
-        
+
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(patterns, num_clusters=5)
-        
+
         assert len(results) == 5
         assert sum(c.size for c in results) == 50
 
@@ -482,7 +482,7 @@ class TestPatternEvolutionIntegration:
             sample_patterns,
             num_clusters=None  # Auto-detect
         )
-        
+
         assert len(results_auto) > 0
         assert sum(c.size for c in results_auto) == len(sample_patterns)
 
@@ -490,7 +490,7 @@ class TestPatternEvolutionIntegration:
         """Test pattern abstraction from cluster results."""
         clusterer = PatternClusterer()
         clusters = clusterer.cluster_patterns(sample_patterns, num_clusters=2)
-        
+
         # Extract patterns from largest cluster
         if clusters:
             largest = clusters[0]
@@ -498,29 +498,29 @@ class TestPatternEvolutionIntegration:
                 str(sample_patterns[pid])
                 for pid in largest.patterns
             ]
-            
+
             abstract = PatternAbstractor.extract_common_pattern(cluster_patterns)
             assert isinstance(abstract, str)
 
     def test_evolution_pipeline_performance(self, sample_patterns, frequency_data):
         """Test performance of complete evolution pipeline."""
         import time
-        
+
         start = time.time()
-        
+
         # Full pipeline
         clusterer = PatternClusterer()
         clusters = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         discoverer = EmergentPatternDiscoverer(novelty_threshold=0.5)
-        emergent = discoverer.discover_patterns(
+        discoverer.discover_patterns(
             sample_patterns,
             clusters,
             frequency_data
         )
-        
+
         elapsed = time.time() - start
-        
+
         # Should complete in reasonable time (< 5 seconds for 8 patterns)
         assert elapsed < 5.0
 
@@ -528,12 +528,12 @@ class TestPatternEvolutionIntegration:
         """Test that pattern evolution doesn't lose original patterns."""
         clusterer = PatternClusterer()
         clusters = clusterer.cluster_patterns(sample_patterns, num_clusters=3)
-        
+
         # Verify all original patterns are in clusters
         clustered_pids = set()
         for cluster in clusters:
             clustered_pids.update(cluster.patterns)
-        
+
         assert clustered_pids == set(sample_patterns.keys())
 
 
@@ -559,7 +559,7 @@ class TestPatternEvolutionEdgeCases:
         }
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(patterns, num_clusters=1)
-        
+
         assert len(results) == 1
         assert results[0].size == 3
 
@@ -572,7 +572,7 @@ class TestPatternEvolutionEdgeCases:
         }
         clusterer = PatternClusterer()
         results = clusterer.cluster_patterns(patterns, num_clusters=3)
-        
+
         assert len(results) <= 3
 
     def test_lcs_very_long_strings(self):
@@ -580,7 +580,7 @@ class TestPatternEvolutionEdgeCases:
         s1 = "A" * 100 + "B" * 50
         s2 = "A" * 100 + "C" * 50
         result = PatternAbstractor.lcs(s1, s2)
-        
+
         # Should find common "A"s
         assert "A" in result or len(result) > 0
 

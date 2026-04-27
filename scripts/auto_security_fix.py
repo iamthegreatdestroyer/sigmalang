@@ -4,12 +4,12 @@
 AI-powered security remediation with zero human intervention
 """
 
-import os
-import sys
 import io
 import json
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 # Fix Windows console Unicode encoding
@@ -20,9 +20,10 @@ if sys.platform == 'win32':
         os.system('chcp 65001 > nul 2>&1')
     except Exception:
         pass
-from datetime import datetime
-from typing import Dict, List, Any, Tuple
 import shutil
+from datetime import datetime
+from typing import Any, Dict, List, Tuple
+
 
 class AutonomousSecurityFixer:
     def __init__(self):
@@ -110,7 +111,7 @@ class AutonomousSecurityFixer:
     def fix_owasp_issues(self, owasp_report: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         OWASP issue analysis and reporting.
-        
+
         SAFETY NOTE: This method now REPORTS issues but does NOT auto-modify files.
         Auto-modification was causing file corruption by breaking Python syntax.
         All fixes require manual review to ensure code correctness.
@@ -130,7 +131,7 @@ class AutonomousSecurityFixer:
 
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
+                    f.read()
 
                 pattern = issue["pattern"]
                 recommendation = ""
@@ -172,7 +173,7 @@ class AutonomousSecurityFixer:
 
         self.print_success(f"Found {len(issues_found)} OWASP issues - report saved to {report_path}")
         self.print_status("NOTE: Files NOT modified. Manual fixes required for safety.")
-        
+
         return issues_found
 
     def install_security_tools(self) -> bool:
@@ -186,7 +187,7 @@ class AutonomousSecurityFixer:
             result = subprocess.run([sys.executable, "-c", "import bandit"], capture_output=True, timeout=10)
             if result.returncode != 0:
                 tools_to_install.append("bandit")
-        except:
+        except Exception:
             tools_to_install.append("bandit")
 
         # Check safety
@@ -194,7 +195,7 @@ class AutonomousSecurityFixer:
             result = subprocess.run([sys.executable, "-c", "import safety"], capture_output=True, timeout=10)
             if result.returncode != 0:
                 tools_to_install.append("safety")
-        except:
+        except Exception:
             tools_to_install.append("safety")
 
         if tools_to_install:
@@ -231,7 +232,7 @@ class AutonomousSecurityFixer:
                 timeout=60
             )
             validation_results["bandit_passed"] = result.returncode == 0
-        except:
+        except Exception:
             pass
 
         # Run safety if available
@@ -244,7 +245,7 @@ class AutonomousSecurityFixer:
                 timeout=30
             )
             validation_results["safety_passed"] = result.returncode == 0
-        except:
+        except Exception:
             pass
 
         # Check for remaining secrets
@@ -271,7 +272,7 @@ class AutonomousSecurityFixer:
                     # Skip if it's clearly a placeholder
                     if not any(skip in content for skip in ["your-", "example", "test", "dummy", "placeholder"]):
                         secrets_found.append({"file": str(py_file.relative_to(self.project_root))})
-            except:
+            except Exception:
                 pass
 
         return secrets_found
@@ -294,7 +295,7 @@ class AutonomousSecurityFixer:
                             "file": str(py_file.relative_to(self.project_root)),
                             "pattern": pattern
                         })
-            except:
+            except Exception:
                 pass
 
         return issues_found

@@ -4,14 +4,15 @@
 Automated API docs and runbook generation
 """
 
+import importlib.util
+import inspect
+import json
 import os
 import sys
-import json
-import inspect
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional
-import importlib.util
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 
 class DocumentationGenerator:
     def __init__(self):
@@ -524,16 +525,16 @@ class DocumentationGenerator:
         endpoints = self.extract_api_endpoints()
 
         # Step 2: Generate OpenAPI spec
-        openapi_spec = self.generate_openapi_spec(endpoints)
+        self.generate_openapi_spec(endpoints)
 
         # Step 3: Extract code documentation
         code_docs = self.extract_code_documentation()
 
         # Step 4: Generate deployment guide
-        deployment_guide = self.generate_deployment_guide()
+        self.generate_deployment_guide()
 
         # Step 5: Generate operations runbook
-        runbook = self.generate_runbook()
+        self.generate_runbook()
 
         # Generate summary
         summary = {

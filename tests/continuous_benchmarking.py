@@ -12,14 +12,14 @@ Features:
 - JSON results export for CI/CD integration
 """
 
-import time
 import json
 import statistics
-from pathlib import Path
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone
 import sys
+import time
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent
@@ -86,6 +86,7 @@ class BenchmarkExecutor:
     def _setup_system_info(self) -> None:
         """Collect system information."""
         import platform
+
         import psutil
 
         self.suite.system_info = {
@@ -111,9 +112,10 @@ class BenchmarkExecutor:
 
     def benchmark_encode_throughput(self, num_samples: int = 100) -> BenchmarkResult:
         """Benchmark encoding throughput."""
-        from sigmalang.core.parser import SemanticParser
-        from sigmalang.core.encoder import SigmaEncoder
         import psutil
+
+        from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
 
         parser = SemanticParser()
         encoder = SigmaEncoder()
@@ -153,9 +155,10 @@ class BenchmarkExecutor:
 
     def benchmark_compression_ratio(self, num_samples: int = 50) -> BenchmarkResult:
         """Benchmark compression ratio."""
-        from sigmalang.core.parser import SemanticParser
-        from sigmalang.core.encoder import SigmaEncoder
         import psutil
+
+        from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
 
         parser = SemanticParser()
         encoder = SigmaEncoder()
@@ -202,8 +205,9 @@ class BenchmarkExecutor:
 
     def benchmark_search_latency(self, num_queries: int = 50) -> BenchmarkResult:
         """Benchmark semantic search latency."""
-        from sigmalang.core.api_server import create_api
         import psutil
+
+        from sigmalang.core.api_server import create_api
 
         api = create_api()
         api.initialize()

@@ -4,13 +4,14 @@
 Self-documenting progress tracking and reporting
 """
 
-import os
-import sys
 import json
+import os
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
+
 
 class StatusUpdater:
     def __init__(self):
@@ -56,7 +57,7 @@ class StatusUpdater:
                 try:
                     with open(py_file, 'r', encoding='utf-8') as f:
                         total_lines += len(f.readlines())
-                except:
+                except Exception:
                     pass
 
             return {
@@ -181,7 +182,7 @@ class StatusUpdater:
         try:
             mtime = file_path.stat().st_mtime
             return (datetime.now().timestamp() - mtime) < (hours * 3600)
-        except:
+        except Exception:
             return False
 
     def generate_status_report(self, metrics: Dict[str, Any]) -> Dict[str, Any]:

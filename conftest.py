@@ -12,14 +12,13 @@ Provides:
 """
 
 import os
-import sys
-import time
-import tempfile
 import shutil
+import sys
+import tempfile
+import time
 import warnings
 
 import pytest
-
 
 # =============================================================================
 # Doctest Collection Filtering

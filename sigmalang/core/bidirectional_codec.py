@@ -18,15 +18,13 @@ Copyright 2025 - Ryot LLM Project
 
 import hashlib
 import json
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, asdict
-from enum import Enum, auto
 import logging
+from dataclasses import asdict, dataclass
+from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Tuple
 
-from sigmalang.core.primitives import (
-    SemanticNode, SemanticTree, Glyph, GlyphStream, GlyphType
-)
-from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder
+from sigmalang.core.primitives import Glyph, GlyphStream, GlyphType, SemanticNode, SemanticTree
 
 logger = logging.getLogger(__name__)
 
@@ -43,19 +41,19 @@ class CompressionMode(Enum):
 @dataclass
 class TreeSnapshot:
     """Snapshot of semantic tree for round-trip verification."""
-    
+
     root_primitive: int
     root_value: str
     node_count: int
     depth: int
     primitives_used: List[int]
     tree_hash: str
-    
+
     @classmethod
     def from_tree(cls, tree: SemanticTree) -> 'TreeSnapshot':
         """Create snapshot from semantic tree."""
         primitives = sorted(tree.primitives_used)
-        
+
         # Create deterministic hash
         hash_input = json.dumps({
             'primitive': tree.root.primitive,
@@ -64,9 +62,9 @@ class TreeSnapshot:
             'depth': tree.depth,
             'primitives': primitives,
         }, sort_keys=True, default=str)
-        
+
         tree_hash = hashlib.sha256(hash_input.encode()).hexdigest()
-        
+
         return cls(
             root_primitive=tree.root.primitive,
             root_value=tree.root.value,
@@ -80,7 +78,7 @@ class TreeSnapshot:
 @dataclass
 class EncodingResult:
     """Result of bidirectional encoding with verification."""
-    
+
     original_data: bytes
     compressed_data: bytes
     mode: CompressionMode
@@ -89,11 +87,11 @@ class EncodingResult:
     round_trip_successful: bool = False
     compression_ratio: float = 1.0
     diagnostics: Dict[str, Any] = None
-    
+
     def __post_init__(self):
         if self.diagnostics is None:
             self.diagnostics = {}
-        
+
         # Calculate compression ratio
         if len(self.original_data) > 0:
             self.compression_ratio = len(self.compressed_data) / len(self.original_data)
@@ -101,7 +99,7 @@ class EncodingResult:
 
 class TreeDiff:
     """Identifies differences between two semantic trees."""
-    
+
     @staticmethod
     def diff_trees(
         original: SemanticTree,
@@ -112,16 +110,16 @@ class TreeDiff:
         Returns list of differences found.
         """
         differences = []
-        
+
         TreeDiff._diff_nodes(
             original.root,
             reconstructed.root,
             path="root",
             differences=differences
         )
-        
+
         return differences
-    
+
     @staticmethod
     def _diff_nodes(
         node1: SemanticNode,
@@ -135,13 +133,13 @@ class TreeDiff:
                 f"At {path}: primitive mismatch "
                 f"({node1.primitive} vs {node2.primitive})"
             )
-        
+
         if node1.value != node2.value:
             differences.append(
                 f"At {path}: value mismatch "
                 f"({repr(node1.value)} vs {repr(node2.value)})"
             )
-        
+
         if len(node1.children) != len(node2.children):
             differences.append(
                 f"At {path}: child count mismatch "
@@ -155,7 +153,7 @@ class TreeDiff:
 class BidirectionalSemanticCodec:
     """
     Bidirectional codec with guaranteed round-trip fidelity.
-    
+
     Encodes semantic trees with verification:
     1. Take snapshot of original tree
     2. Encode using best strategy
@@ -164,18 +162,18 @@ class BidirectionalSemanticCodec:
     5. If mismatch, fallback to lossless
     6. Return verification results
     """
-    
+
     def __init__(self, verify_round_trip: bool = True):
         """
         Initialize codec.
-        
+
         Args:
             verify_round_trip: If True, verify all encodes round-trip correctly
         """
         self.encoder = SigmaEncoder()
         self.decoder = SigmaDecoder(self.encoder)
         self.verify_round_trip = verify_round_trip
-        
+
         # Statistics tracking
         self.stats = {
             'total_encodes': 0,
@@ -187,7 +185,7 @@ class BidirectionalSemanticCodec:
             'lossless_mode_uses': 0,
             'average_compression_ratio': 0.0,
         }
-    
+
     def encode_with_verification(
         self,
         tree: SemanticTree,
@@ -195,45 +193,45 @@ class BidirectionalSemanticCodec:
     ) -> EncodingResult:
         """
         Encode semantic tree with round-trip verification.
-        
+
         Process:
         1. Create snapshot of original tree
         2. Try encoding with best strategy (pattern)
         3. Decode and verify round-trip
         4. If verification fails, fallback to lossless
         5. Return result with diagnostics
-        
+
         Args:
             tree: Semantic tree to encode
             fallback_to_lossless: If True, fallback when verification fails
-            
+
         Returns:
             EncodingResult with verification status and diagnostics
         """
         self.stats['total_encodes'] += 1
-        
+
         # Step 1: Snapshot original
         original_snapshot = TreeSnapshot.from_tree(tree)
         logger.info(f"Encoding tree: depth={tree.depth}, nodes={tree.node_count}")
-        
+
         # Step 2: Try best strategy first
         encoded, mode = self._encode_optimized(tree)
-        
+
         # Step 3: Decode for verification
         decoded_tree = None
         decoded_snapshot = None
         differences = []
-        
+
         if self.verify_round_trip:
             try:
                 decoded_tree = self.decoder.decode(encoded)
                 decoded_snapshot = TreeSnapshot.from_tree(decoded_tree)
-                
+
                 # Step 4: Compare snapshots
                 if original_snapshot.tree_hash == decoded_snapshot.tree_hash:
                     logger.info(f"Round-trip successful with {mode.name}")
                     self.stats['successful_roundtrips'] += 1
-                    
+
                     result = EncodingResult(
                         original_data=tree.source_text.encode('utf-8'),
                         compressed_data=encoded,
@@ -253,16 +251,16 @@ class BidirectionalSemanticCodec:
                     # Hashes don't match - fallback needed
                     differences = TreeDiff.diff_trees(tree, decoded_tree)
                     logger.warning(f"Round-trip failed with {mode.name}. Differences: {differences}")
-                    
+
                     if fallback_to_lossless:
                         logger.info("Falling back to lossless encoding")
                         encoded = self._encode_lossless(tree)
                         self.stats['fallbacks_to_lossless'] += 1
-                        
+
                         # Verify lossless round-trip
                         decoded_tree = self.decoder.decode(encoded)
                         decoded_snapshot = TreeSnapshot.from_tree(decoded_tree)
-                        
+
                         result = EncodingResult(
                             original_data=tree.source_text.encode('utf-8'),
                             compressed_data=encoded,
@@ -297,16 +295,16 @@ class BidirectionalSemanticCodec:
                                 'decoded_hash': decoded_snapshot.tree_hash,
                             }
                         )
-                        logger.error(f"Round-trip failed and fallback disabled")
-            
+                        logger.error("Round-trip failed and fallback disabled")
+
             except Exception as e:
                 logger.exception(f"Exception during decoding: {e}")
-                
+
                 if fallback_to_lossless:
                     logger.info("Falling back to lossless due to decode exception")
                     encoded = self._encode_lossless(tree)
                     self.stats['fallbacks_to_lossless'] += 1
-                    
+
                     result = EncodingResult(
                         original_data=tree.source_text.encode('utf-8'),
                         compressed_data=encoded,
@@ -336,16 +334,16 @@ class BidirectionalSemanticCodec:
                     'verification': 'skipped',
                 }
             )
-        
+
         # Update statistics
         self._update_statistics(result)
-        
+
         return result
-    
+
     def _encode_optimized(self, tree: SemanticTree) -> Tuple[bytes, CompressionMode]:
         """
         Encode tree using best available strategy.
-        
+
         Tries strategies in order:
         1. Pattern matching (best compression)
         2. Reference (good compression)
@@ -360,17 +358,17 @@ class BidirectionalSemanticCodec:
         except Exception as e:
             logger.debug(f"Pattern encoding failed: {e}, trying lossless")
             return self._encode_lossless(tree), CompressionMode.LOSSLESS
-    
+
     def _encode_lossless(self, tree: SemanticTree) -> bytes:
         """
         Encode tree in lossless mode - guaranteed perfect reconstruction.
-        
+
         Serializes complete tree structure without lossy compression.
         """
         # For now, use existing encoder as "lossless"
         # In future, could implement actual lossless serialization
         return self.encoder.encode(tree)
-    
+
     def _update_statistics(self, result: EncodingResult):
         """Update codec statistics."""
         if result.mode == CompressionMode.PATTERN:
@@ -381,13 +379,13 @@ class BidirectionalSemanticCodec:
             self.stats['delta_mode_uses'] += 1
         elif result.mode == CompressionMode.LOSSLESS:
             self.stats['lossless_mode_uses'] += 1
-        
+
         # Update average compression ratio
         total_encodes = self.stats['total_encodes']
         current_avg = self.stats['average_compression_ratio']
         new_avg = (current_avg * (total_encodes - 1) + result.compression_ratio) / total_encodes
         self.stats['average_compression_ratio'] = new_avg
-    
+
     def get_statistics(self) -> Dict[str, Any]:
         """Get codec usage statistics."""
         return {
@@ -412,11 +410,11 @@ class AdaptiveCompressor:
     Intelligently selects compression strategy based on input characteristics.
     Falls back to raw encoding if compression is counterproductive.
     """
-    
+
     def __init__(self):
         self.codec = BidirectionalSemanticCodec()
         self.strategy_stats = {}
-    
+
     def compress(
         self,
         tree: SemanticTree,
@@ -424,21 +422,21 @@ class AdaptiveCompressor:
     ) -> EncodingResult:
         """
         Adaptively compress semantic tree.
-        
+
         Args:
             tree: Semantic tree to compress
             context: Optional context for strategy selection
-            
+
         Returns:
             EncodingResult with chosen strategy and compression metrics
         """
         # Encode with verification
         result = self.codec.encode_with_verification(tree, fallback_to_lossless=True)
-        
+
         # Check if compression is worthwhile
         original_size = len(result.original_data)
-        compressed_size = len(result.compressed_data)
-        
+        len(result.compressed_data)
+
         # If compression ratio > 0.95 (less than 5% compression), consider raw
         if result.compression_ratio > 0.95 and original_size < 1000:
             # For small inputs with poor compression, just use raw
@@ -446,5 +444,5 @@ class AdaptiveCompressor:
             result.mode = CompressionMode.RAW
             result.compressed_data = result.original_data
             result.compression_ratio = 1.0
-        
+
         return result

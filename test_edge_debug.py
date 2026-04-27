@@ -2,9 +2,10 @@
 """Debug script to identify edge case failures at Glyph level."""
 
 import sys
+
 sys.path.insert(0, '.')
 
-from core.primitives import Glyph, GlyphType, ExistentialPrimitive, GlyphStream
+from core.primitives import ExistentialPrimitive, Glyph, GlyphStream, GlyphType
 
 print('=== Glyph Encoding/Decoding Test ===')
 

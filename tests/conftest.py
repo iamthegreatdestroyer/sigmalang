@@ -14,27 +14,34 @@ This module sets up:
 Copyright 2025 - Ryot LLM Project
 """
 
-import sys
-from pathlib import Path
-import pytest
-import numpy as np
-from typing import List, Tuple, Dict, Any
-from dataclasses import dataclass
 import json
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pytest
 
 # Add project root to path for imports
 sigmalang_root = Path(__file__).parent.parent
 sys.path.insert(0, str(sigmalang_root))
 
-from sigmalang.core.primitives import (
-    SemanticNode, SemanticTree, Glyph, GlyphStream, GlyphType,
-    ExistentialPrimitive, CodePrimitive, ActionPrimitive,
-    EntityPrimitive, PRIMITIVE_REGISTRY
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder  # noqa: E402
+from sigmalang.core.parser import SemanticParser  # noqa: E402
+from sigmalang.core.primitives import (  # noqa: E402
+    PRIMITIVE_REGISTRY,
+    ActionPrimitive,
+    CodePrimitive,
+    EntityPrimitive,
+    ExistentialPrimitive,
+    Glyph,
+    GlyphStream,
+    GlyphType,
+    SemanticNode,
+    SemanticTree,
 )
-from sigmalang.core.parser import SemanticParser
-from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
-from sigmalang.training.codebook import LearnedCodebook, CodebookTrainer
-
+from sigmalang.training.codebook import CodebookTrainer, LearnedCodebook  # noqa: E402
 
 # ============================================================================
 # SEMANTIC TREE GENERATORS
@@ -42,7 +49,7 @@ from sigmalang.training.codebook import LearnedCodebook, CodebookTrainer
 
 class SemanticTreeBuilder:
     """Helper for building test semantic trees."""
-    
+
     @staticmethod
     def simple_tree() -> SemanticTree:
         """Create a simple 2-level semantic tree."""
@@ -61,7 +68,7 @@ class SemanticTreeBuilder:
             ]
         )
         return SemanticTree(root=root, source_text="Create a function that sorts a list")
-    
+
     @staticmethod
     def complex_tree() -> SemanticTree:
         """Create a deeper, more complex semantic tree."""
@@ -110,7 +117,7 @@ class SemanticTreeBuilder:
             ]
         )
         return SemanticTree(root=root, source_text="Implement a DataProcessor class with error handling")
-    
+
     @staticmethod
     def random_tree(
         depth: int = 4,
@@ -120,19 +127,19 @@ class SemanticTreeBuilder:
         """Generate random semantic tree for stress testing."""
         np.random.seed(seed)
         primitives = list(ExistentialPrimitive) + list(CodePrimitive)
-        
+
         def build_random_node(current_depth: int) -> SemanticNode:
             primitive = primitives[np.random.randint(0, len(primitives))]
             value = f"value_{np.random.randint(0, 10000)}"
-            
+
             children = []
             if current_depth < depth:
                 num_children = max(0, int(np.random.exponential(avg_branching - 1)))
                 for _ in range(num_children):
                     children.append(build_random_node(current_depth + 1))
-            
+
             return SemanticNode(primitive=primitive, value=value, children=children)
-        
+
         root = build_random_node(0)
         return SemanticTree(root=root, source_text="random_input")
 
@@ -199,7 +206,7 @@ class CompressionTestCase:
 
 class TestDatasets:
     """Collections of test data for various scenarios."""
-    
+
     CODE_SNIPPETS = [
         "Create a Python function that sorts a list in descending order",
         "Write a JavaScript async function to fetch data from an API",
@@ -212,7 +219,7 @@ class TestDatasets:
         "Write a function to merge two sorted arrays efficiently",
         "Implement a trie data structure for prefix matching",
     ]
-    
+
     QUERIES = [
         "What is the time complexity of quicksort?",
         "How do I handle exceptions in Python?",
@@ -225,7 +232,7 @@ class TestDatasets:
         "What is the difference between a list and a tuple?",
         "How do I optimize database queries?",
     ]
-    
+
     EXPLANATIONS = [
         "Explain how this algorithm works step by step",
         "Walk me through this code and explain each function",
@@ -238,7 +245,7 @@ class TestDatasets:
         "Describe the event loop in JavaScript",
         "Explain how DNS resolution works",
     ]
-    
+
     MODIFICATIONS = [
         "Refactor this code to use async/await",
         "Optimize this algorithm for better performance",
@@ -251,7 +258,7 @@ class TestDatasets:
         "Update this code to handle edge cases",
         "Refactor this to use design patterns",
     ]
-    
+
     @classmethod
     def all_inputs(cls) -> List[str]:
         """Return all test inputs."""
@@ -261,7 +268,7 @@ class TestDatasets:
             cls.EXPLANATIONS +
             cls.MODIFICATIONS
         )
-    
+
     @classmethod
     def get_test_cases(cls) -> List[CompressionTestCase]:
         """Generate test cases with expected compression ranges."""
@@ -306,12 +313,12 @@ class TestDatasets:
 
 class TreeComparator:
     """Utilities for comparing semantic trees."""
-    
+
     @staticmethod
     def trees_equal(tree1: SemanticTree, tree2: SemanticTree) -> bool:
         """Check if two semantic trees are structurally equivalent."""
         return TreeComparator._nodes_equal(tree1.root, tree2.root)
-    
+
     @staticmethod
     def _nodes_equal(node1: SemanticNode, node2: SemanticNode) -> bool:
         """Recursively compare semantic nodes."""
@@ -321,12 +328,12 @@ class TreeComparator:
             return False
         if len(node1.children) != len(node2.children):
             return False
-        
+
         return all(
             TreeComparator._nodes_equal(c1, c2)
             for c1, c2 in zip(node1.children, node2.children)
         )
-    
+
     @staticmethod
     def get_differences(
         tree1: SemanticTree,
@@ -334,7 +341,7 @@ class TreeComparator:
     ) -> List[str]:
         """Get list of differences between trees."""
         differences = []
-        
+
         def compare_nodes(n1: SemanticNode, n2: SemanticNode, path: str = "root"):
             if n1.primitive != n2.primitive:
                 differences.append(
@@ -345,7 +352,7 @@ class TreeComparator:
                 differences.append(
                     f"At {path}: value mismatch ({n1.value} vs {n2.value})"
                 )
-            
+
             if len(n1.children) != len(n2.children):
                 differences.append(
                     f"At {path}: child count mismatch "
@@ -354,21 +361,21 @@ class TreeComparator:
             else:
                 for i, (c1, c2) in enumerate(zip(n1.children, n2.children)):
                     compare_nodes(c1, c2, f"{path}.child[{i}]")
-        
+
         compare_nodes(tree1.root, tree2.root)
         return differences
 
 
 class CompressionAnalyzer:
     """Analyze compression results."""
-    
+
     @staticmethod
     def compute_ratio(original_size: int, compressed_size: int) -> float:
         """Compute compression ratio (0.0 = best, 1.0+ = no/negative compression)."""
         if original_size == 0:
             return 0.0
         return compressed_size / original_size
-    
+
     @staticmethod
     def analyze_result(
         original_text: str,
@@ -379,7 +386,7 @@ class CompressionAnalyzer:
         original_size = len(original_text.encode('utf-8'))
         compressed_size = len(encoded_bytes)
         ratio = CompressionAnalyzer.compute_ratio(original_size, compressed_size)
-        
+
         result = {
             'original_size_bytes': original_size,
             'compressed_size_bytes': compressed_size,
@@ -388,12 +395,12 @@ class CompressionAnalyzer:
             'bytes_saved': original_size - compressed_size,
             'percent_reduction': (1 - ratio) * 100,
         }
-        
+
         if decoded_text is not None:
             decoded_size = len(decoded_text.encode('utf-8'))
             result['decoded_size_bytes'] = decoded_size
             result['round_trip_successful'] = decoded_text == original_text
-        
+
         return result
 
 

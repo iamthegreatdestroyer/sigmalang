@@ -1,13 +1,14 @@
 """ΣLANG Roundtrip Validation for Claude Code Execution."""
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath('S:/sigmalang'))
 
 try:
-    from sigmalang.core.encoder import SigmaEncoder
     from sigmalang.core.decoder import SigmaDecoder
     from sigmalang.core.metrics import semantic_similarity
+
+    from sigmalang.core.encoder import SigmaEncoder
     IMPORTS_OK = True
 except ImportError as e:
     IMPORTS_OK = False

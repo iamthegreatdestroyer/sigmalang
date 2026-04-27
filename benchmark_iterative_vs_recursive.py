@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 """Phase 4A.2 Task 3-4: Iterative vs Recursive Traversal Benchmark"""
 
-import time
 import statistics
-from sigmalang.core.primitives import SemanticNode, SemanticTree, ExistentialPrimitive, CodePrimitive
-from sigmalang.core.encoder import SigmaEncoder, SigmaDecoder
+import time
+
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder
+from sigmalang.core.primitives import CodePrimitive, ExistentialPrimitive, SemanticNode, SemanticTree
+
 
 def create_deep_tree(depth: int) -> SemanticTree:
     """Create a deep tree for testing traversal performance."""
@@ -28,20 +30,20 @@ def create_wide_tree(width: int) -> SemanticTree:
 def benchmark_traversal(trees, enable_optimizations=True, iterations=5):
     """Benchmark iterative vs recursive traversal."""
     results = {}
-    
+
     for name, tree in trees:
         times = []
-        
+
         for _ in range(iterations):
             # Create encoder with specified optimization setting
             encoder = SigmaEncoder(enable_optimizations=enable_optimizations)
-            
+
             # Encode (which triggers traversal)
             start = time.perf_counter()
-            encoded = encoder.encode(tree, tree.source_text)
+            encoder.encode(tree, tree.source_text)
             elapsed = (time.perf_counter() - start) * 1_000_000
             times.append(elapsed)
-        
+
         results[name] = {
             'mean': statistics.mean(times),
             'median': statistics.median(times),
@@ -49,7 +51,7 @@ def benchmark_traversal(trees, enable_optimizations=True, iterations=5):
             'max': max(times),
             'stdev': statistics.stdev(times) if len(times) > 1 else 0,
         }
-    
+
     return results
 
 def main():
@@ -57,7 +59,7 @@ def main():
     print('=' * 80)
     print('PHASE 4A.2 TASK 3-4: ITERATIVE VS RECURSIVE TRAVERSAL BENCHMARK')
     print('=' * 80)
-    
+
     # Create test trees with various shapes
     trees = [
         ('shallow', create_deep_tree(2)),
@@ -66,27 +68,27 @@ def main():
         ('wide_10', create_wide_tree(10)),
         ('wide_50', create_wide_tree(50)),
     ]
-    
+
     print('\nTest suite:')
     for name, tree in trees:
         depth = _get_tree_depth(tree.root)
         width = len(tree.root.children) if hasattr(tree.root, 'children') else 0
         print(f'  - {name}: depth={depth}, width={width}')
-    
+
     # Benchmark with optimizations disabled (recursive)
     print('\n' + '=' * 80)
     print('BASELINE: Recursive Traversal (optimizations disabled)')
     print('=' * 80)
     recursive = benchmark_traversal(trees, enable_optimizations=False, iterations=3)
     print_results(recursive)
-    
+
     # Benchmark with optimizations enabled (iterative)
     print('\n' + '=' * 80)
     print('OPTIMIZED: Iterative Traversal (optimizations enabled)')
     print('=' * 80)
     iterative = benchmark_traversal(trees, enable_optimizations=True, iterations=3)
     print_results(iterative)
-    
+
     # Print comparison
     print('\n' + '=' * 80)
     print('IMPROVEMENTS')

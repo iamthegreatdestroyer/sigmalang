@@ -30,10 +30,10 @@ Usage:
     distances = pq.asymmetric_distance(query_vector, codes)
 """
 
-import math
 import logging
-from typing import Dict, List, Tuple, Optional, Any
+import math
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

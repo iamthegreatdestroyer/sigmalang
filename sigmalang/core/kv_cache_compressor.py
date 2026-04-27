@@ -43,12 +43,12 @@ Usage:
     windows = compressor.select_windows(keys, values, query)
 """
 
-import math
 import logging
+import math
 import time
-from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

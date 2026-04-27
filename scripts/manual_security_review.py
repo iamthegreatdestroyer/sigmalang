@@ -33,7 +33,7 @@ for file_path in crypto_files:
 
     # Check weak key sizes
     if 'RSA' in content and '1024' in content:
-        issues.append(f"[FAIL] Weak RSA key: 1024 bits")
+        issues.append("[FAIL] Weak RSA key: 1024 bits")
 
     if issues:
         for issue in issues:

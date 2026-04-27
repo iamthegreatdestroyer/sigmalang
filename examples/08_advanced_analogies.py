@@ -10,8 +10,8 @@ Analogies are fundamental to reasoning and transfer learning.
 sigmalang's semantic representations enable powerful analogy operations.
 """
 
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
 
 # Import sigmalang components
 try:
@@ -36,14 +36,14 @@ class AnalogyResult:
 class AdvancedAnalogyEngine:
     """
     Advanced analogy engine with extended capabilities.
-    
+
     Features:
     - Multiple analogy types
     - Chain reasoning
     - Custom relation definitions
     - Explanation generation
     """
-    
+
     # Predefined analogy patterns
     ANALOGY_PATTERNS = {
         "gender": {
@@ -91,32 +91,32 @@ class AdvancedAnalogyEngine:
             "word": "sentence", "star": "galaxy", "cell": "body"
         }
     }
-    
+
     def __init__(self):
         """Initialize the advanced analogy engine."""
         if ANALOGY_AVAILABLE:
             self.base_engine = SemanticAnalogyEngine()
         else:
             self.base_engine = None
-        
+
         # Build reverse mappings for analogy solving
         self._build_reverse_mappings()
-    
+
     def _build_reverse_mappings(self):
         """Build reverse mappings for bidirectional analogies."""
         self.reverse_patterns = {}
         for category, pairs in self.ANALOGY_PATTERNS.items():
             self.reverse_patterns[category] = {v: k for k, v in pairs.items()}
-    
+
     def solve(self, a: str, b: str, c: str) -> AnalogyResult:
         """
         Solve analogy: A is to B as C is to ?
-        
+
         Args:
             a: First term
             b: Second term (related to a)
             c: Third term (analogous to a)
-            
+
         Returns:
             AnalogyResult with answer and metadata
         """
@@ -133,14 +133,14 @@ class AdvancedAnalogyEngine:
                 )
             except Exception:
                 pass
-        
+
         # Fall back to pattern matching
         return self._pattern_based_solve(a, b, c)
-    
+
     def _pattern_based_solve(self, a: str, b: str, c: str) -> AnalogyResult:
         """Solve using predefined patterns."""
         a_lower, b_lower, c_lower = a.lower(), b.lower(), c.lower()
-        
+
         # Check each pattern category
         for category, patterns in self.ANALOGY_PATTERNS.items():
             # Check forward mapping
@@ -154,7 +154,7 @@ class AdvancedAnalogyEngine:
                         reasoning=f"Matched {category} pattern: {a}→{b} similar to {c}→{answer}",
                         alternatives=[]
                     )
-            
+
             # Check reverse mapping
             reverse = self.reverse_patterns.get(category, {})
             if a_lower in reverse and reverse[a_lower].lower() == b_lower:
@@ -167,7 +167,7 @@ class AdvancedAnalogyEngine:
                         reasoning=f"Matched reverse {category} pattern",
                         alternatives=[]
                     )
-        
+
         # No pattern found
         return AnalogyResult(
             query=f"{a}:{b}::{c}:?",
@@ -176,96 +176,96 @@ class AdvancedAnalogyEngine:
             reasoning="No matching pattern found",
             alternatives=[]
         )
-    
+
     def chain_analogy(self, terms: list[tuple[str, str]]) -> list[AnalogyResult]:
         """
         Solve a chain of analogies.
-        
+
         Args:
             terms: List of (a, b) pairs to chain
-            
+
         Returns:
             List of analogy results
         """
         results = []
-        
+
         for i in range(len(terms) - 1):
             a, b = terms[i]
             c, _ = terms[i + 1]
             result = self.solve(a, b, c)
             results.append(result)
-        
+
         return results
-    
+
     def find_relation(self, a: str, b: str) -> Optional[str]:
         """
         Identify the relationship between two terms.
-        
+
         Args:
             a: First term
             b: Second term
-            
+
         Returns:
             Relationship type or None
         """
         a_lower, b_lower = a.lower(), b.lower()
-        
+
         for category, patterns in self.ANALOGY_PATTERNS.items():
             if a_lower in patterns and patterns[a_lower].lower() == b_lower:
                 return category
-            
+
             reverse = self.reverse_patterns.get(category, {})
             if a_lower in reverse and reverse[a_lower].lower() == b_lower:
                 return f"reverse_{category}"
-        
+
         return None
-    
+
     def complete_analogy_set(self, category: str) -> list[tuple[str, str]]:
         """
         Get all analogies of a specific type.
-        
+
         Args:
             category: Analogy category name
-            
+
         Returns:
             List of (term, related_term) pairs
         """
         patterns = self.ANALOGY_PATTERNS.get(category, {})
         return list(patterns.items())
-    
+
     def generate_quiz(self, category: str, count: int = 5) -> list[dict]:
         """
         Generate analogy quiz questions.
-        
+
         Args:
             category: Category for questions
             count: Number of questions
-            
+
         Returns:
             List of quiz questions
         """
         import random
-        
+
         patterns = self.ANALOGY_PATTERNS.get(category, {})
         items = list(patterns.items())
-        
+
         if len(items) < 2:
             return []
-        
+
         questions = []
         random.shuffle(items)
-        
+
         for i in range(min(count, len(items) - 1)):
             a, b = items[i]
             c, d = items[(i + 1) % len(items)]
-            
+
             questions.append({
                 "question": f"{a} : {b} :: {c} : ?",
                 "answer": d,
                 "category": category,
                 "distractors": [items[j][1] for j in range(len(items)) if j != (i + 1) % len(items)][:3]
             })
-        
+
         return questions
 
 
@@ -274,16 +274,16 @@ def example_basic_analogy():
     print("=" * 60)
     print("Basic Analogy Solving")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     analogies = [
         ("king", "queen", "man"),      # Gender
         ("France", "Paris", "Japan"),  # Capital
         ("big", "bigger", "small"),    # Comparative
         ("walk", "walked", "run"),     # Past tense
     ]
-    
+
     print("\nSolving analogies (A:B :: C:?):")
     for a, b, c in analogies:
         result = engine.solve(a, b, c)
@@ -297,9 +297,9 @@ def example_chain_reasoning():
     print("\n" + "=" * 60)
     print("Chain Analogy Reasoning")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     # Build a chain of related concepts
     chain = [
         ("France", "Paris"),
@@ -307,10 +307,10 @@ def example_chain_reasoning():
         ("Germany", "Berlin"),
         ("Italy", "Rome"),
     ]
-    
+
     print("\nAnalogy chain:")
     results = engine.chain_analogy(chain)
-    
+
     for i, result in enumerate(results):
         print(f"  Step {i+1}: {result.query} → {result.answer}")
 
@@ -320,9 +320,9 @@ def example_relation_discovery():
     print("\n" + "=" * 60)
     print("Relation Discovery")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     pairs = [
         ("king", "queen"),
         ("France", "French"),
@@ -330,7 +330,7 @@ def example_relation_discovery():
         ("finger", "hand"),
         ("apple", "banana"),  # No known relation
     ]
-    
+
     print("\nDiscovering relationships:")
     for a, b in pairs:
         relation = engine.find_relation(a, b)
@@ -345,9 +345,9 @@ def example_analogy_categories():
     print("\n" + "=" * 60)
     print("Analogy Categories")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     print("\nAvailable analogy categories:")
     for category in engine.ANALOGY_PATTERNS.keys():
         pairs = engine.complete_analogy_set(category)
@@ -363,11 +363,11 @@ def example_quiz_generation():
     print("\n" + "=" * 60)
     print("Analogy Quiz Generation")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     quiz = engine.generate_quiz("capital", count=3)
-    
+
     print("\nGenerated Quiz (Capital Cities):")
     for i, q in enumerate(quiz, 1):
         print(f"\n  Question {i}: {q['question']}")
@@ -381,20 +381,20 @@ def example_multi_hop_reasoning():
     print("\n" + "=" * 60)
     print("Multi-Hop Reasoning")
     print("=" * 60)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     print("\nProblem: What language is spoken in the capital of Italy?")
     print("\nReasoning steps:")
-    
+
     # Step 1: Italy → Capital
     step1 = engine.solve("France", "Paris", "Italy")
     print(f"  1. Italy's capital: {step1.answer}")
-    
+
     # Step 2: Country → Language
     step2 = engine.solve("France", "French", "Italy")
     print(f"  2. Italy's language: {step2.answer}")
-    
+
     print(f"\n  Answer: {step2.answer} is spoken in {step1.answer}")
 
 
@@ -403,12 +403,12 @@ def example_analogy_algebra():
     print("\n" + "=" * 60)
     print("Analogy Algebra")
     print("=" * 60)
-    
+
     print("""
     Analogies can be thought of as vector operations:
-    
+
     king - man + woman ≈ queen
-    
+
     This is because:
     - "king" encodes [royalty, male]
     - "man" encodes [male]
@@ -417,9 +417,9 @@ def example_analogy_algebra():
     - Adding "woman" adds [female]
     - Result: [royalty, female] ≈ "queen"
     """)
-    
+
     engine = AdvancedAnalogyEngine()
-    
+
     # Demonstrate the concept
     result = engine.solve("king", "queen", "man")
     print(f"  king : queen :: man : {result.answer}")
@@ -431,40 +431,40 @@ def example_cross_domain():
     print("\n" + "=" * 60)
     print("Cross-Domain Analogies")
     print("=" * 60)
-    
+
     print("""
     Cross-domain analogies transfer knowledge between fields:
-    
+
     Biological Neural Networks : Artificial Neural Networks
     Natural Selection : Genetic Algorithms
     Ant Colonies : Swarm Optimization
     DNA : Source Code
-    
+
     These cross-domain mappings inspire innovation through:
     1. Identifying structural similarities
     2. Transferring solution strategies
     3. Discovering new research directions
     """)
-    
+
     cross_domain_examples = [
         ("neurons", "nodes", "synapses", "connections"),
         ("evolution", "optimization", "mutation", "perturbation"),
         ("ant", "agent", "pheromone", "signal"),
     ]
-    
-    engine = AdvancedAnalogyEngine()
-    
+
+    AdvancedAnalogyEngine()
+
     print("\nCross-domain mappings:")
     for a, b, c, expected in cross_domain_examples:
         print(f"  {a}:{b} :: {c}:{expected}")
-        print(f"    (Domain transfer: biology → computer science)")
+        print("    (Domain transfer: biology → computer science)")
 
 
 def main():
     """Run all advanced analogy examples."""
     print("Sigmalang Advanced Analogies Examples")
     print("=" * 60)
-    
+
     example_basic_analogy()
     example_chain_reasoning()
     example_relation_discovery()
@@ -473,7 +473,7 @@ def main():
     example_multi_hop_reasoning()
     example_analogy_algebra()
     example_cross_domain()
-    
+
     print("\n" + "=" * 60)
     print("Key Concepts")
     print("=" * 60)

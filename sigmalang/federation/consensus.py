@@ -23,8 +23,8 @@ Usage:
 """
 
 import logging
-from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

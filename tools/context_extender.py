@@ -25,16 +25,16 @@ Architecture:
 Expected Impact: 200K -> 2M+ effective tokens (10x extension)
 """
 
-import sys
-import json
-import time
 import hashlib
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, field, asdict
-from collections import deque
-from enum import Enum
+import json
 import logging
+import sys
+import time
+from collections import deque
+from dataclasses import asdict, dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 sigmalang_root = Path(__file__).parent.parent
 sys.path.insert(0, str(sigmalang_root))
@@ -163,8 +163,8 @@ class ContextWindowExtender:
             return
 
         try:
-            from sigmalang.core.parser import SemanticParser
             from sigmalang.core.encoder import SigmaEncoder
+            from sigmalang.core.parser import SemanticParser
 
             self._parser = SemanticParser()
             self._encoder = SigmaEncoder()

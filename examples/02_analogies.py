@@ -7,6 +7,7 @@ Demonstrates solving word analogies with the ΣLANG analogy engine.
 """
 
 import sys
+
 sys.path.insert(0, '..')
 
 
@@ -15,13 +16,13 @@ def main():
     print("=" * 60)
     print("ΣLANG Analogies Example")
     print("=" * 60)
-    
+
     # Import analogy engine
     print("\n1. Initializing analogy engine...")
     try:
         from sigmalang.core.semantic_analogy_engine import SemanticAnalogyEngine
         engine = SemanticAnalogyEngine()
-        
+
         # Register candidate words
         candidates = [
             "woman", "man", "king", "queen", "prince", "princess",
@@ -40,7 +41,7 @@ def main():
         print(f"   ⚠ SemanticAnalogyEngine not available: {e}")
         print("   Using fallback demonstration...")
         engine_available = False
-    
+
     # Define test analogies
     test_analogies = [
         ("king", "queen", "man"),           # Gender relationship
@@ -48,17 +49,17 @@ def main():
         ("big", "small", "hot"),            # Antonym relationship
         ("dog", "puppy", "cat"),            # Adult-young relationship
     ]
-    
+
     print("\n2. Solving analogies (A:B::C:?):")
     print("-" * 50)
-    
+
     for a, b, c in test_analogies:
         print(f"\n   {a} : {b} :: {c} : ?")
-        
+
         if engine_available:
             try:
                 result = engine.solve_analogy(a, b, c, top_k=3)
-                
+
                 if hasattr(result, 'solutions'):
                     for i, sol in enumerate(result.solutions[:3]):
                         answer = sol.answer if hasattr(sol, 'answer') else str(sol)
@@ -82,16 +83,16 @@ def main():
             }
             answer = expected.get((a, b, c), "?")
             print(f"      Expected: {answer}")
-    
+
     # Explain analogies
     print("\n3. Explaining analogies:")
     print("-" * 50)
-    
+
     if engine_available and hasattr(engine, 'explain_analogy'):
         try:
             explanation = engine.explain_analogy("Paris", "France", "Tokyo", "Japan")
             if hasattr(explanation, 'explanation'):
-                print(f"\n   Paris:France::Tokyo:Japan")
+                print("\n   Paris:France::Tokyo:Japan")
                 print(f"   Explanation: {explanation.explanation}")
                 print(f"   Similarity: {explanation.similarity_score:.1%}")
         except Exception as e:
@@ -100,11 +101,11 @@ def main():
         print("\n   Paris:France::Tokyo:Japan")
         print("   Explanation: Capital city to country relationship")
         print("   Paris is the capital of France, Tokyo is the capital of Japan")
-    
+
     # Analogy types
     print("\n4. Analogy types supported:")
     print("-" * 50)
-    
+
     analogy_types = [
         ("Semantic", "king:queen::man:woman", "Meaning-based relationships"),
         ("Structural", "A:AB::B:BC", "Pattern-based relationships"),
@@ -112,10 +113,10 @@ def main():
         ("Causal", "rain:wet::fire:burn", "Cause-effect relationships"),
         ("Functional", "pen:write::knife:cut", "Purpose-based relationships"),
     ]
-    
+
     for atype, example, desc in analogy_types:
         print(f"   {atype:15} | {example:20} | {desc}")
-    
+
     print("\n" + "=" * 60)
     print("Example complete!")
     print("=" * 60)

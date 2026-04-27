@@ -23,18 +23,18 @@ Key Properties:
 Automation Level: 98%
 """
 
-import time
-import uuid
-import math
 import json
+import logging
+import math
 import random
 import threading
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Callable, Tuple
-from dataclasses import dataclass, field, asdict
+import time
+import uuid
 from collections import defaultdict
+from dataclasses import asdict, dataclass, field
 from enum import Enum
-import logging
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -202,7 +202,7 @@ class StatisticalAnalyzer:
         if denominator == 0:
             return t_stat, 1.0
 
-        df = numerator / denominator
+        numerator / denominator
 
         # Approximate p-value using normal distribution for large df
         # (simplified - production would use scipy.stats)

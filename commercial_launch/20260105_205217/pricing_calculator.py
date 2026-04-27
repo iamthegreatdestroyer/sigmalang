@@ -5,8 +5,9 @@ SigmaLang Pricing Calculator
 Dynamic pricing calculation based on usage and value metrics.
 """
 
-from typing import Dict, Any
 import json
+from typing import Any, Dict
+
 
 class PricingCalculator:
     """Dynamic pricing calculator for SigmaLang"""

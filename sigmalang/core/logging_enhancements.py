@@ -9,11 +9,11 @@ Enhancements to the existing StructuredLogger:
 """
 
 import re
-import uuid
 import threading
+import uuid
 from contextvars import ContextVar
-from typing import Any, Dict, List, Optional, Set
 from functools import wraps
+from typing import Any, Dict, List, Optional, Set
 
 # Context variables for async-safe request tracking
 REQUEST_ID: ContextVar[Optional[str]] = ContextVar('request_id', default=None)
@@ -300,7 +300,7 @@ def with_correlation_id(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         # Generate and set request ID
-        request_id = CorrelationIDManager.set_request_id()
+        CorrelationIDManager.set_request_id()
 
         try:
             return func(*args, **kwargs)
@@ -323,7 +323,6 @@ def with_trace(trace_name: Optional[str] = None):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            span_name = trace_name or func.__name__
 
             # Set trace ID if not already set
             if not CorrelationIDManager.get_trace_id():

@@ -1,5 +1,6 @@
 """Quick ΣLANG validation for Claude Code Execution."""
 import sys
+
 sys.path.insert(0, 'S:/sigmalang')
 
 print("[*] Quick ΣLANG Validation")
@@ -7,7 +8,7 @@ print("-" * 40)
 
 # Test 1: Import check
 try:
-    from sigmalang.core import encoder, decoder
+    from sigmalang.core import decoder, encoder
     print("[OK] Imports: OK")
 except ImportError as e:
     print(f"[FAIL] Imports: FAILED - {e}")
@@ -27,7 +28,7 @@ except Exception as e:
 try:
     dec = decoder.SigmaDecoder()
     reconstructed = dec.decode(compressed.glyph_sequence)
-    print(f"[OK] Decode: OK")
+    print("[OK] Decode: OK")
 except Exception as e:
     print(f"[FAIL] Decode: FAILED - {e}")
     sys.exit(1)

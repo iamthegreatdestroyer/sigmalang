@@ -42,14 +42,14 @@ Usage:
     print(f"Two-pass ratio: {result['total_ratio']:.2f}x")
 """
 
-import time
 import logging
-from typing import Dict, Any, Optional, List
+import time
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 from .meta_token import (
-    MetaTokenCompressor,
     CompressionStats,
+    MetaTokenCompressor,
     get_meta_compressor,
 )
 
@@ -259,8 +259,8 @@ class TwoPassCompressor:
             return True
 
         try:
-            from sigmalang.core.parser import SemanticParser
             from sigmalang.core.encoder import SigmaEncoder
+            from sigmalang.core.parser import SemanticParser
 
             self._parser = SemanticParser()
             self._encoder = SigmaEncoder()

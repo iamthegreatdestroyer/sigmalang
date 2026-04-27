@@ -12,13 +12,13 @@ Features:
 - Coverage-driven test expansion
 """
 
+import ast
 import inspect
 import sys
-from pathlib import Path
-from typing import List, Dict, Any, Callable, get_type_hints
-from dataclasses import dataclass
-import ast
 import textwrap
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable, Dict, List, get_type_hints
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent.parent
@@ -219,17 +219,17 @@ def test_{method_name}(self, service):
             annotation = param_info['annotation']
 
             # Generate appropriate test value based on type
-            if annotation == str or annotation == inspect.Parameter.empty:
+            if annotation is str or annotation == inspect.Parameter.empty:
                 inputs[param_name] = '"test input"'
-            elif annotation == int:
+            elif annotation is int:
                 inputs[param_name] = '42'
-            elif annotation == float:
+            elif annotation is float:
                 inputs[param_name] = '3.14'
-            elif annotation == bool:
+            elif annotation is bool:
                 inputs[param_name] = 'True'
-            elif annotation == list or str(annotation).startswith('List'):
+            elif annotation is list or str(annotation).startswith('List'):
                 inputs[param_name] = '["item1", "item2"]'
-            elif annotation == dict or str(annotation).startswith('Dict'):
+            elif annotation is dict or str(annotation).startswith('Dict'):
                 inputs[param_name] = '{"key": "value"}'
             else:
                 # Skip parameters with complex types

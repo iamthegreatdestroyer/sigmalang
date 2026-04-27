@@ -4,11 +4,11 @@
 AI-powered validation of Phase 2 fixes and automated promotion
 """
 
-import os
-import sys
 import io
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 # Fix Windows console Unicode encoding
@@ -20,7 +20,8 @@ if sys.platform == 'win32':
     except Exception:
         pass
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 
 class Phase2Validator:
     def __init__(self):
@@ -56,13 +57,13 @@ class Phase2Validator:
         try:
             subprocess.run([sys.executable, "-c", "import bandit"], capture_output=True, timeout=5)
             security_validation["security_tools_installed"] = True
-        except:
+        except Exception:
             pass
 
         try:
             subprocess.run([sys.executable, "-c", "import safety"], capture_output=True, timeout=5)
             security_validation["security_tools_installed"] = True
-        except:
+        except Exception:
             pass
 
         # Check for remaining security issues
@@ -159,8 +160,8 @@ class Phase2Validator:
         sys.path.insert(0, str(self.project_root))
 
         try:
-            import sigmalang.core.encoder
             import sigmalang.core.bidirectional_codec
+            import sigmalang.core.encoder
             performance_validation["core_modules_importable"] = True
             performance_validation["no_import_errors"] = True
         except ImportError:
@@ -214,7 +215,7 @@ class Phase2Validator:
                 if ("password" in content or "secret" in content or "key" in content):
                     if not any(skip in content for skip in ["your-", "example", "test", "dummy", "placeholder", "api_key =", "secret =", "key ="]):
                         secrets_found += 1
-            except:
+            except Exception:
                 pass
 
         return secrets_found == 0
@@ -234,7 +235,7 @@ class Phase2Validator:
                     if pattern in content:
                         issues_found += 1
                         break
-            except:
+            except Exception:
                 pass
 
         return issues_found == 0
@@ -244,7 +245,7 @@ class Phase2Validator:
         try:
             mtime = file_path.stat().st_mtime
             return (datetime.now().timestamp() - mtime) < (minutes * 60)
-        except:
+        except Exception:
             return False
 
     def run_comprehensive_validation(self) -> Dict[str, Any]:

@@ -17,12 +17,11 @@ Benefits:
 - Integrates with existing Tier 2 learned primitives
 """
 
-import struct
-from typing import Dict, List, Tuple, Optional, Any
-from dataclasses import dataclass, field
-from collections import defaultdict
 import hashlib
-
+import struct
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 # =============================================================================
 # Hypertoken Data Structures
@@ -208,7 +207,7 @@ class LZWHypertokenEncoder:
                 else:
                     # Add this new sequence to dictionary
                     if len(self.dictionary.tokens) < self.max_dict_size:
-                        new_id = self.dictionary.add(sequence)
+                        self.dictionary.add(sequence)
                         self.stats['hypertokens_created'] += 1
                     break
 

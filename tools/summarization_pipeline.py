@@ -24,16 +24,16 @@ Features:
 - Incremental updates
 """
 
-import sys
-import json
-import time
 import hashlib
-import re
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, field, asdict
-from collections import defaultdict
+import json
 import logging
+import re
+import sys
+import time
+from collections import defaultdict
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 sigmalang_root = Path(__file__).parent.parent
 sys.path.insert(0, str(sigmalang_root))
@@ -328,8 +328,8 @@ class SummarizationPipeline:
         sigma_compressed = None
         sigma_size = 0
         try:
-            from sigmalang.core.parser import SemanticParser
             from sigmalang.core.encoder import SigmaEncoder
+            from sigmalang.core.parser import SemanticParser
 
             parser = SemanticParser()
             encoder = SigmaEncoder()

@@ -4,13 +4,14 @@
 Automated SOC2 and GDPR compliance checking
 """
 
-import os
-import sys
 import json
+import os
 import re
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
+
 
 class ComplianceValidator:
     def __init__(self):

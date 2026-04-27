@@ -49,12 +49,13 @@ Example Usage:
     >>> weight = weight_learner.get_pattern_weight("p1")
 """
 
+import logging
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Optional, Any, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import LabelEncoder
-import logging
 
 logger = logging.getLogger(__name__)
 

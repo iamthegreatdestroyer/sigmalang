@@ -15,11 +15,11 @@ Features:
 import random
 import string
 import sys
-from pathlib import Path
-from typing import List, Dict, Any, Callable, Optional
+import traceback
 from dataclasses import dataclass, field
 from datetime import datetime
-import traceback
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent
@@ -206,7 +206,7 @@ class ChaosTestExecutor:
 
             try:
                 # Try to parse
-                tree = parser.parse(text)
+                parser.parse(text)
 
                 # Verify result
                 result = ChaosTestResult(
@@ -243,8 +243,8 @@ class ChaosTestExecutor:
 
     def test_encoder_robustness(self, num_tests: int = 50) -> List[ChaosTestResult]:
         """Test encoder with chaos inputs."""
-        from sigmalang.core.parser import SemanticParser
         from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
 
         parser = SemanticParser()
         encoder = SigmaEncoder()
@@ -301,8 +301,8 @@ class ChaosTestExecutor:
 
     def test_memory_pressure(self) -> ChaosTestResult:
         """Test behavior under memory pressure."""
-        from sigmalang.core.parser import SemanticParser
         from sigmalang.core.encoder import SigmaEncoder
+        from sigmalang.core.parser import SemanticParser
 
         parser = SemanticParser()
         encoder = SigmaEncoder()
@@ -315,7 +315,7 @@ class ChaosTestExecutor:
 
         try:
             tree = parser.parse(huge_text)
-            encoded = encoder.encode(tree)
+            encoder.encode(tree)
 
             result = ChaosTestResult(
                 test_name="memory_pressure",
@@ -350,6 +350,7 @@ class ChaosTestExecutor:
     def test_concurrent_chaos(self, num_threads: int = 10) -> List[ChaosTestResult]:
         """Test concurrent access with chaos inputs."""
         import threading
+
         from sigmalang.core.parser import SemanticParser
 
         fuzz_corpus = FuzzInputGenerator.generate_fuzz_corpus(num_threads)
@@ -363,7 +364,7 @@ class ChaosTestExecutor:
             start = time.perf_counter()
 
             try:
-                tree = parser.parse(text)
+                parser.parse(text)
 
                 result = ChaosTestResult(
                     test_name=f"concurrent_chaos_{worker_id}",

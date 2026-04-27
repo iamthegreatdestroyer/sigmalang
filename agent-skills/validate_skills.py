@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 
+
 def validate_skill(skill_dir):
     """Validate agentskills.io format compliance."""
     skill_json = skill_dir / "skill.json"
@@ -43,5 +44,5 @@ if __name__ == '__main__':
             print(f"  - {error}")
     else:
         skill_count = len([p for p in skills_dir.iterdir() if p.is_dir() and not p.name.startswith('.')])
-        print(f"[OK] All skills validated successfully")
+        print("[OK] All skills validated successfully")
         print(f"[OK] {skill_count} skills ready for deployment")

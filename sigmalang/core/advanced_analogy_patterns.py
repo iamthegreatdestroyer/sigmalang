@@ -26,15 +26,15 @@ Example:
     ...     cache.put("king", "man", "queen", result)
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Dict, Any, Callable
+import json
 import logging
-from pathlib import Path
 import time
 from collections import OrderedDict, deque
-import json
+from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from statistics import mean, median
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -597,14 +597,14 @@ class AnalogyChainingEngine:
         """
         import time
         start_time = time.time()
-        
+
         if len(concepts) < 2:
             return ChainedAnalogyResult(chain=[], chain_length=0)
-        
+
         chain = concepts[:chain_length] if chain_length <= len(concepts) else concepts
         intermediate_steps = []
         total_confidence = 0.0
-        
+
         # Build intermediate steps by solving analogies sequentially
         if chain_length > 2 and len(chain) >= 3:
             # For longer chains, solve intermediate analogies
@@ -615,12 +615,12 @@ class AnalogyChainingEngine:
                         intermediate_steps.append(result.answer)
                         if hasattr(result, 'confidence'):
                             total_confidence += result.confidence
-                except:
+                except Exception:
                     pass
-        
+
         validity_score = self.validate_chain_consistency(chain)
         latency_ms = (time.time() - start_time) * 1000
-        
+
         return ChainedAnalogyResult(
             chain=chain,
             chain_length=len(chain),
@@ -650,12 +650,12 @@ class AnalogyChainingEngine:
         """
         import time
         start_time = time.time()
-        
+
         # Build chain based on requested length
         chain = [a, b, c]
         intermediate_steps = []
         total_confidence = 0.0
-        
+
         # For longer chains, extend with additional solved concepts
         if length > 3:
             # Use base engine to predict next elements
@@ -671,12 +671,12 @@ class AnalogyChainingEngine:
                             total_confidence += result.confidence
                     else:
                         break
-                except:
+                except Exception:
                     break
-        
+
         validity_score = self.validate_chain_consistency(chain)
         latency_ms = (time.time() - start_time) * 1000
-        
+
         return ChainedAnalogyResult(
             chain=chain,
             chain_length=length,
@@ -700,10 +700,10 @@ class AnalogyChainingEngine:
         """
         if len(chain) < 2:
             return 0.0
-        
+
         if len(chain) == 2:
             return 1.0  # Perfect consistency for 2-element chains
-        
+
         # For longer chains, check consistency by validating relationships
         consistency_scores = []
         for i in range(len(chain) - 2):
@@ -715,12 +715,12 @@ class AnalogyChainingEngine:
                     consistency_scores.append(result.confidence)
                 else:
                     consistency_scores.append(0.5)  # Default moderate consistency
-            except:
+            except Exception:
                 consistency_scores.append(0.3)  # Lower consistency for failed relationships
-        
+
         if not consistency_scores:
             return 0.5
-        
+
         # Average the consistency scores
         avg_consistency = sum(consistency_scores) / len(consistency_scores)
         return min(1.0, max(0.0, avg_consistency))

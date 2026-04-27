@@ -88,7 +88,7 @@ class SDKGenerator:
         print(f"Command: {' '.join(cmd)}\n")
 
         try:
-            result = subprocess.run(
+            subprocess.run(
                 cmd,
                 cwd=self.project_root,
                 check=True,
@@ -100,7 +100,7 @@ class SDKGenerator:
 
             return True, str(output_path)
 
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             print(f"\n[FAIL] {generator.upper()} SDK generation failed")
             return False, ""
 

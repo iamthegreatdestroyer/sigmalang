@@ -17,14 +17,14 @@ Benefits:
 - Reduced catastrophic forgetting
 """
 
-from typing import Dict, List, Optional, Any, Tuple, Set
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 import numpy as np
 import torch
 import torch.nn as nn
-from collections import defaultdict
-
 
 # =============================================================================
 # Codebook Layer Types

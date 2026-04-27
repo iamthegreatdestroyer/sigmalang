@@ -11,12 +11,12 @@ Usage:
 """
 
 import argparse
-import subprocess
-import sys
 import os
 import re
+import subprocess
+import sys
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 
 class PyPIPublisher:
@@ -112,9 +112,9 @@ class PyPIPublisher:
 
         # Check for version constraints
         if ">=" in deps:
-            print(f"  [INFO] Using minimum version constraints (>=)")
+            print("  [INFO] Using minimum version constraints (>=)")
         else:
-            print(f"  [WARN] No version constraints found")
+            print("  [WARN] No version constraints found")
 
         return True
 
@@ -153,9 +153,9 @@ class PyPIPublisher:
         license_files = list(self.project_root.glob("LICENSE*"))
 
         if license_files:
-            print(f"  [PASS] License specified, LICENSE file found")
+            print("  [PASS] License specified, LICENSE file found")
         else:
-            print(f"  [WARN] License specified but no LICENSE file found")
+            print("  [WARN] License specified but no LICENSE file found")
 
         return True
 

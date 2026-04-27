@@ -18,11 +18,10 @@ Benefits:
 - Improved compression on morphologically rich languages
 """
 
-from typing import List, Dict, Optional, Tuple, Set, Any
-from dataclasses import dataclass, field
-from collections import defaultdict
 import re
-
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # =============================================================================
 # Morphological Components

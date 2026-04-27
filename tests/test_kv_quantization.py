@@ -2,8 +2,9 @@
 Tests for KV-Cache Mixed-Precision Quantization (kv_quantization.py)
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from sigmalang.core.kv_quantization import (
     KVQuantizer,
     MixedPrecisionKVCache,

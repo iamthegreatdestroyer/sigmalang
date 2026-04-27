@@ -20,18 +20,15 @@ Copyright 2025 - SigmaLang Project
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 import queue
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, Future, as_completed
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from typing import (
-    Any, Callable, Dict, Generic, Iterable, List, Optional, 
-    Tuple, TypeVar, Union
-)
 from functools import partial
-import logging
+from typing import Any, Callable, Dict, Generic, Iterable, List, Optional, Tuple, TypeVar, Union
 
 # Type variables for generic operations
 T = TypeVar('T')
@@ -52,7 +49,7 @@ class ExecutionResult(Generic[T]):
     error: Optional[Exception] = None
     execution_time_ms: float = 0.0
     worker_id: Optional[int] = None
-    
+
     @property
     def is_success(self) -> bool:
         return self.success and self.error is None
@@ -66,12 +63,12 @@ class BatchResult(Generic[T]):
     successful_count: int
     failed_count: int
     worker_utilization: Dict[int, float] = field(default_factory=dict)
-    
+
     @property
     def success_rate(self) -> float:
         total = self.successful_count + self.failed_count
         return self.successful_count / total if total > 0 else 0.0
-    
+
     def get_successful_values(self) -> List[T]:
         """Get all successful result values."""
         return [r.value for r in self.results if r.is_success and r.value is not None]
@@ -84,20 +81,20 @@ class BatchResult(Generic[T]):
 class ParallelExecutor:
     """
     Thread pool management with intelligent work distribution.
-    
+
     Features:
     - Auto-tuned thread count based on CPU cores
     - Work stealing for load balancing
     - Batch submission with progress tracking
     - Graceful shutdown handling
-    
+
     Example:
         >>> executor = ParallelExecutor(max_workers=4)
         >>> results = executor.map_parallel(process_pattern, patterns)
         >>> print(f"Processed {len(results)} patterns")
         >>> executor.shutdown()
     """
-    
+
     def __init__(
         self,
         max_workers: Optional[int] = None,
@@ -106,7 +103,7 @@ class ParallelExecutor:
     ):
         """
         Initialize parallel executor.
-        
+
         Args:
             max_workers: Maximum worker threads (default: CPU count)
             thread_name_prefix: Prefix for worker thread names
@@ -115,24 +112,24 @@ class ParallelExecutor:
         self.max_workers = max_workers or self.get_optimal_workers()
         self.thread_name_prefix = thread_name_prefix
         self.enable_work_stealing = enable_work_stealing
-        
+
         self._executor: Optional[ThreadPoolExecutor] = None
         self._active_tasks: Dict[int, int] = {}  # worker_id -> task_count
         self._lock = threading.Lock()
         self._total_tasks_submitted = 0
         self._total_tasks_completed = 0
         self._start_time: Optional[float] = None
-        
+
         # Work stealing scheduler
         self._scheduler: Optional[WorkStealingScheduler] = None
         if enable_work_stealing:
             self._scheduler = WorkStealingScheduler(self.max_workers)
-    
+
     @staticmethod
     def get_optimal_workers() -> int:
         """
         Determine optimal worker count based on system resources.
-        
+
         Returns:
             Optimal number of worker threads
         """
@@ -140,7 +137,7 @@ class ParallelExecutor:
         # Use CPU count for compute-bound, 2x for I/O-bound
         # Default to CPU count as most pattern ops are compute-bound
         return max(2, min(cpu_count, 16))  # Cap at 16 to avoid overhead
-    
+
     def _ensure_executor(self) -> ThreadPoolExecutor:
         """Ensure executor is initialized."""
         if self._executor is None:
@@ -150,35 +147,35 @@ class ParallelExecutor:
             )
             self._start_time = time.time()
         return self._executor
-    
+
     def submit(
-        self, 
-        fn: Callable[..., T], 
-        *args: Any, 
+        self,
+        fn: Callable[..., T],
+        *args: Any,
         **kwargs: Any
     ) -> Future[ExecutionResult[T]]:
         """
         Submit a single task for execution.
-        
+
         Args:
             fn: Function to execute
             *args: Positional arguments
             **kwargs: Keyword arguments
-            
+
         Returns:
             Future containing ExecutionResult
         """
         executor = self._ensure_executor()
-        
+
         def wrapped_fn() -> ExecutionResult[T]:
             worker_id = hash(threading.current_thread().name) % self.max_workers
             start = time.time()
             try:
                 with self._lock:
                     self._active_tasks[worker_id] = self._active_tasks.get(worker_id, 0) + 1
-                
+
                 result = fn(*args, **kwargs)
-                
+
                 execution_time = (time.time() - start) * 1000
                 return ExecutionResult(
                     value=result,
@@ -200,22 +197,22 @@ class ParallelExecutor:
                 with self._lock:
                     self._active_tasks[worker_id] = self._active_tasks.get(worker_id, 1) - 1
                     self._total_tasks_completed += 1
-        
+
         with self._lock:
             self._total_tasks_submitted += 1
-        
+
         return executor.submit(wrapped_fn)
-    
+
     def submit_batch(
         self,
         tasks: List[Tuple[Callable[..., T], tuple, dict]]
     ) -> BatchResult[T]:
         """
         Submit multiple tasks for execution.
-        
+
         Args:
             tasks: List of (function, args, kwargs) tuples
-            
+
         Returns:
             BatchResult containing all results
         """
@@ -226,43 +223,43 @@ class ParallelExecutor:
                 successful_count=0,
                 failed_count=0
             )
-        
+
         start_time = time.time()
         futures: List[Future[ExecutionResult[T]]] = []
-        
+
         for fn, args, kwargs in tasks:
             future = self.submit(fn, *args, **kwargs)
             futures.append(future)
-        
+
         # Collect results
         results: List[ExecutionResult[T]] = []
         successful = 0
         failed = 0
         worker_times: Dict[int, float] = {}
-        
+
         for future in as_completed(futures):
             result = future.result()
             results.append(result)
-            
+
             if result.is_success:
                 successful += 1
             else:
                 failed += 1
-            
+
             if result.worker_id is not None:
                 worker_times[result.worker_id] = worker_times.get(
                     result.worker_id, 0
                 ) + result.execution_time_ms
-        
+
         total_time = (time.time() - start_time) * 1000
-        
+
         # Calculate worker utilization
         max_worker_time = max(worker_times.values()) if worker_times else 1.0
         utilization = {
-            wid: wtime / max_worker_time 
+            wid: wtime / max_worker_time
             for wid, wtime in worker_times.items()
         }
-        
+
         return BatchResult(
             results=results,
             total_time_ms=total_time,
@@ -270,7 +267,7 @@ class ParallelExecutor:
             failed_count=failed,
             worker_utilization=utilization
         )
-    
+
     def map_parallel(
         self,
         fn: Callable[[T], R],
@@ -279,31 +276,31 @@ class ParallelExecutor:
     ) -> List[R]:
         """
         Apply function to items in parallel.
-        
+
         Args:
             fn: Function to apply to each item
             items: Items to process
             chunk_size: Items per chunk (auto-determined if None)
-            
+
         Returns:
             List of results in original order
         """
         items_list = list(items)
         if not items_list:
             return []
-        
+
         # Auto-determine chunk size
         if chunk_size is None:
             chunk_size = max(1, len(items_list) // (self.max_workers * 4))
-        
+
         executor = self._ensure_executor()
-        
+
         # Submit all items
         future_to_idx: Dict[Future, int] = {}
         for idx, item in enumerate(items_list):
             future = executor.submit(fn, item)
             future_to_idx[future] = idx
-        
+
         # Collect results in order
         results: List[Optional[R]] = [None] * len(items_list)
         for future in as_completed(future_to_idx):
@@ -313,9 +310,9 @@ class ParallelExecutor:
             except Exception as e:
                 logger.error(f"map_parallel item {idx} failed: {e}")
                 results[idx] = None  # type: ignore
-        
+
         return results  # type: ignore
-    
+
     def reduce_parallel(
         self,
         fn: Callable[[T, T], T],
@@ -324,52 +321,52 @@ class ParallelExecutor:
     ) -> Optional[T]:
         """
         Parallel reduction of items.
-        
+
         Uses tree-based reduction for optimal parallelism.
-        
+
         Args:
             fn: Binary reduction function
             items: Items to reduce
             initial: Initial value (optional)
-            
+
         Returns:
             Reduced value or None if empty
         """
         if not items:
             return initial
-        
+
         if len(items) == 1:
             return fn(initial, items[0]) if initial is not None else items[0]
-        
+
         # Tree-based parallel reduction
         current = list(items)
         if initial is not None:
             current = [initial] + current
-        
+
         while len(current) > 1:
             # Pair up items for parallel reduction
             pairs: List[Tuple[T, T]] = []
             for i in range(0, len(current) - 1, 2):
                 pairs.append((current[i], current[i + 1]))
-            
+
             # Handle odd item
             remainder = current[-1] if len(current) % 2 == 1 else None
-            
+
             # Reduce pairs in parallel
             reduced = self.map_parallel(lambda p: fn(p[0], p[1]), pairs)
-            
+
             current = reduced
             if remainder is not None:
                 current.append(remainder)
-        
+
         return current[0] if current else None
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get executor statistics."""
         with self._lock:
             active = sum(self._active_tasks.values())
             uptime = (time.time() - self._start_time) if self._start_time else 0
-        
+
         return {
             'max_workers': self.max_workers,
             'total_submitted': self._total_tasks_submitted,
@@ -378,11 +375,11 @@ class ParallelExecutor:
             'uptime_seconds': uptime,
             'work_stealing_enabled': self.enable_work_stealing
         }
-    
+
     def shutdown(self, wait: bool = True) -> None:
         """
         Shutdown the executor.
-        
+
         Args:
             wait: Wait for pending tasks to complete
         """
@@ -390,11 +387,11 @@ class ParallelExecutor:
             self._executor.shutdown(wait=wait)
             self._executor = None
             logger.info(f"ParallelExecutor shut down. Stats: {self.get_stats()}")
-    
+
     def __enter__(self) -> 'ParallelExecutor':
         self._ensure_executor()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.shutdown(wait=True)
 
@@ -406,16 +403,16 @@ class ParallelExecutor:
 class AsyncPatternProcessor:
     """
     Async I/O for pattern operations.
-    
+
     Enables non-blocking pattern processing for I/O-bound operations
     like disk access and network calls.
-    
+
     Example:
         >>> processor = AsyncPatternProcessor()
         >>> results = await processor.encode_batch_async(patterns)
         >>> print(f"Encoded {len(results)} patterns")
     """
-    
+
     def __init__(
         self,
         max_concurrent: int = 100,
@@ -423,7 +420,7 @@ class AsyncPatternProcessor:
     ):
         """
         Initialize async processor.
-        
+
         Args:
             max_concurrent: Maximum concurrent operations
             timeout_seconds: Operation timeout
@@ -437,13 +434,13 @@ class AsyncPatternProcessor:
             'failed_operations': 0,
             'timeout_operations': 0
         }
-    
+
     def _get_semaphore(self) -> asyncio.Semaphore:
         """Get or create semaphore for concurrency control."""
         if self._semaphore is None:
             self._semaphore = asyncio.Semaphore(self.max_concurrent)
         return self._semaphore
-    
+
     async def _execute_with_limit(
         self,
         coro: Any,
@@ -452,10 +449,10 @@ class AsyncPatternProcessor:
         """Execute coroutine with concurrency limit."""
         semaphore = self._get_semaphore()
         timeout = timeout or self.timeout_seconds
-        
+
         start = time.time()
         self._stats['total_operations'] += 1
-        
+
         async with semaphore:
             try:
                 result = await asyncio.wait_for(coro, timeout=timeout)
@@ -484,7 +481,7 @@ class AsyncPatternProcessor:
                     error=e,
                     execution_time_ms=execution_time
                 )
-    
+
     async def encode_batch_async(
         self,
         patterns: List[Any],
@@ -492,26 +489,26 @@ class AsyncPatternProcessor:
     ) -> List[ExecutionResult]:
         """
         Encode patterns asynchronously.
-        
+
         Args:
             patterns: Patterns to encode
             encoder_fn: Synchronous encoder function
-            
+
         Returns:
             List of ExecutionResults
         """
         loop = asyncio.get_event_loop()
-        
+
         async def encode_one(pattern: Any) -> Any:
             return await loop.run_in_executor(None, encoder_fn, pattern)
-        
+
         tasks = [
             self._execute_with_limit(encode_one(p))
             for p in patterns
         ]
-        
+
         return await asyncio.gather(*tasks)
-    
+
     async def search_batch_async(
         self,
         queries: List[Any],
@@ -519,26 +516,26 @@ class AsyncPatternProcessor:
     ) -> List[ExecutionResult]:
         """
         Search patterns asynchronously.
-        
+
         Args:
             queries: Queries to search
             search_fn: Synchronous search function
-            
+
         Returns:
             List of ExecutionResults
         """
         loop = asyncio.get_event_loop()
-        
+
         async def search_one(query: Any) -> List[Any]:
             return await loop.run_in_executor(None, search_fn, query)
-        
+
         tasks = [
             self._execute_with_limit(search_one(q))
             for q in queries
         ]
-        
+
         return await asyncio.gather(*tasks)
-    
+
     async def cluster_async(
         self,
         patterns: List[Any],
@@ -546,21 +543,21 @@ class AsyncPatternProcessor:
     ) -> ExecutionResult:
         """
         Cluster patterns asynchronously.
-        
+
         Args:
             patterns: Patterns to cluster
             cluster_fn: Synchronous clustering function
-            
+
         Returns:
             ExecutionResult with cluster assignments
         """
         loop = asyncio.get_event_loop()
-        
+
         async def do_cluster() -> Dict[int, List[Any]]:
             return await loop.run_in_executor(None, cluster_fn, patterns)
-        
+
         return await self._execute_with_limit(do_cluster())
-    
+
     async def process_stream(
         self,
         items: Iterable[T],
@@ -569,34 +566,34 @@ class AsyncPatternProcessor:
     ) -> List[ExecutionResult[R]]:
         """
         Process items as a stream with callbacks.
-        
+
         Args:
             items: Items to process
             processor_fn: Processing function
             on_result: Optional callback for each result
-            
+
         Returns:
             List of all results
         """
         loop = asyncio.get_event_loop()
         results: List[ExecutionResult[R]] = []
-        
+
         async def process_one(item: T) -> ExecutionResult[R]:
             async def run():
                 return await loop.run_in_executor(None, processor_fn, item)
-            
+
             result = await self._execute_with_limit(run())
-            
+
             if on_result:
                 on_result(result)
-            
+
             return result
-        
+
         tasks = [process_one(item) for item in items]
         results = await asyncio.gather(*tasks)
-        
+
         return results
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get processor statistics."""
         return {
@@ -608,7 +605,7 @@ class AsyncPatternProcessor:
                 if self._stats['total_operations'] > 0 else 0.0
             )
         }
-    
+
     def reset_stats(self) -> None:
         """Reset statistics."""
         self._stats = {
@@ -630,7 +627,7 @@ class WorkItem(Generic[T]):
     data: T
     priority: int = 0
     created_at: float = field(default_factory=time.time)
-    
+
     def __lt__(self, other: 'WorkItem') -> bool:
         # Higher priority first, then older first
         if self.priority != other.priority:
@@ -641,25 +638,25 @@ class WorkItem(Generic[T]):
 class WorkStealingScheduler:
     """
     Dynamic load balancing through work stealing.
-    
+
     Each worker has its own queue. When a worker's queue is empty,
     it "steals" work from the busiest worker's queue.
-    
+
     Benefits:
     - Automatic load balancing
     - Reduced contention
     - Better cache locality
-    
+
     Example:
         >>> scheduler = WorkStealingScheduler(num_workers=4)
         >>> scheduler.submit_work(WorkItem(id=1, data=pattern))
         >>> work = scheduler.get_work(worker_id=0)
     """
-    
+
     def __init__(self, num_workers: int):
         """
         Initialize work stealing scheduler.
-        
+
         Args:
             num_workers: Number of worker threads
         """
@@ -675,14 +672,14 @@ class WorkStealingScheduler:
         self._work_counter = 0
         self._steal_count = 0
         self._submit_count = 0
-    
+
     def submit_work(self, work: WorkItem) -> int:
         """
         Submit work to scheduler.
-        
+
         Args:
             work: Work item to schedule
-            
+
         Returns:
             Worker ID assigned to the work
         """
@@ -691,29 +688,29 @@ class WorkStealingScheduler:
             # Find least loaded worker
             min_size = float('inf')
             best_worker = 0
-            
+
             for i in range(self.num_workers):
                 size = self._queues[i].qsize()
                 if size < min_size:
                     min_size = size
                     best_worker = i
-            
+
             self._queues[best_worker].put(work)
             self._submit_count += 1
             return best_worker
-    
+
     def get_work(
-        self, 
-        worker_id: int, 
+        self,
+        worker_id: int,
         timeout: float = 0.1
     ) -> Optional[WorkItem]:
         """
         Get work for a worker, stealing if necessary.
-        
+
         Args:
             worker_id: Worker requesting work
             timeout: Timeout for blocking get
-            
+
         Returns:
             WorkItem or None if no work available
         """
@@ -723,24 +720,24 @@ class WorkStealingScheduler:
             return work
         except queue.Empty:
             pass
-        
+
         # Try to steal from busiest worker
         return self._steal_work(worker_id)
-    
+
     def _steal_work(self, thief_id: int) -> Optional[WorkItem]:
         """
         Steal work from another worker.
-        
+
         Args:
             thief_id: Worker trying to steal
-            
+
         Returns:
             Stolen work item or None
         """
         # Find busiest worker
         max_size = 0
         victim_id = -1
-        
+
         for i in range(self.num_workers):
             if i == thief_id:
                 continue
@@ -748,26 +745,26 @@ class WorkStealingScheduler:
             if size > max_size:
                 max_size = size
                 victim_id = i
-        
+
         if victim_id < 0 or max_size <= 1:
             return None
-        
+
         # Try to steal half of victim's work
         with self._locks[victim_id]:
             if self._queues[victim_id].empty():
                 return None
-            
+
             try:
                 work = self._queues[victim_id].get_nowait()
                 self._steal_count += 1
                 return work
             except queue.Empty:
                 return None
-    
+
     def balance_load(self) -> Dict[int, int]:
         """
         Get current load distribution.
-        
+
         Returns:
             Dict mapping worker_id to queue size
         """
@@ -775,18 +772,18 @@ class WorkStealingScheduler:
             i: self._queues[i].qsize()
             for i in range(self.num_workers)
         }
-    
+
     def get_pending_count(self) -> int:
         """Get total pending work items."""
         return sum(q.qsize() for q in self._queues)
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get scheduler statistics."""
         load = self.balance_load()
         total_pending = sum(load.values())
         max_load = max(load.values()) if load else 0
         min_load = min(load.values()) if load else 0
-        
+
         return {
             'num_workers': self.num_workers,
             'total_submitted': self._submit_count,
@@ -795,15 +792,15 @@ class WorkStealingScheduler:
             'load_balance': load,
             'load_imbalance': max_load - min_load,
             'steal_rate': (
-                self._steal_count / self._submit_count 
+                self._steal_count / self._submit_count
                 if self._submit_count > 0 else 0.0
             )
         }
-    
+
     def clear(self) -> int:
         """
         Clear all pending work.
-        
+
         Returns:
             Number of items cleared
         """
@@ -830,12 +827,12 @@ def parallel_map(
 ) -> List[R]:
     """
     Convenience function for parallel mapping.
-    
+
     Args:
         fn: Function to apply
         items: Items to process
         max_workers: Worker count (default: auto)
-        
+
     Returns:
         Results in original order
     """
@@ -851,13 +848,13 @@ def parallel_reduce(
 ) -> Optional[T]:
     """
     Convenience function for parallel reduction.
-    
+
     Args:
         fn: Binary reduction function
         items: Items to reduce
         initial: Initial value
         max_workers: Worker count (default: auto)
-        
+
     Returns:
         Reduced value
     """
@@ -872,12 +869,12 @@ async def async_map(
 ) -> List[ExecutionResult[R]]:
     """
     Convenience function for async mapping.
-    
+
     Args:
         fn: Function to apply
         items: Items to process
         max_concurrent: Max concurrent operations
-        
+
     Returns:
         List of ExecutionResults
     """
@@ -892,35 +889,35 @@ async def async_map(
 if __name__ == "__main__":
     # Demo parallel processing
     import math
-    
+
     print("=" * 60)
     print("PARALLEL PROCESSOR DEMONSTRATION")
     print("=" * 60)
-    
+
     # Test data
     numbers = list(range(1, 101))
-    
+
     # Sequential baseline
     print("\n1. Sequential Processing:")
     start = time.time()
     sequential_results = [math.factorial(n % 20 + 100) for n in numbers]
     seq_time = (time.time() - start) * 1000
     print(f"   Time: {seq_time:.2f}ms")
-    
+
     # Parallel processing
     print("\n2. Parallel Processing:")
     with ParallelExecutor() as executor:
         print(f"   Workers: {executor.max_workers}")
         start = time.time()
         parallel_results = executor.map_parallel(
-            lambda n: math.factorial(n % 20 + 100), 
+            lambda n: math.factorial(n % 20 + 100),
             numbers
         )
         par_time = (time.time() - start) * 1000
         print(f"   Time: {par_time:.2f}ms")
         print(f"   Speedup: {seq_time / par_time:.2f}x")
         print(f"   Stats: {executor.get_stats()}")
-    
+
     # Parallel reduction
     print("\n3. Parallel Reduction:")
     with ParallelExecutor() as executor:
@@ -932,18 +929,18 @@ if __name__ == "__main__":
         expected = sum(range(1, 1001))
         print(f"   Expected: {expected}")
         print(f"   Match: {result == expected}")
-    
+
     # Work stealing demo
     print("\n4. Work Stealing Scheduler:")
     scheduler = WorkStealingScheduler(num_workers=4)
-    
+
     # Submit uneven work
     for i in range(20):
         scheduler.submit_work(WorkItem(id=i, data=f"task_{i}", priority=i % 3))
-    
+
     print(f"   Initial load: {scheduler.balance_load()}")
     print(f"   Stats: {scheduler.get_stats()}")
-    
+
     print("\n" + "=" * 60)
     print("Demonstration complete!")
     print("=" * 60)

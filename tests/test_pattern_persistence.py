@@ -9,21 +9,16 @@ Tests cover:
 - Performance and compression validation
 """
 
-import pytest
-import json
 import gzip
+import json
 import tempfile
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import List, Tuple
 
-from sigmalang.core.pattern_persistence import (
-    PatternMetadata,
-    PatternIndex,
-    CatalogPersistence,
-    EnhancedAnalogyCatalog
-)
+import pytest
 
+from sigmalang.core.pattern_persistence import CatalogPersistence, EnhancedAnalogyCatalog, PatternIndex, PatternMetadata
 
 # ============================================================================
 # FIXTURES
@@ -461,7 +456,6 @@ class TestEnhancedAnalogyCatalog:
         # First update
         sample_catalog.update_metadata(pattern_id, confidence=0.8)
         meta = sample_catalog.metadata[pattern_id]
-        first_avg = meta.avg_confidence
 
         # Second update
         sample_catalog.update_metadata(pattern_id, confidence=0.9)
@@ -591,7 +585,7 @@ class TestPersistenceIntegration:
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = Path(tmpdir) / "large_catalog.json.gz"
 
-            saved_size = catalog.save(str(filepath))
+            catalog.save(str(filepath))
 
             # Load and verify
             new_catalog = EnhancedAnalogyCatalog()

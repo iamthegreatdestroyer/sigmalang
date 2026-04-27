@@ -12,18 +12,19 @@ Install:
     pip install streamlit requests plotly pandas
 """
 
-import streamlit as st
-import requests
 import json
-import time
-from datetime import datetime, timedelta
-import subprocess
 import os
 import platform
+import subprocess
+import time
+from datetime import datetime, timedelta
 from pathlib import Path
-import plotly.graph_objects as go
-import plotly.express as px
+
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import requests
+import streamlit as st
 
 # Page configuration
 st.set_page_config(
@@ -80,7 +81,7 @@ def check_api_health():
     try:
         response = requests.get(f"{API_HOST}/health", timeout=2)
         return response.status_code == 200
-    except:
+    except Exception:
         return False
 
 def get_detailed_health():
@@ -88,7 +89,7 @@ def get_detailed_health():
     try:
         response = requests.get(f"{API_HOST}/health/detailed", timeout=2)
         return response.json()
-    except:
+    except Exception:
         return None
 
 def run_command(cmd):
@@ -146,7 +147,7 @@ def get_metrics():
     try:
         response = requests.get(f"{PROMETHEUS_URL}/api/v1/targets", timeout=2)
         return response.json()
-    except:
+    except Exception:
         return None
 
 # ============================================================================
@@ -346,7 +347,7 @@ def setup_page():
                 mem_available = memory.available // (1024**3)
                 st.metric("Memory Available", f"{mem_available}GB",
                          "✅ Sufficient" if mem_available > 2 else "⚠️ Low")
-            except:
+            except Exception:
                 st.info("Install psutil for memory info: pip install psutil")
 
         if all([docker_ok, compose_ok, python_ok, git_ok]):
@@ -439,9 +440,9 @@ def check_docker_running():
 def check_redis():
     """Check if Redis is accessible"""
     try:
-        response = requests.get("http://localhost:26500", timeout=1)
+        requests.get("http://localhost:26500", timeout=1)
         return False  # Redis doesn't respond to HTTP
-    except:
+    except Exception:
         # Try redis-cli
         success, _, _ = run_command("docker exec sigmalang-redis redis-cli ping")
         return "PONG" in success if success else False
@@ -451,7 +452,7 @@ def check_prometheus():
     try:
         response = requests.get(f"{PROMETHEUS_URL}/-/healthy", timeout=2)
         return response.status_code == 200
-    except:
+    except Exception:
         return False
 
 # ============================================================================

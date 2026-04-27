@@ -9,10 +9,11 @@ surface and creating test cases for each public method.
 DO NOT EDIT MANUALLY - Regenerate using test_generator.py
 """
 
-import pytest
 import sys
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import pytest
 
 # Add parent to path
 sigmalang_root = Path(__file__).parent.parent.parent

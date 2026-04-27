@@ -4,16 +4,18 @@
 Automated performance analysis and optimization
 """
 
+import json
 import os
 import sys
-import json
-import time
-import psutil
-import tracemalloc
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Any
 import threading
+import time
+import tracemalloc
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import psutil
+
 
 class PerformanceProfiler:
     def __init__(self):
@@ -67,7 +69,7 @@ class PerformanceProfiler:
 
                 # Perform encoding operation
                 test_text = "This is a test sentence for memory profiling. " * 100
-                result = encoder.encode(test_text)
+                encoder.encode(test_text)
 
                 # Take snapshot after
                 snapshot2 = tracemalloc.take_snapshot()
@@ -93,7 +95,7 @@ class PerformanceProfiler:
                 snapshot1 = tracemalloc.take_snapshot()
 
                 test_tree = {"text": "Hello world", "type": "sentence"}
-                encoded = codec.encode_with_verification(test_tree)
+                codec.encode_with_verification(test_tree)
 
                 snapshot2 = tracemalloc.take_snapshot()
 
@@ -209,7 +211,7 @@ class PerformanceProfiler:
                 # Run multiple times for statistical significance
                 for _ in range(10):
                     start_time = time.perf_counter()
-                    result = encoder.encode(test_text)
+                    encoder.encode(test_text)
                     end_time = time.perf_counter()
 
                     latency = (end_time - start_time) * 1000  # Convert to milliseconds

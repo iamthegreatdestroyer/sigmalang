@@ -8,19 +8,20 @@ Tests for:
 - Integration of persistence, evolution, and intelligence layers
 """
 
-import pytest
 import json
 import time
 from pathlib import Path
 from unittest.mock import Mock, patch
+
+import pytest
+
 from sigmalang.core.advanced_analogy_patterns import (
     AnalyticsCollector,
-    QueryMethod,
-    QueryAnalytic,
     FeedbackLoop,
+    QueryAnalytic,
+    QueryMethod,
     SystemIntelligence,
 )
-
 
 # ============================================================================
 # ANALYTICS COLLECTOR TESTS

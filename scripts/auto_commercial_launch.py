@@ -18,12 +18,13 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
-import shutil
+from typing import Any, Dict, List
+
 
 class CommercialLaunchPreparer:
     """AI-powered commercial launch preparation system"""
@@ -555,7 +556,7 @@ def main():
     with open(results_file, 'w') as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n💰 Commercial Launch Preparation Complete")
+    print("\n💰 Commercial Launch Preparation Complete")
     print(f"📂 Results: {results_file}")
 
     # Summary

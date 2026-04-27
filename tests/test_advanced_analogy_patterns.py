@@ -18,35 +18,35 @@ Total Tests: 40+
 Coverage Target: >90%
 """
 
-import pytest
-import time
 import json
+import time
 from pathlib import Path
 from typing import List
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
-from sigmalang.core.semantic_analogy_engine import (
-    SemanticAnalogyEngine,
-    AnalogyResult,
-)
+import pytest
+
 from sigmalang.core.advanced_analogy_patterns import (
-    AnalogyCachingLayer,
-    FuzzyAnalogyMatcher,
-    InverseAnalogyResolver,
-    AnalogyChainingEngine,
     AnalogyCacheManager,
+    AnalogyCachingLayer,
+    AnalogyChainingEngine,
     CacheStatistics,
     ChainedAnalogyResult,
-    InverseAnalogyResult,
+    FuzzyAnalogyMatcher,
     FuzzyAnalogyResult,
+    InverseAnalogyResolver,
+    InverseAnalogyResult,
 )
 from sigmalang.core.analogy_composition import (
-    AnalogyCompositionEngine,
     AnalogyCatalog,
-    AnalogySolver,
+    AnalogyCompositionEngine,
     AnalogyPattern,
+    AnalogySolver,
 )
-
+from sigmalang.core.semantic_analogy_engine import (
+    AnalogyResult,
+    SemanticAnalogyEngine,
+)
 
 # ============================================================================
 # FIXTURES
@@ -474,10 +474,10 @@ class TestAnalogyCompositionEngine:
 
     def test_pattern_chaining(self, composition_engine):
         """Test creating chained patterns."""
-        pattern1 = composition_engine.create_pattern(
+        composition_engine.create_pattern(
             [("king", "male")], pattern_name="p1"
         )
-        pattern2 = composition_engine.create_pattern(
+        composition_engine.create_pattern(
             [("queen", "female")], pattern_name="p2"
         )
 
@@ -626,10 +626,6 @@ def test_chaining_various_lengths(chaining_engine, chain_length):
 # ============================================================================
 
 __all__ = [
-    'test_cache_initialization',
-    'test_cache_hit_and_miss',
-    'test_fuzzy_matching_basic',
-    'test_inverse_with_multiple_solutions',
     'TestAnalogyCachingLayer',
     'TestFuzzyAnalogyMatcher',
     'TestInverseAnalogyResolver',

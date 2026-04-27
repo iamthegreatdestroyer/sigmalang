@@ -19,12 +19,13 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
-import shutil
+from typing import Any, Dict, List
+
 
 class SDKGenerator:
     """AI-powered SDK generation engine"""
@@ -802,7 +803,7 @@ def main():
     with open(results_file, 'w') as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n📦 SDK Generation Complete")
+    print("\n📦 SDK Generation Complete")
     print(f"📂 Results: {results_file}")
 
     # Summary

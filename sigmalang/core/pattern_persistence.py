@@ -10,14 +10,17 @@ Key Components:
 - PatternDiscovery: Advanced search algorithms
 """
 
-import json
 import gzip
 import hashlib
-from pathlib import Path
-from typing import Dict, List, Set, Tuple, Any, Optional
-from dataclasses import dataclass, asdict, field
-from datetime import datetime
+import json
 import logging
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple
+
+if TYPE_CHECKING:
+    from sigmalang.core.analogy_composition import AnalogyPattern
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +55,7 @@ class PatternMetadata:
 class PatternIndex:
     """
     Inverted index for efficient pattern searching.
-    
+
     Features:
     - Word-based indexing for pattern terms
     - Domain tag indexing
@@ -87,17 +90,17 @@ class PatternIndex:
 
         # Index terms from analogies - handle dict and attribute-based patterns
         pattern_str = str(pattern).lower()
-        
+
         # Extract terms from string representation
         import re
         # Find all words (sequences of alphanumeric characters, including single letters)
         terms = re.findall(r'\b[a-z0-9]+\b', pattern_str)
-        
+
         # Add original terms before lowercasing (to catch uppercase letters like A, B, X, Y)
         pattern_str_orig = str(pattern)
         terms_orig = re.findall(r'\b[a-zA-Z0-9]+\b', pattern_str_orig)
         terms.extend([t.lower() for t in terms_orig])
-        
+
         for term in terms:
             if term and term not in ['analogies', 'relationships', 'name', 'and', 'the', 'a', 'false', 'true', 'none']:  # Skip common words
                 if term not in self.term_index:
@@ -225,7 +228,7 @@ class PatternIndex:
 class CatalogPersistence:
     """
     Handles catalog serialization and deserialization.
-    
+
     Features:
     - JSON format for human readability
     - Gzip compression for efficiency
@@ -351,7 +354,7 @@ class CatalogPersistence:
 class EnhancedAnalogyCatalog:
     """
     Enhanced analogy pattern catalog with persistence and indexing.
-    
+
     Features:
     - Pattern registration with metadata
     - Efficient search via indexing

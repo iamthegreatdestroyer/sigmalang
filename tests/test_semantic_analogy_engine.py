@@ -22,21 +22,21 @@ Author: ΣLANG Team
 License: AGPLv3 / Commercial Dual License
 """
 
-import pytest
-import numpy as np
-from typing import List, Tuple, Set
+import json
 import time
 from pathlib import Path
-import json
-from unittest.mock import Mock, patch, MagicMock
+from typing import List, Set, Tuple
+from unittest.mock import MagicMock, Mock, patch
+
+import numpy as np
+import pytest
 
 from sigmalang.core.semantic_analogy_engine import (
-    SemanticAnalogyEngine,
-    AnalogyResult,
     AnalogyBenchmark,
+    AnalogyResult,
     HDVectorSpace,
+    SemanticAnalogyEngine,
 )
-
 
 # ============================================================================
 # FIXTURES

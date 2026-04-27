@@ -14,11 +14,11 @@ Usage:
   python scripts/auto_fix_tests.py --ci     # CI mode (exit 1 on unfixable)
 """
 
+import os
+import re
+import shutil
 import subprocess
 import sys
-import re
-import os
-import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -122,7 +122,7 @@ def auto_fix_import_error(failure, dry_run=True):
                 )
                 content = content.replace(old_import, new_import)
                 full_path.write_text(content, encoding="utf-8")
-                print(f"  ✅ Auto-wrapped import in try/except")
+                print("  ✅ Auto-wrapped import in try/except")
                 return True
     return False
 
@@ -143,13 +143,13 @@ def auto_fix_timeout(failure, dry_run=True):
     content = full_path.read_text(encoding="utf-8")
 
     # Check if already marked
-    if f"@pytest.mark.timeout" in content and func_name in content:
+    if "@pytest.mark.timeout" in content and func_name in content:
         return False
 
     if not dry_run:
         # Add timeout marker before the test function
         pattern = rf"(    def {func_name}\()"
-        replacement = f"    @pytest.mark.timeout(600)\n\\1"
+        replacement = "    @pytest.mark.timeout(600)\n\\1"
         new_content = re.sub(pattern, replacement, content, count=1)
         if new_content != content:
             full_path.write_text(new_content, encoding="utf-8")

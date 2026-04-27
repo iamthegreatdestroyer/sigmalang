@@ -33,10 +33,10 @@ Usage:
     matches = vq.search_across_modalities(query_vec, top_k=5)
 """
 
-import math
 import logging
-from typing import Dict, List, Tuple, Optional, Any
+import math
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -463,7 +463,7 @@ class MultiModalVQ:
         if magic != b'\xCE\xA3\x4D\x56':
             raise ValueError("Invalid MultiModalVQ magic bytes")
 
-        version = struct.unpack_from('<B', data, offset)[0]
+        struct.unpack_from('<B', data, offset)[0]
         offset += 1
 
         cb_size, shared_dim, text_dim, image_dim = struct.unpack_from('<IIII', data, offset)

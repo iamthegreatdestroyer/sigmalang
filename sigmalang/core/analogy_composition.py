@@ -21,12 +21,15 @@ Example:
     >>> result = solver.solve_interactive("prince", "boy", "princess")
 """
 
-from dataclasses import dataclass, field
-from typing import List, Tuple, Optional, Dict, Any
-import logging
-from pathlib import Path
 import json
+import logging
 import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+
+if TYPE_CHECKING:
+    from sigmalang.core.advanced_analogy_patterns import CompositeAnalogyResult
 
 logger = logging.getLogger(__name__)
 

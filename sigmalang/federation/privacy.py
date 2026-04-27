@@ -17,10 +17,10 @@ Research Basis:
     - RDP Composition (Mironov, 2017): Renyi differential privacy
 """
 
-import math
 import logging
-from typing import Optional, List, Tuple
+import math
 from dataclasses import dataclass, field
+from typing import List, Optional, Tuple
 
 import numpy as np
 

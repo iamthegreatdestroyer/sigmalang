@@ -44,10 +44,10 @@ from .types import (
 class CompressionEngine(Protocol):
     """
     Core ΣLANG compression engine protocol.
-    
+
     This is the PRIMARY integration point for Ryot LLM.
     """
-    
+
     @abstractmethod
     def encode(
         self,
@@ -58,7 +58,7 @@ class CompressionEngine(Protocol):
     ) -> EncodingResult:
         """Encode token sequence to ΣLANG representation."""
         ...
-    
+
     @abstractmethod
     def decode(
         self,
@@ -66,7 +66,7 @@ class CompressionEngine(Protocol):
     ) -> DecodingResult:
         """Decode ΣLANG representation back to tokens."""
         ...
-    
+
     @abstractmethod
     def encode_streaming(
         self,
@@ -75,17 +75,17 @@ class CompressionEngine(Protocol):
     ) -> Iterator[EncodedGlyph]:
         """Encode tokens in streaming mode for real-time processing."""
         ...
-    
+
     @abstractmethod
     def get_compression_ratio(self) -> float:
         """Get average compression ratio from recent operations."""
         ...
-    
+
     @abstractmethod
     def get_statistics(self) -> CompressionStatistics:
         """Get comprehensive compression statistics."""
         ...
-    
+
     @abstractmethod
     def is_available(self) -> bool:
         """Check if ΣLANG is ready for encoding."""
@@ -95,7 +95,7 @@ class CompressionEngine(Protocol):
 @runtime_checkable
 class RSUManager(Protocol):
     """RSU (Recyclable Semantic Unit) management protocol."""
-    
+
     @abstractmethod
     def store(
         self,
@@ -105,7 +105,7 @@ class RSUManager(Protocol):
     ) -> RSUReference:
         """Store encoded context as a reusable RSU."""
         ...
-    
+
     @abstractmethod
     def retrieve(
         self,
@@ -113,7 +113,7 @@ class RSUManager(Protocol):
     ) -> RSUEntry:
         """Retrieve RSU by reference."""
         ...
-    
+
     @abstractmethod
     def find_by_hash(
         self,
@@ -122,7 +122,7 @@ class RSUManager(Protocol):
     ) -> Optional[RSUReference]:
         """Find RSU by semantic hash (O(1) lookup)."""
         ...
-    
+
     @abstractmethod
     def find_similar(
         self,
@@ -132,7 +132,7 @@ class RSUManager(Protocol):
     ) -> List[Tuple[RSUReference, float]]:
         """Find similar RSUs by semantic similarity."""
         ...
-    
+
     @abstractmethod
     def get_chain(
         self,
@@ -140,7 +140,7 @@ class RSUManager(Protocol):
     ) -> RSUChain:
         """Get all RSUs in a conversation chain."""
         ...
-    
+
     @abstractmethod
     def create_delta(
         self,
@@ -149,7 +149,7 @@ class RSUManager(Protocol):
     ) -> RSUReference:
         """Create delta-encoded RSU from parent."""
         ...
-    
+
     @abstractmethod
     def promote_tier(
         self,
@@ -158,7 +158,7 @@ class RSUManager(Protocol):
     ) -> bool:
         """Move RSU to different storage tier."""
         ...
-    
+
     @abstractmethod
     def evict(
         self,
@@ -166,7 +166,7 @@ class RSUManager(Protocol):
     ) -> bool:
         """Remove RSU from storage."""
         ...
-    
+
     @abstractmethod
     def get_statistics(self) -> Dict:
         """Get RSU storage statistics."""
@@ -176,17 +176,17 @@ class RSUManager(Protocol):
 @runtime_checkable
 class CodebookProtocol(Protocol):
     """ΣLANG codebook management protocol."""
-    
+
     @abstractmethod
     def load(self, path: str) -> bool:
         """Load codebook from file."""
         ...
-    
+
     @abstractmethod
     def save(self, path: str) -> bool:
         """Save codebook to file."""
         ...
-    
+
     @abstractmethod
     def lookup_glyph(
         self,
@@ -194,7 +194,7 @@ class CodebookProtocol(Protocol):
     ) -> Optional[SemanticGlyph]:
         """Find glyph that represents given token sequence."""
         ...
-    
+
     @abstractmethod
     def lookup_tokens(
         self,
@@ -202,7 +202,7 @@ class CodebookProtocol(Protocol):
     ) -> List[List[int]]:
         """Find token patterns associated with glyph."""
         ...
-    
+
     @abstractmethod
     def add_learned_pattern(
         self,
@@ -211,17 +211,17 @@ class CodebookProtocol(Protocol):
     ) -> Optional[int]:
         """Add a learned pattern to Tier 2."""
         ...
-    
+
     @abstractmethod
     def get_metadata(self) -> CodebookMetadata:
         """Get codebook metadata."""
         ...
-    
+
     @abstractmethod
     def export_state(self) -> CodebookState:
         """Export complete codebook state."""
         ...
-    
+
     @abstractmethod
     def import_state(self, state: CodebookState) -> bool:
         """Import codebook state."""
@@ -231,7 +231,7 @@ class CodebookProtocol(Protocol):
 @runtime_checkable
 class StorageBackend(Protocol):
     """Storage backend protocol for RSU persistence. ΣVAULT implements this."""
-    
+
     @abstractmethod
     def store(
         self,
@@ -241,7 +241,7 @@ class StorageBackend(Protocol):
     ) -> bool:
         """Store binary data with key."""
         ...
-    
+
     @abstractmethod
     def retrieve(
         self,
@@ -249,7 +249,7 @@ class StorageBackend(Protocol):
     ) -> Optional[bytes]:
         """Retrieve data by key."""
         ...
-    
+
     @abstractmethod
     def delete(
         self,
@@ -257,7 +257,7 @@ class StorageBackend(Protocol):
     ) -> bool:
         """Delete data by key."""
         ...
-    
+
     @abstractmethod
     def exists(
         self,
@@ -265,7 +265,7 @@ class StorageBackend(Protocol):
     ) -> bool:
         """Check if key exists."""
         ...
-    
+
     @abstractmethod
     def list_keys(
         self,
@@ -278,7 +278,7 @@ class StorageBackend(Protocol):
 @runtime_checkable
 class SigmaFactory(Protocol):
     """Factory for creating configured ΣLANG components."""
-    
+
     @abstractmethod
     def create_engine(
         self,
@@ -288,7 +288,7 @@ class SigmaFactory(Protocol):
     ) -> CompressionEngine:
         """Create configured compression engine."""
         ...
-    
+
     @abstractmethod
     def create_rsu_manager(
         self,

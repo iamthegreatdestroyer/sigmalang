@@ -11,16 +11,17 @@ Install:
     pip install fastapi uvicorn requests
 """
 
-from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-import requests
+import asyncio
 import json
 import subprocess
-from pathlib import Path
 from datetime import datetime
-import asyncio
+from pathlib import Path
 from typing import Optional
+
+import requests
+from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 # Configuration
 API_HOST = "http://localhost:26080"
@@ -43,7 +44,7 @@ def check_api_health():
     try:
         response = requests.get(f"{API_HOST}/health", timeout=2)
         return response.status_code == 200
-    except:
+    except Exception:
         return False
 
 def get_detailed_health():
@@ -51,7 +52,7 @@ def get_detailed_health():
     try:
         response = requests.get(f"{API_HOST}/health/detailed", timeout=2)
         return response.json()
-    except:
+    except Exception:
         return None
 
 def run_command(cmd):
