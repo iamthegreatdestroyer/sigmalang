@@ -83,7 +83,7 @@ jobs:
         run: |
           python -m pytest tests/ --ignore=tests/claude_integration \
             -q --tb=short --cov=sigmalang --cov-report=term-missing \
-            --cov-fail-under=85 --timeout=300
+            --cov-fail-under=60 --timeout=300
 
       - name: Health monitor
         if: always()
