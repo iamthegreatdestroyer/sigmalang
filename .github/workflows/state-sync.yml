@@ -1,0 +1,78 @@
+# =============================================================================
+# State Sync — Autonomy & Automation v10 (Tier E1)
+# Auto-updates automation_state.json on milestone events
+# =============================================================================
+name: State Sync
+
+on:
+  workflow_run:
+    workflows: ["CI", "Release"]
+    types: [completed]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly Monday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual sync'
+        required: false
+        default: 'manual refresh'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: state-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Update automation_state.json
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Patch automation_state.json
+        id: patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, datetime, pathlib
+          p = pathlib.Path("automation_state.json")
+          if not p.exists():
+              raise SystemExit("automation_state.json missing")
+          state = json.loads(p.read_text(encoding="utf-8"))
+          now = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+          state["last_updated"] = now
+          sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+          state["last_commit_sha"] = sha
+          trigger = os.environ.get("GITHUB_EVENT_NAME", "manual")
+          history = state.setdefault("sync_history", [])
+          history.append({"ts": now, "trigger": trigger, "sha": sha[:7]})
+          state["sync_history"] = history[-25:]  # cap
+          p.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+          print("patched")
+          PY
+
+      - name: Commit & push if changed
+        shell: bash
+        run: |
+          if git diff --quiet automation_state.json; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add automation_state.json
+          git commit -m "chore(state): auto-sync automation_state [skip ci]
+
+          Trigger: ${{ github.event_name }}
+          Run: ${{ github.run_id }}"
+          git push

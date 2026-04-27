@@ -1,0 +1,49 @@
+# =============================================================================
+# Badge Refresh — Autonomy & Automation v10 (Tier E2)
+# Forces shields.io cache invalidation so README badges stay fresh
+# =============================================================================
+name: Badge Refresh
+
+on:
+  schedule:
+    - cron: '15 7 * * *'  # Daily 07:15 UTC
+  workflow_run:
+    workflows: ["CI", "Release", "Docker"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: badge-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    name: Invalidate shields.io cache
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract & ping badge URLs from README
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f README.md ]; then
+            echo "README.md missing — nothing to refresh"
+            exit 0
+          fi
+          urls=$(grep -oE 'https://img\.shields\.io/[^)\"[:space:]]+' README.md | sort -u || true)
+          if [ -z "$urls" ]; then
+            echo "No shields.io badges detected"
+            exit 0
+          fi
+          count=0
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            curl -fsSL --max-time 10 -o /dev/null "$url" || echo "warn: $url"
+            count=$((count+1))
+          done <<< "$urls"
+          echo "Refreshed $count badge(s)"
