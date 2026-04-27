@@ -131,6 +131,8 @@ credentials.json
 token.json
 apikey.txt
 *credentials*
+# Allow documentation file (no actual secrets, only setup instructions)
+!docs/publishing/CREDENTIALS_SETUP.md
 
 # Spyder project settings
 .spyderproject
@@ -217,3 +219,7 @@ test_final_report.txt
 test_fix_check*.txt
 stream_test_errors.txt
 streaming_results_*.txt
+
+# Archived legacy artifacts
+archive/
+
