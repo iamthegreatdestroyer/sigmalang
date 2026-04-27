@@ -35,6 +35,30 @@ Transform the SigmaLang repository from a *manually-maintained* state into a *se
 
 ---
 
+## Required Repository Secrets
+
+Configure once via `gh secret set <NAME>` (or GitHub UI → Settings → Secrets and variables → Actions). These secrets unblock fully autonomous release + container publish flows.
+
+| Secret | Required By | Purpose | Acquisition |
+|--------|-------------|---------|-------------|
+| `PYPI_API_TOKEN` | `release.yml:142` | Publish wheels/sdist to PyPI on tag push | https://pypi.org/manage/account/token/ → scope: project `sigmalang` |
+| `DOCKER_HUB_USERNAME` | `release.yml:167` | Authenticate Docker Hub push | Docker Hub account username |
+| `DOCKER_HUB_TOKEN` | `release.yml:168` | Push container images on release | https://hub.docker.com/settings/security → New Access Token (Read/Write/Delete) |
+| `CODECOV_TOKEN` *(optional)* | `ci.yml` | Upload coverage reports | https://app.codecov.io/gh/iamthegreatdestroyer/sigmalang/settings → Repository Upload Token |
+
+**Setup commands (PowerShell):**
+
+```powershell
+gh secret set PYPI_API_TOKEN --body "pypi-AgEI..."
+gh secret set DOCKER_HUB_USERNAME --body "iamthegreatdestroyer"
+gh secret set DOCKER_HUB_TOKEN --body "dckr_pat_..."
+gh secret set CODECOV_TOKEN --body "..."   # optional
+```
+
+**Verification:** `gh secret list` should show all four (or three) entries. Re-trigger `release.yml` via tag push or `workflow_dispatch` to confirm jobs no longer skip on missing credentials.
+
+---
+
 ## Tier B — Carry-over from v9 Tier 4 (F1–F10)
 
 Items deferred from v9 that remain valuable but were not blockers. Tracked but executed *after* Tier C autonomy infrastructure is in place so they benefit from automation.
