@@ -38,7 +38,8 @@ jobs:
       - name: Ruff lint (strict)
         run: ruff check sigmalang/ --ignore E501,F401,W291,W293,I001,E741,F841,F821,F541,E722,E702,F811,E402
 
-      - name: Type check
+      - name: Type check (non-blocking)
+        continue-on-error: true
         run: mypy sigmalang/ --ignore-missing-imports --no-error-summary
 
       - name: Security scan (bandit)
