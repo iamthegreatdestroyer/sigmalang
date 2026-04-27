@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, '.')
 
-from core.primitives import ExistentialPrimitive, Glyph, GlyphStream, GlyphType
+from sigmalang.core.primitives import ExistentialPrimitive, Glyph, GlyphStream, GlyphType
 
 print('=== Glyph Encoding/Decoding Test ===')
 

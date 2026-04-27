@@ -5,8 +5,8 @@ import sys
 
 sys.path.insert(0, '.')
 
-from core.encoder import SigmaDecoder, SigmaEncoder
-from core.parser import SemanticParser
+from sigmalang.core.encoder import SigmaDecoder, SigmaEncoder
+from sigmalang.core.parser import SemanticParser
 
 print('=== Full Pipeline Debug: Special Characters ===')
 print()

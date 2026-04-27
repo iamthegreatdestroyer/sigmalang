@@ -38,6 +38,9 @@ collect_ignore_glob = [
     "core/semantic_search.py",
     "core/multilingual_support.py",
     "core/streaming_processor.py",
+    # Debug scripts (not pytest tests) — kept runnable standalone
+    "tests/test_pipeline_debug.py",
+    "tests/test_edge_debug.py",
 ]
 
 

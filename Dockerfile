@@ -36,7 +36,7 @@ RUN pip install --upgrade pip setuptools wheel && \
 
 # Install the package with all dependencies
 COPY . .
-RUN pip install -e ".[dev]"
+RUN pip install ".[dev]"
 
 # =============================================================================
 # STAGE 2: Production - Minimal runtime image
@@ -62,7 +62,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     SIGMALANG_LOG_FORMAT=json \
     SIGMALANG_METRICS_ENABLED=true \
     # Virtual environment
-    PATH="/opt/venv/bin:$PATH"
+    PATH="/opt/venv/bin:$PATH" \
+    # Ensure /app source tree is importable (defense-in-depth alongside pip install)
+    PYTHONPATH=/app
 
 # Create non-root user for security
 RUN groupadd --gid 1000 sigmalang && \
