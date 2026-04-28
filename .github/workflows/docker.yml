@@ -252,36 +252,48 @@ jobs:
           # Start all services
           docker compose -f docker-compose.yml up -d
 
-          # Wait for services to be healthy
-          echo "Waiting for services to be healthy..."
-          sleep 15
+          # Wait for sigmalang API to be ready (compose maps 26080:8000)
+          echo "Waiting for sigmalang API on :26080 to be ready..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:26080/health >/dev/null 2>&1; then
+              echo "✓ API ready after ${i} attempts"
+              break
+            fi
+            sleep 2
+            if [ "$i" -eq 60 ]; then
+              echo "✗ API failed to become ready within 120s"
+              docker compose ps
+              docker compose logs --tail=200
+              exit 1
+            fi
+          done
 
       - name: Verify all services running
         run: |
-          # Check sigmalang API
-          curl -sf http://localhost:8000/health | jq .
+          # Check sigmalang API (compose: 26080:8000)
+          curl -sf http://localhost:26080/health | jq .
 
-          # Check Prometheus
-          curl -sf http://localhost:9090/-/healthy
+          # Check Prometheus (compose: 26900:9090)
+          curl -sf http://localhost:26900/-/healthy
 
-          # Check Grafana
-          curl -sf http://localhost:3000/api/health | jq .
+          # Check Grafana (compose: 26910:3000)
+          curl -sf http://localhost:26910/api/health | jq .
 
       - name: Run integration tests
         run: |
           # Test API with Redis caching
           for i in $(seq 1 5); do
-            curl -sf -X POST http://localhost:8000/api/v1/encode \
+            curl -sf -X POST http://localhost:26080/api/v1/encode \
               -H "Content-Type: application/json" \
               -d '{"text": "Integration test '"$i"'"}' > /dev/null
           done
 
           # Verify metrics are being collected
-          curl -sf http://localhost:8000/metrics | grep -q "sigmalang_"
+          curl -sf http://localhost:26080/metrics | grep -q "sigmalang_"
           echo "✓ Metrics are being exported"
 
           # Verify Prometheus is scraping
-          curl -sf "http://localhost:9090/api/v1/query?query=up" | jq .
+          curl -sf "http://localhost:26900/api/v1/query?query=up" | jq .
           echo "✓ Prometheus is scraping metrics"
 
       - name: Collect logs on failure
