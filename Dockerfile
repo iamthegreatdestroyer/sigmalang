@@ -118,3 +118,13 @@ FROM production AS cli
 # Override entrypoint for CLI usage
 ENTRYPOINT ["sigmalang"]
 CMD ["--help"]
+
+# =============================================================================
+# STAGE 5: Default runtime - Ensures `docker build .` (no --target) yields the
+# API server image, not the CLI. This is the LAST stage so it becomes the
+# default build target. Mirrors `production` exactly.
+# =============================================================================
+FROM production AS runtime
+# Inherits all production config: sigmalang user, /opt/venv, EXPOSE 8000,
+# HEALTHCHECK on /health, and CMD ["sigmalang-server"].
+
