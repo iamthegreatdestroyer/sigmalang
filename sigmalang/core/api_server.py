@@ -623,7 +623,8 @@ class SigmalangAPI:
 
         try:
             if request.vectors:
-                vectors = [np.array(v) for v in request.vectors]
+                # Cast to int64 to support bitwise ops (<<) in decoder pipeline
+                vectors = [np.asarray(v, dtype=np.int64) for v in request.vectors]
                 texts = self.decoder.decode_batch(vectors, request.max_length)
                 return DecodeResponse(
                     success=True,
@@ -632,7 +633,8 @@ class SigmalangAPI:
                     processing_time_ms=(time.perf_counter() - start) * 1000
                 )
             else:
-                vector = np.array(request.vector)
+                # Cast to int64 to support bitwise ops (<<) in decoder pipeline
+                vector = np.asarray(request.vector, dtype=np.int64)
                 text = self.decoder.decode(vector, request.max_length)
                 return DecodeResponse(
                     success=True,
