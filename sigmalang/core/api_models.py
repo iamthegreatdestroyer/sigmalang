@@ -111,6 +111,7 @@ class EncodeResponse(BaseResponse):
     dimensions: int = 0
     metadata: Optional[Dict[str, Any]] = None
     token_count: int = 0
+    codeword: Optional[str] = None  # Compressed representation of encoded data
 
 
 @dataclass
