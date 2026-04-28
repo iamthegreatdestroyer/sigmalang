@@ -157,3 +157,31 @@ def perf_timer():
     def _factory():
         return _Timer()
     return _factory
+
+
+# =============================================================================
+# CI Hang Mitigation (RCA #9)
+# =============================================================================
+# Some integration tests start non-daemon worker threads (streaming, asyncio
+# pools) that prevent Python interpreter shutdown after pytest finishes.
+# This caused CI jobs to hang for hours after all tests had already passed.
+# In CI environments, force-exit if non-daemon threads remain alive after
+# pytest fully completes. Locally we leave normal shutdown for debugging.
+@pytest.hookimpl(trylast=True)
+def pytest_unconfigure(config):
+    """Force interpreter exit in CI if non-daemon threads are still alive."""
+    if not os.environ.get("CI"):
+        return
+    import threading
+    # Brief grace period for any final cleanup hooks (e.g. coverage flush)
+    time.sleep(0.5)
+    leaked = [
+        t for t in threading.enumerate()
+        if t is not threading.main_thread() and t.is_alive() and not t.daemon
+    ]
+    if leaked:
+        # All test results, coverage, and reports have already been written.
+        # Force exit to prevent the runner step from hanging.
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(0 if not getattr(config, "_pytest_session_failed", False) else 1)

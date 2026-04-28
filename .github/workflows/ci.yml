@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
   schedule:
     - cron: "0 6 * * 1" # Weekly Monday 6am UTC — catch dependency drift
 
@@ -37,7 +37,8 @@ jobs:
           pip install ruff mypy bandit[toml] pip-audit numpy
 
       - name: Ruff lint (strict)
-        run: ruff check sigmalang/ --ignore E501,F401,W291,W293,I001,E741,F841,F821,F541,E722,E702,F811,E402
+        run: ruff check sigmalang/ --ignore
+          E501,F401,W291,W293,I001,E741,F841,F821,F541,E722,E702,F811,E402
 
       - name: Type check (non-blocking)
         continue-on-error: true
@@ -60,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +92,8 @@ jobs:
             --timeout=300 -m "not integration"
 
       - name: Run integration tests
-        run: python -m pytest tests/integration/ -v --timeout=600
+        timeout-minutes: 10
+        run: python -m pytest tests/integration/ -v --timeout=120
 
       - name: Upload coverage (primary version only)
         uses: codecov/codecov-action@v4
