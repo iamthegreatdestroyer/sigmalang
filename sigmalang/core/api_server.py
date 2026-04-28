@@ -979,35 +979,35 @@ def create_app(config: Optional[SigmalangConfig] = None):
     def _metrics():
         return api.metrics()
 
-    @app.post("/encode")
+    @app.post("/api/v1/encode")
     def _encode(req: EncodeRequest):
         return api.encode(req)
 
-    @app.post("/decode")
+    @app.post("/api/v1/decode")
     def _decode(req: DecodeRequest):
         return api.decode(req)
 
-    @app.post("/analogy")
+    @app.post("/api/v1/analogy")
     def _analogy(req: AnalogyRequest):
         return api.solve_analogy(req)
 
-    @app.post("/analogy/explain")
+    @app.post("/api/v1/analogy/explain")
     def _analogy_explain(req: AnalogyExplainRequest):
         return api.explain_analogy(req)
 
-    @app.post("/search")
+    @app.post("/api/v1/search")
     def _search(req: SearchRequest):
         return api.search_corpus(req)
 
-    @app.post("/entities")
+    @app.post("/api/v1/entities")
     def _entities(req: EntityExtractionRequest):
         return api.extract_entities(req)
 
-    @app.post("/embeddings")
+    @app.post("/api/v1/embeddings")
     def _embeddings(req: EmbeddingRequest):
         return api.get_embeddings(req)
 
-    @app.post("/similarity")
+    @app.post("/api/v1/similarity")
     def _similarity(req: SimilarityRequest):
         return api.compute_similarity(req)
 
