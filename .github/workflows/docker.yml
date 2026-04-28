@@ -196,13 +196,13 @@ jobs:
             -d '{"text": "Hello, ΣLANG!", "config": {"quality": "balanced"}}')
           echo "Encode response: $ENCODE_RESPONSE"
 
-          # Extract encoded data
-          ENCODED=$(echo $ENCODE_RESPONSE | jq -r '.encoded')
+          # Extract encoded vector (compact JSON array)
+          ENCODED=$(echo $ENCODE_RESPONSE | jq -c '.vector')
 
           # Test decode endpoint
           DECODE_RESPONSE=$(curl -sf -X POST http://localhost:8000/api/v1/decode \
             -H "Content-Type: application/json" \
-            -d "{\"encoded\": \"$ENCODED\"}")
+            -d "{\"vector\": $ENCODED}")
           echo "Decode response: $DECODE_RESPONSE"
 
           # Verify roundtrip
