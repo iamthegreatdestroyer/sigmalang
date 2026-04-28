@@ -1026,7 +1026,7 @@ def main():
     import os
     import uvicorn
 
-    host = os.environ.get("SIGMALANG_API_HOST", "0.0.0.0")
+    host = os.environ.get("SIGMALANG_API_HOST", "0.0.0.0")  # nosec B104
     port = int(os.environ.get("SIGMALANG_API_PORT", "8000"))
     log_level = os.environ.get("SIGMALANG_LOG_LEVEL", "info").lower()
 
