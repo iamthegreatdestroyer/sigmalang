@@ -937,3 +937,106 @@ def create_api(config: Optional[SigmalangConfig] = None) -> SigmalangAPI:
     api = SigmalangAPI(config)
     api.initialize()
     return api
+
+
+# =============================================================================
+# FastAPI HTTP Layer
+# =============================================================================
+try:
+    from fastapi import FastAPI, HTTPException
+    from fastapi.responses import PlainTextResponse
+    _HAS_FASTAPI = True
+except ImportError:  # pragma: no cover
+    _HAS_FASTAPI = False
+    FastAPI = None  # type: ignore
+    HTTPException = None  # type: ignore
+    PlainTextResponse = None  # type: ignore
+
+
+def create_app(config: Optional[SigmalangConfig] = None):
+    """Create the FastAPI application with all SigmaLang routes."""
+    if not _HAS_FASTAPI:
+        raise RuntimeError(
+            "FastAPI is not installed. Install with: pip install fastapi uvicorn"
+        )
+
+    app = FastAPI(
+        title="SigmaLang API",
+        description="ΣLANG REST API - Semantic compression and reasoning",
+        version=__version__,
+    )
+    api = create_api(config) if config is not None else get_api()
+
+    @app.get("/health")
+    def _health():
+        return api.health()
+
+    @app.get("/info")
+    def _info():
+        return api.info()
+
+    @app.get("/metrics", response_class=PlainTextResponse)
+    def _metrics():
+        return api.metrics()
+
+    @app.post("/encode")
+    def _encode(req: EncodeRequest):
+        return api.encode(req)
+
+    @app.post("/decode")
+    def _decode(req: DecodeRequest):
+        return api.decode(req)
+
+    @app.post("/analogy")
+    def _analogy(req: AnalogyRequest):
+        return api.solve_analogy(req)
+
+    @app.post("/analogy/explain")
+    def _analogy_explain(req: AnalogyExplainRequest):
+        return api.explain_analogy(req)
+
+    @app.post("/search")
+    def _search(req: SearchRequest):
+        return api.search_corpus(req)
+
+    @app.post("/entities")
+    def _entities(req: EntityExtractionRequest):
+        return api.extract_entities(req)
+
+    @app.post("/embeddings")
+    def _embeddings(req: EmbeddingRequest):
+        return api.get_embeddings(req)
+
+    @app.post("/similarity")
+    def _similarity(req: SimilarityRequest):
+        return api.compute_similarity(req)
+
+    return app
+
+
+# Alias for compatibility with docker-compose.dev.yml
+create_fastapi_app = create_app
+
+# Module-level app instance for `uvicorn sigmalang.core.api_server:app`
+app = create_app() if _HAS_FASTAPI else None
+
+
+def main():
+    """Console entrypoint for `sigmalang-server` (pyproject.toml script)."""
+    import os
+    import uvicorn
+
+    host = os.environ.get("SIGMALANG_API_HOST", "0.0.0.0")
+    port = int(os.environ.get("SIGMALANG_API_PORT", "8000"))
+    log_level = os.environ.get("SIGMALANG_LOG_LEVEL", "info").lower()
+
+    uvicorn.run(
+        "sigmalang.core.api_server:app",
+        host=host,
+        port=port,
+        log_level=log_level,
+    )
+
+
+if __name__ == "__main__":
+    main()
