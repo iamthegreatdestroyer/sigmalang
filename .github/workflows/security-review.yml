@@ -5,7 +5,7 @@ on:
     paths:
       - "sigmalang/**/*.py"
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
     paths:
       - "sigmalang/core/crypto_*.py"
       - "sigmalang/core/key_*.py"
@@ -35,7 +35,8 @@ jobs:
         run: bandit -r sigmalang/ -ll -f json -o bandit-report.json || true
 
       - name: pip-audit (dependency CVEs)
-        run: pip-audit --strict --desc --format json --output pip-audit-report.json 2>&1 || true
+        run: pip-audit --strict --desc --format json --output pip-audit-report.json 2>&1
+          || true
 
       - name: Safety check (known vulnerabilities)
         run: safety check --json --output safety-report.json 2>&1 || true
@@ -65,7 +66,8 @@ jobs:
 
   nightly-health:
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '0 3 * * *' || github.event_name ==
+      'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 
@@ -87,7 +89,8 @@ jobs:
 
       - name: Health monitor
         if: always()
-        run: python scripts/health_monitor.py --quick 2>&1 || echo "::warning::Health check issues detected"
+        run: python scripts/health_monitor.py --quick 2>&1 || echo "::warning::Health
+          check issues detected"
 
       - name: Auto-test-fixer (diagnose mode)
         if: failure()
