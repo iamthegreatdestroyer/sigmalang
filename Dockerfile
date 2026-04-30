@@ -36,7 +36,10 @@ RUN pip install --upgrade pip setuptools wheel && \
 
 # Install the package with all dependencies
 COPY . .
-RUN pip install ".[dev]"
+RUN pip install "." && \
+    # Remove __pycache__ and .pyc files to reduce image size
+    find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /opt/venv -name "*.pyc" -delete 2>/dev/null || true
 
 # =============================================================================
 # STAGE 2: Production - Minimal runtime image
