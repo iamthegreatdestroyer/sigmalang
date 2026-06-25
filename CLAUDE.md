@@ -58,7 +58,7 @@ Document compression ratios and throughput in BENCHMARK_RESULTS.md:
 ```
 
 ## Done Criteria
-- [ ] 1,656 tests pass (no regression)
+- [x] 1,704 tests pass (no regression)
 - [ ] `docker build && docker run /health` returns 200
 - [ ] `python -m build` produces valid wheel
 - [ ] `BENCHMARK_RESULTS.md` with actual compression numbers
