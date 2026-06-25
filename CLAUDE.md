@@ -59,10 +59,10 @@ Document compression ratios and throughput in BENCHMARK_RESULTS.md:
 
 ## Done Criteria
 - [x] 1,704 tests pass (no regression)
-- [ ] `docker build && docker run /health` returns 200
-- [ ] `python -m build` produces valid wheel
-- [ ] `BENCHMARK_RESULTS.md` with actual compression numbers
-- [ ] `INTEGRATION.md` written
+- [x] `docker build && docker run /health` returns 200
+- [x] `python -m build` (sigmalang-2.0.0-py3-none-any.whl) produces valid wheel
+- [x] `BENCHMARK_RESULTS.md` with actual compression numbers
+- [x] `INTEGRATION.md` written
 
 ## Completion Signal
 Commit "chore: ecosystem integration prep for v1.0.0" and push.
