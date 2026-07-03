@@ -54,7 +54,12 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      # NOTE: the production image (Dockerfile, `production`/`runtime` targets)
+      # never installs curl, so a curl-based test can never succeed regardless
+      # of app health (see Dockerfile's own HEALTHCHECK and docker-compose.personal.yml
+      # for the same precedent). Use the Python urllib one-liner instead, which is
+      # already present in every stage since it's stdlib.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
