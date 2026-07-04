@@ -98,48 +98,64 @@ services:
       - sigmalang-network
 
   # ===========================================================================
-  # Prometheus Metrics
+  # Prometheus Metrics — DISABLED 2026-07-04 (redundant sidecar cleanup)
   # ===========================================================================
-  prometheus:
-    image: prom/prometheus:v2.47.0
-    container_name: sigmalang-prometheus
-    restart: unless-stopped
-    ports:
-      - "26900:9090"  # Prometheus (internal 9090 → external 26900)
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
-      - "--web.enable-lifecycle"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    depends_on:
-      - sigmalang
-    networks:
-      - sigmalang-network
+  # Removed as a duplicate of the box-wide Prometheus (systemd service on
+  # port 9090, config at /etc/prometheus/prometheus.yml). This sidecar was
+  # NOT scraping identical targets — it uniquely scraped sigmalang's own
+  # /metrics endpoint (job "sigmalang", target sigmalang:8000) which the
+  # box-wide instance did not cover. However, that endpoint is reachable
+  # from the host at localhost:26080/metrics, so rather than run a whole
+  # second Prometheus+Grafana+isolated-network stack (~187MB) for one
+  # scrape target, the fix is to add a "sigmalang" job to the box-wide
+  # Prometheus config (/etc/prometheus/prometheus.yml) pointing at
+  # localhost:26080/metrics. See ecosystem review notes, Move 5a sibling
+  # task. Re-enable this block instead if that wiring is ever reverted.
+  # prometheus:
+  #   image: prom/prometheus:v2.47.0
+  #   container_name: sigmalang-prometheus
+  #   restart: unless-stopped
+  #   ports:
+  #     - "26900:9090"  # Prometheus (internal 9090 → external 26900)
+  #   command:
+  #     - "--config.file=/etc/prometheus/prometheus.yml"
+  #     - "--storage.tsdb.path=/prometheus"
+  #     - "--storage.tsdb.retention.time=15d"
+  #     - "--web.enable-lifecycle"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - prometheus-data:/prometheus
+  #   depends_on:
+  #     - sigmalang
+  #   networks:
+  #     - sigmalang-network
 
   # ===========================================================================
-  # Grafana Dashboards
+  # Grafana Dashboards — DISABLED 2026-07-04 (redundant sidecar cleanup)
   # ===========================================================================
-  grafana:
-    image: grafana/grafana:10.2.0
-    container_name: sigmalang-grafana
-    restart: unless-stopped
-    ports:
-      - "26910:3000"  # Grafana (internal 3000 → external 26910)
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme}
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_SERVER_ROOT_URL: "http://localhost:26910"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
-    depends_on:
-      - prometheus
-    networks:
-      - sigmalang-network
+  # Removed alongside prometheus above. Verified before removal: zero
+  # dashboard JSON files were ever provisioned (the dashboards provider
+  # pointed at an empty directory), so no unique visualizations existed
+  # here. Its only datasource was its own sigmalang-prometheus sidecar,
+  # which is also disabled above. Nothing unique is lost by disabling this.
+  # grafana:
+  #   image: grafana/grafana:10.2.0
+  #   container_name: sigmalang-grafana
+  #   restart: unless-stopped
+  #   ports:
+  #     - "26910:3000"  # Grafana (internal 3000 → external 26910)
+  #   environment:
+  #     GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+  #     GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme}
+  #     GF_USERS_ALLOW_SIGN_UP: "false"
+  #     GF_SERVER_ROOT_URL: "http://localhost:26910"
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ./grafana/provisioning:/etc/grafana/provisioning:ro
+  #   depends_on:
+  #     - prometheus
+  #   networks:
+  #     - sigmalang-network
 
 # =============================================================================
 # Networks
@@ -155,7 +171,8 @@ networks:
 volumes:
   redis-data:
     name: sigmalang-redis-data
-  prometheus-data:
-    name: sigmalang-prometheus-data
-  grafana-data:
-    name: sigmalang-grafana-data
+  # Unused while prometheus/grafana services above are disabled (2026-07-04).
+  # prometheus-data:
+  #   name: sigmalang-prometheus-data
+  # grafana-data:
+  #   name: sigmalang-grafana-data
