@@ -23,7 +23,15 @@ services:
     container_name: sigmalang-api
     restart: unless-stopped
     ports:
-      - "26080:8000"  # API (internal 8000 → external 26080)
+      # Loopback-only 2026-07-04 security review: no auth on this API (no
+      # API key/JWT anywhere in source or this compose file), and 300 lines
+      # of container logs showed zero non-localhost/non-Docker-internal
+      # client IPs (only 127.0.0.1 and the sigmalang-network's own 172.22.x
+      # addresses from the healthcheck/metrics scrape). The metrics-endpoint
+      # comment below (Prometheus sidecar removal note) also assumes
+      # localhost:26080 as the intended access pattern. Restore to
+      # "26080:8000" if a real external/LAN consumer is confirmed.
+      - "127.0.0.1:26080:8000"  # API (internal 8000 → external 26080, loopback-only)
     environment:
       # API Configuration
       SIGMALANG_API_HOST: "0.0.0.0"
@@ -85,7 +93,12 @@ services:
     container_name: sigmalang-redis
     restart: unless-stopped
     ports:
-      - "26500:6379"  # Redis (internal 6379 → external 26500)
+      # Loopback-only 2026-07-04 security review: no requirepass configured
+      # (see command: below) and its only consumer is sigmalang-api over
+      # Docker-internal DNS (redis://redis:6379/0) — the external port
+      # mapping serves no documented purpose. Restore to "26500:6379" if a
+      # real external/LAN consumer is confirmed.
+      - "127.0.0.1:26500:6379"  # Redis (internal 6379 → external 26500, loopback-only)
     command: redis-server --save 60 1 --loglevel warning --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
