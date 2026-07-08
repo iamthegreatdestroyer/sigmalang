@@ -609,11 +609,11 @@ def metrics_page():
 
     with col1:
         fig1 = px.line(df, x='Date', y='Requests', title='Requests Over Time')
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, width="stretch")
 
     with col2:
         fig2 = px.line(df, x='Date', y='Latency', title='Average Latency')
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 
 # ============================================================================
 # PAGE: PERFORMANCE
