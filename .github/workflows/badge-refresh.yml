@@ -26,7 +26,7 @@ jobs:
         if: ${{ github.event_name != 'workflow_run' ||
             github.event.workflow_run.conclusion == 'success' }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - name: Extract & ping badge URLs from README
               shell: bash
