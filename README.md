@@ -402,7 +402,7 @@ pytest tests/test_api_server.py -v
 
 ## License
 
-MIT License - Copyright 2025 Ryot LLM Project
+MIT License - Copyright 2025 Stephen Bilodeau
 
 ---
 
