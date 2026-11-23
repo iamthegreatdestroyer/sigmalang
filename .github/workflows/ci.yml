@@ -50,6 +50,7 @@ jobs:
       - name: Dependency audit (pip-audit)
         run: |
           pip install -e .
+          pip install --upgrade "setuptools>=84.1.0"
           pip-audit --desc
 
   # ════════════════════════════════════════════════════════════════════════
