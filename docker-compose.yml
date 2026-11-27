@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    image: ghcr.io/iamthegreatdestroyer/sigmalang:latest
+    image: ${SIGMALANG_IMAGE:-ghcr.io/iamthegreatdestroyer/sigmalang:latest}
     container_name: sigmalang-api
     restart: unless-stopped
     ports:
