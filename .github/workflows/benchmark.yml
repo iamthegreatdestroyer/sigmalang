@@ -54,8 +54,21 @@ jobs:
                   path: benchmark.json
                   retention-days: 90
 
+            # The comparison reads stored baseline results from the gh-pages branch.
+            # That branch does not exist yet, so skip the comparison until it does
+            # instead of failing every pull request.
+            - name: Check for gh-pages baseline branch
+              id: baseline
+              run: |
+                  if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
+                      echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                      echo "::notice::No gh-pages branch: benchmark baseline comparison skipped"
+                  fi
+
             - name: Compare to baseline (PR only)
-              if: github.event_name == 'pull_request'
+              if: github.event_name == 'pull_request' && steps.baseline.outputs.exists == 'true'
               uses: benchmark-action/github-action-benchmark@v1
               with:
                   tool: "pytest"
