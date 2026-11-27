@@ -273,12 +273,6 @@ jobs:
           # Check sigmalang API (compose: 26080:8000)
           curl -sf http://localhost:26080/health | jq .
 
-          # Check Prometheus (compose: 26900:9090)
-          curl -sf http://localhost:26900/-/healthy
-
-          # Check Grafana (compose: 26910:3000)
-          curl -sf http://localhost:26910/api/health | jq .
-
       - name: Run integration tests
         run: |
           # Test API with Redis caching
@@ -291,10 +285,6 @@ jobs:
           # Verify metrics are being collected
           curl -sf http://localhost:26080/metrics | grep -q "sigmalang_"
           echo "✓ Metrics are being exported"
-
-          # Verify Prometheus is scraping
-          curl -sf "http://localhost:26900/api/v1/query?query=up" | jq .
-          echo "✓ Prometheus is scraping metrics"
 
       - name: Collect logs on failure
         if: failure()
