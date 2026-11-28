@@ -568,13 +568,18 @@ def env_list(key: str, default: Optional[List[str]] = None, separator: str = ","
 
 def configure_from_file(path: str) -> Dict[str, Any]:
     """
-    Load configuration from a file and apply it to global config.
+    Load configuration from a file and merge it over the current settings.
+
+    The merge is done on dictionaries: the current global configuration is
+    read with ``to_dict()`` and the file's values are laid over it. The
+    global ``SigmalangConfig`` object itself is not replaced; use
+    ``set_config()`` with a ``SigmalangConfig`` for that.
 
     Args:
-        path: Path to configuration file (YAML, JSON, or TOML)
+        path: Path to configuration file (JSON or TOML)
 
     Returns:
-        The loaded configuration dictionary
+        The merged configuration dictionary
 
     Raises:
         FileNotFoundError: If configuration file doesn't exist
@@ -583,14 +588,8 @@ def configure_from_file(path: str) -> Dict[str, Any]:
     config = load_config_file(path)
 
     # Merge with existing config
-    current = get_config()
-    merged = merge_configs(current, config)
-
-    # Apply merged config
-    for key, value in merged.items():
-        set_config(key, value)
-
-    return merged
+    current = get_config().to_dict()
+    return merge_configs(current, config)
 
 
 def configure_from_env(prefix: str = "SIGMALANG") -> Dict[str, Any]:
@@ -625,10 +624,6 @@ def configure_from_env(prefix: str = "SIGMALANG") -> Dict[str, Any]:
                 config[config_key] = float(value)
             else:
                 config[config_key] = value
-
-    # Apply to global config
-    for key, value in config.items():
-        set_config(key, value)
 
     return config
 

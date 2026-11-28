@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from sigmalang.core.streaming_encoder import (
     StreamingEncoder,
-    estimate_memory_usage,
     get_optimal_chunk_size,
     get_streaming_vs_full_memory,
 )
@@ -44,10 +43,11 @@ def benchmark_streaming_encoder(file_size_mb: int) -> dict:
     try:
         # Show memory estimates
         print("\n2. Memory Analysis:")
-        estimates = estimate_memory_usage(file_size_mb)
+        estimates = get_streaming_vs_full_memory(file_size_mb * 1024 * 1024)
+        memory_saved_mb = estimates['full_load_mb'] - estimates['streaming_mb']
         print(f"   Full-load approach: {estimates['full_load_mb']:.1f} MB")
         print(f"   Streaming approach: {estimates['streaming_mb']:.1f} MB")
-        print(f"   Memory saved: {estimates['memory_saved_mb']:.1f} MB ({estimates['reduction_factor']:.1f}x less)")
+        print(f"   Memory saved: {memory_saved_mb:.1f} MB ({estimates['reduction_ratio']:.1f}x less)")
 
         # Optimal chunk size
         chunk_size = get_optimal_chunk_size(file_size_mb)

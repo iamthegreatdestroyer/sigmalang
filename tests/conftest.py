@@ -41,7 +41,11 @@ from sigmalang.core.primitives import (  # noqa: E402
     SemanticNode,
     SemanticTree,
 )
-from sigmalang.training.codebook import CodebookTrainer, LearnedCodebook  # noqa: E402
+from sigmalang.training.codebook import (  # noqa: E402
+    CodebookTrainer,
+    LearnedCodebook,
+    TrainingConfig,
+)
 
 # ============================================================================
 # SEMANTIC TREE GENERATORS
@@ -169,7 +173,7 @@ def semantic_encoder() -> SigmaEncoder:
 @pytest.fixture
 def semantic_decoder() -> SigmaDecoder:
     """Fixture: Initialized ΣLANG decoder."""
-    return SigmaDecoder()
+    return SigmaDecoder(SigmaEncoder())
 
 
 @pytest.fixture
@@ -187,7 +191,7 @@ def learned_codebook() -> LearnedCodebook:
 @pytest.fixture
 def codebook_trainer() -> CodebookTrainer:
     """Fixture: Codebook trainer instance."""
-    return CodebookTrainer()
+    return CodebookTrainer(LearnedCodebook(), TrainingConfig())
 
 
 # ============================================================================

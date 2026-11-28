@@ -621,6 +621,7 @@ class TestTracer:
     def test_tracer_span_exception(self):
         """Test span handles exceptions."""
         tracer = Tracer("test_service")
+        span = None
 
         try:
             with tracer.span("failing") as span:
@@ -628,6 +629,7 @@ class TestTracer:
         except ValueError:
             pass
 
+        assert span is not None
         assert span.status == "ERROR"
         assert span.attributes["error.type"] == "ValueError"
 

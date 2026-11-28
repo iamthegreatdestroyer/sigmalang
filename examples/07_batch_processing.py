@@ -66,7 +66,7 @@ class BatchProcessor:
 
         if ENCODER_AVAILABLE:
             self.encoder = SigmaEncoder()
-            self.decoder = SigmaDecoder()
+            self.decoder = SigmaDecoder(self.encoder)
         else:
             self.encoder = None
             self.decoder = None

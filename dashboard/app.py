@@ -444,8 +444,8 @@ def check_redis():
         return False  # Redis doesn't respond to HTTP
     except Exception:
         # Try redis-cli
-        success, _, _ = run_command("docker exec sigmalang-redis redis-cli ping")
-        return "PONG" in success if success else False
+        success, stdout, _ = run_command("docker exec sigmalang-redis redis-cli ping")
+        return success and "PONG" in stdout
 
 def check_prometheus():
     """Check if Prometheus is accessible"""

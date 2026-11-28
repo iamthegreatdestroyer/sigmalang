@@ -25,7 +25,9 @@ except ImportError:  # pragma: no cover
     _HAS_FASTAPI = False
     FastAPI = None  # type: ignore
     WebSocket = None  # type: ignore
-    WebSocketDisconnect = None  # type: ignore
+
+    class WebSocketDisconnect(Exception):  # type: ignore[no-redef]
+        """Stand-in so `except WebSocketDisconnect` stays valid without fastapi."""
 
 try:
     from .encoder import SigmaEncoder

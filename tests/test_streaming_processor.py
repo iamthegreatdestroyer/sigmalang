@@ -252,7 +252,8 @@ class TestListSink:
     def test_write_returns_true(self):
         """Test write returns True."""
         sink = ListSink()
-        assert sink.write("test") is True
+        result = sink.write("test")
+        assert result is True
 
     def test_write_batch(self):
         """Test batch writing."""
@@ -310,8 +311,10 @@ class TestCallbackSink:
         """Test callback return value is propagated."""
         sink = CallbackSink(lambda x: x > 0)
 
-        assert sink.write(1) is True
-        assert sink.write(-1) is False
+        positive = sink.write(1)
+        negative = sink.write(-1)
+        assert positive is True
+        assert negative is False
 
     def test_callback_exception_handling(self):
         """Test callback exceptions are handled."""
@@ -319,7 +322,8 @@ class TestCallbackSink:
             raise ValueError("Test error")
 
         sink = CallbackSink(failing_callback)
-        assert sink.write(1) is False
+        result = sink.write(1)
+        assert result is False
 
 
 # =============================================================================
@@ -611,10 +615,8 @@ class TestBackpressureHandler:
         handler.push(2)
         handler.push(3)
 
-        assert handler.pop(block=False) == 1
-        assert handler.pop(block=False) == 2
-        assert handler.pop(block=False) == 3
-        assert handler.pop(block=False) is None
+        popped = [handler.pop(block=False) for _ in range(4)]
+        assert popped == [1, 2, 3, None]
 
     def test_drop_oldest_strategy(self):
         """Test drop-oldest strategy."""
@@ -629,9 +631,8 @@ class TestBackpressureHandler:
         handler.push(3)
         handler.push(4)  # Should drop 1
 
-        assert handler.pop(block=False) == 2
-        assert handler.pop(block=False) == 3
-        assert handler.pop(block=False) == 4
+        popped = [handler.pop(block=False) for _ in range(3)]
+        assert popped == [2, 3, 4]
 
     def test_drop_newest_strategy(self):
         """Test drop-newest strategy."""
@@ -644,11 +645,11 @@ class TestBackpressureHandler:
         handler.push(1)
         handler.push(2)
         handler.push(3)
-        assert handler.push(4) is False  # Should be rejected
+        rejected = handler.push(4)  # Should be rejected
+        assert rejected is False
 
-        assert handler.pop(block=False) == 1
-        assert handler.pop(block=False) == 2
-        assert handler.pop(block=False) == 3
+        popped = [handler.pop(block=False) for _ in range(3)]
+        assert popped == [1, 2, 3]
 
     def test_sample_strategy(self):
         """Test sampling strategy."""

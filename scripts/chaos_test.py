@@ -185,15 +185,16 @@ class InputFuzzingChaos:
                     # Empty/None response is acceptable for invalid input
                     passed += 1
 
+            except UnicodeDecodeError:
+                # Unicode errors are acceptable for binary data.
+                # Caught before ValueError, which is its parent class.
+                passed += 1
+                logger.debug(f"Correctly rejected binary data {i}")
+
             except ValueError as e:
                 # ValueError is acceptable for invalid input
                 passed += 1
                 logger.debug(f"Correctly rejected input {i}: {str(e)[:50]}")
-
-            except UnicodeDecodeError:
-                # Unicode errors are acceptable for binary data
-                passed += 1
-                logger.debug(f"Correctly rejected binary data {i}")
 
             except Exception as e:
                 # Unexpected errors are failures

@@ -1020,7 +1020,10 @@ class RetryPolicy:
                     )
                     time.sleep(delay)
 
-        raise last_exception  # type: ignore
+        if last_exception is None:
+            # Only reachable when max_retries is negative, so no attempt ran.
+            raise RuntimeError("RetryPolicy.execute made no attempts (max_retries < 0)")
+        raise last_exception
 
     def __call__(self, func: Callable[..., T]) -> Callable[..., T]:
         """Decorator to apply retry policy to a function."""
