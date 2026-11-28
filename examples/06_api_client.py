@@ -60,7 +60,7 @@ def main():
     }
 
     print(f"\nBase URL: {BASE_URL}")
-    print(f"API Key: {API_KEY[:10]}...")
+    print("API Key: set" if API_KEY else "API Key: not set")
 
     # Check if server is running
     print("\n1. Health check:")

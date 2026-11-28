@@ -238,7 +238,7 @@ class DockerPublisher:
         if self.registry == "docker.io":
             print("NOTE: Ensure you're logged in to Docker Hub:")
             print("  docker login")
-        elif self.registry.startswith("ghcr.io"):
+        elif self._is_ghcr():
             print("NOTE: Ensure you're logged in to GitHub Container Registry:")
             print("  echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin")
 
@@ -271,10 +271,14 @@ class DockerPublisher:
 
             if self.registry == "docker.io":
                 print(f"\nDocker Hub: https://hub.docker.com/r/{self.organization}/{self.image_name}")
-            elif self.registry.startswith("ghcr.io"):
+            elif self._is_ghcr():
                 print(f"\nGitHub Packages: https://github.com/{self.organization}/{self.image_name}/pkgs/container/{self.image_name}")
 
         return success
+
+    def _is_ghcr(self) -> bool:
+        """True when the registry host is exactly ghcr.io (an optional path may follow)."""
+        return self.registry.split("/", 1)[0] == "ghcr.io"
 
     def tag_additional(self, source_tag: str, new_tags: List[str]) -> bool:
         """Tag an existing image with additional tags."""
