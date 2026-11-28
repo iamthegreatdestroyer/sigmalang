@@ -33,10 +33,25 @@ jobs:
     outputs:
       image-digest: ${{ steps.build.outputs.digest }}
       image-tags: ${{ steps.meta.outputs.tags }}
+      pushed: ${{ steps.publish.outputs.push }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Pushes to main and version tags always publish. A manual run publishes
+      # only when its "push" input is ticked. Pull requests never publish.
+      - name: Decide whether to publish
+        id: publish
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "push=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.push }}" = "true" ]; then
+            echo "push=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "push=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Build only: the image is not pushed, so the image test jobs are skipped"
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4.0.0
@@ -92,7 +107,7 @@ jobs:
           file: ./Dockerfile
           target: production
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ steps.publish.outputs.push == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -118,7 +133,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name != 'pull_request'
+    if: needs.build.outputs.pushed == 'true'
     permissions:
       contents: read
       packages: read
@@ -228,7 +243,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name != 'pull_request'
+    if: needs.build.outputs.pushed == 'true'
     permissions:
       contents: read
       packages: read
@@ -300,7 +315,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name != 'pull_request'
+    if: needs.build.outputs.pushed == 'true'
     permissions:
       contents: read
       packages: read
@@ -351,7 +366,9 @@ jobs:
           echo "Integration: ${{ needs.integration.result }}"
           echo "Security: ${{ needs.security.result }}"
 
-          if [ "${{ needs.build.result }}" = "success" ]; then
+          if [ "${{ needs.build.result }}" = "success" ] && [ "${{ needs.build.outputs.pushed }}" != "true" ]; then
+            echo "✓ Docker image built (not pushed)"
+          elif [ "${{ needs.build.result }}" = "success" ]; then
             echo "✓ Docker image built and pushed successfully"
             echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
             echo "Tags: ${{ needs.build.outputs.image-tags }}"
