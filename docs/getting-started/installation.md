@@ -9,10 +9,10 @@
 
 ## Standard Installation
 
-Install ΣLANG from PyPI:
+ΣLANG is not published on PyPI yet. Install it from GitHub:
 
 ```bash
-pip install sigmalang
+pip install git+https://github.com/iamthegreatdestroyer/sigmalang.git
 ```
 
 ## Development Installation
@@ -96,11 +96,11 @@ python --version  # Should be 3.10 or higher
 ### Permission Denied (Unix/Linux)
 If you get permission errors, use `--user` flag or virtual environment:
 ```bash
-pip install --user sigmalang
+pip install --user git+https://github.com/iamthegreatdestroyer/sigmalang.git
 # OR
 python -m venv venv
 source venv/bin/activate
-pip install sigmalang
+pip install git+https://github.com/iamthegreatdestroyer/sigmalang.git
 ```
 
 ## Next Steps

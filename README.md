@@ -3,9 +3,8 @@
 [![CI](https://github.com/iamthegreatdestroyer/sigmalang/actions/workflows/ci.yml/badge.svg)](https://github.com/iamthegreatdestroyer/sigmalang/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](https://github.com/iamthegreatdestroyer/sigmalang)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI Version](https://img.shields.io/badge/pypi-v1.0.0-blue.svg)](https://pypi.org/project/sigmalang/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com/r/sigmalang/sigmalang)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![Docs](https://img.shields.io/badge/docs-complete-green.svg)](docs/)
 
 **A revolutionary compression language designed exclusively for internal LLM representation**
@@ -82,10 +81,10 @@ Specialized encodings for code, math, logic, entities, actions, communication, a
 
 ## 📦 Installation
 
-### From PyPI (Recommended)
+ΣLANG is not published on PyPI yet. Install it from GitHub:
 
 ```bash
-pip install sigmalang
+pip install git+https://github.com/iamthegreatdestroyer/sigmalang.git
 ```
 
 ### From Source
@@ -98,9 +97,11 @@ pip install -e ".[dev]"  # Include development dependencies
 
 ### Docker
 
+No public image is published yet. Build it from the repository:
+
 ```bash
-docker pull sigmalang/sigmalang:latest
-docker run -p 8000:8000 sigmalang/sigmalang:latest
+docker build --target production -t sigmalang .
+docker run -p 8000:8000 sigmalang
 ```
 
 ## 🚀 Quick Start
@@ -304,7 +305,8 @@ curl -X POST http://localhost:8000/v1/analogies/solve \
 ### Quick Start
 
 ```bash
-docker run -p 8000:8000 sigmalang/sigmalang:latest
+docker build --target production -t sigmalang .
+docker run -p 8000:8000 sigmalang
 ```
 
 ### Full Stack with Compose
