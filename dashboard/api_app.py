@@ -13,6 +13,7 @@ Install:
 
 import asyncio
 import json
+import logging
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -22,6 +23,8 @@ import requests
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+
+logger = logging.getLogger(__name__)
 
 # Configuration
 API_HOST = "http://localhost:26080"
@@ -66,8 +69,10 @@ def run_command(cmd):
             timeout=30
         )
         return result.returncode == 0, result.stdout, result.stderr
-    except Exception as e:
-        return False, "", str(e)
+    except Exception:
+        # Details go to the server log, not to the browser.
+        logger.exception("Command failed to run: %s", cmd)
+        return False, "", "The command could not be run. See the dashboard log."
 
 def test_encode(text, optimization="medium"):
     """Test encoding endpoint"""
@@ -78,8 +83,9 @@ def test_encode(text, optimization="medium"):
             timeout=10
         )
         return response.status_code == 200, response.json()
-    except Exception as e:
-        return False, {"error": str(e)}
+    except Exception:
+        logger.exception("Request to the API failed")
+        return False, {"error": "The API request failed. See the dashboard log."}
 
 def test_entities(text):
     """Test entity extraction"""
@@ -90,8 +96,9 @@ def test_entities(text):
             timeout=10
         )
         return response.status_code == 200, response.json()
-    except Exception as e:
-        return False, {"error": str(e)}
+    except Exception:
+        logger.exception("Request to the API failed")
+        return False, {"error": "The API request failed. See the dashboard log."}
 
 def test_analogy(word1, word2, word3):
     """Test analogy solving"""
@@ -102,8 +109,9 @@ def test_analogy(word1, word2, word3):
             timeout=10
         )
         return response.status_code == 200, response.json()
-    except Exception as e:
-        return False, {"error": str(e)}
+    except Exception:
+        logger.exception("Request to the API failed")
+        return False, {"error": "The API request failed. See the dashboard log."}
 
 # ============================================================================
 # HTML TEMPLATES
