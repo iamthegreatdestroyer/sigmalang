@@ -7,7 +7,7 @@
 
 ### Prerequisites
 - Docker & Docker Compose installed
-- Python 3.9+ (optional, for CLI testing)
+- Python 3.10+ (optional, for CLI testing)
 - Git
 
 ### Option 1: Docker Compose (Recommended for Testing)

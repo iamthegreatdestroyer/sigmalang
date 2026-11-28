@@ -31,7 +31,7 @@ Be respectful, inclusive, and constructive. We're all here to build something in
 ## Development Setup
 
 ### Prerequisites
-- Python 3.9 or higher
+- Python 3.10 or higher
 - NumPy
 
 ### Installation

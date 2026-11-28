@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- **Python**: 3.9 or higher
+- **Python**: 3.10 or higher
 - **pip**: Latest version
 - **OS**: Linux, macOS, or Windows
 - **Optional**: Docker & Docker Compose for containerized deployment
@@ -88,9 +88,9 @@ export SIGMALANG_API_PORT=8001
 ```
 
 ### Python Version Issue
-Ensure you're using Python 3.9+:
+Ensure you're using Python 3.10+:
 ```bash
-python --version  # Should be 3.9 or higher
+python --version  # Should be 3.10 or higher
 ```
 
 ### Permission Denied (Unix/Linux)

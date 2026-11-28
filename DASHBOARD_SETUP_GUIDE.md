@@ -15,7 +15,7 @@ Three dashboard options are available for local setup and testing:
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- Python 3.9+
+- Python 3.10+
 - 2GB+ available memory
 
 ### Installation & Running
@@ -48,7 +48,7 @@ streamlit run app.py
 ### Prerequisites
 
 - Docker and Docker Compose installed
-- Python 3.9+
+- Python 3.10+
 - pip packages: fastapi, uvicorn, requests
 
 ### Installation & Running

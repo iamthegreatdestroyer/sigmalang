@@ -35,6 +35,6 @@ python 01_basic_encoding.py
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.10+
 - ΣLANG installed (`pip install -e ..`)
 - For API examples: running API server (`sigmalang serve`)

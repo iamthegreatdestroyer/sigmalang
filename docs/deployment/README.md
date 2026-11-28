@@ -18,7 +18,7 @@ Complete guide for deploying ΣLANG in development, Docker, and Kubernetes envir
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.10+
 - pip or poetry
 - Redis (optional, for caching)
 
