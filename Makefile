@@ -145,7 +145,7 @@ release-major: ## Create major release
 # Automation & Quality Gates
 # =============================================================================
 test-strict: ## Run tests with coverage enforcement (fails below 85%)
-	$(PYTEST) tests/ --ignore=tests/claude_integration \
+	$(PYTEST) tests/ \
 		-v --cov=sigmalang --cov-report=term-missing \
 		--cov-fail-under=85 --timeout=300
 
@@ -156,7 +156,7 @@ test-watch: ## Run core tests continuously on file changes
 	$(PYTEST) tests/test_sigmalang.py tests/test_config.py -q --timeout=30 -x
 
 coverage-report: ## Generate HTML coverage report
-	$(PYTEST) tests/ --ignore=tests/claude_integration \
+	$(PYTEST) tests/ \
 		--cov=sigmalang --cov-report=html --cov-report=term-missing --timeout=300
 	@echo "Coverage report at htmlcov/index.html"
 

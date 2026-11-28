@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pytest tests/ --ignore=tests/claude_integration -v --timeout=300
+          python -m pytest tests/ -v --timeout=300
 
   build:
     needs: test

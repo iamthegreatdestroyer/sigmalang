@@ -83,7 +83,7 @@ jobs:
 
       - name: Full test suite (nightly)
         run: |
-          python -m pytest tests/ --ignore=tests/claude_integration \
+          python -m pytest tests/ \
             -q --tb=short --cov=sigmalang --cov-report=term-missing \
             --cov-fail-under=60 --timeout=300
 

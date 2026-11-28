@@ -41,7 +41,6 @@ def run_tests_collect_failures():
     result = subprocess.run(
         [
             sys.executable, "-m", "pytest", str(TESTS_DIR),
-            "--ignore=tests/claude_integration",
             "-q", "--tb=line", "--no-header", "--timeout=120",
         ],
         capture_output=True, text=True, cwd=str(ROOT), timeout=600

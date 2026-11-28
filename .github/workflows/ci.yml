@@ -87,7 +87,7 @@ jobs:
 
       - name: Run unit tests with coverage
         run: |
-          python -m pytest tests/ --ignore=tests/claude_integration \
+          python -m pytest tests/ \
             -v --cov=sigmalang --cov-report=xml --cov-report=term-missing \
             --cov-fail-under=${{ env.MIN_COVERAGE }} \
             --timeout=300 -m "not integration"
